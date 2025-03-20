@@ -3,7 +3,10 @@ import githubMarkSVG from "../assets/github-mark.svg";
 
 const MoveToRepositoryButton = () => {
     return (
-        <a href="" target="_blank">
+        <a
+            href="https://github.com/Telehakke/atelier-series-strategy-memo"
+            target="_blank"
+        >
             <picture className="hover:opacity-70">
                 <source
                     srcSet={githubMarkWhiteSVG}
