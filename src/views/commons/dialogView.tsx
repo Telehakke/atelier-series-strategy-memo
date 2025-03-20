@@ -8,55 +8,81 @@ const DialogView = ({
     setIsOpen,
     title,
     primaryButtonLabel,
-    onPrimaryButtonClick,
+    secondaryButtonLabel,
+    handlePrimaryButtonClick,
     shouldUseWarningColor,
     children,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     title: string;
-    primaryButtonLabel: string;
-    onPrimaryButtonClick: (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => void;
+    primaryButtonLabel?: string;
+    secondaryButtonLabel: string;
+    handlePrimaryButtonClick?: () => void;
     shouldUseWarningColor?: boolean;
     children?: ReactNode;
 }) => {
     return (
         <Dialog
-            className={`relative z-50 ${Text.neutral950}`}
+            className={`relative z-50 ${Text.neutral950_100}`}
             open={isOpen}
             onClose={() => setIsOpen(false)}
         >
             <div
-                className={`fixed inset-0 flex w-screen items-center justify-center ${Bg.black_25}`}
+                className={`fixed inset-0 grid items-center justify-center overflow-scroll ${Bg.black_white_25}`}
             >
-                <DialogPanel
-                    className={`m-4 w-full max-w-100 space-y-2 rounded-xl p-4 ${Bg.neutral50}`}
-                >
-                    <DialogTitle
-                        className={`text-center font-bold ${Text.neutral950}`}
+                <div className="w-screen max-w-100">
+                    <DialogPanel
+                        className={`m-4 flex flex-col gap-4 rounded-xl p-4 ${Bg.neutral50_950}`}
                     >
-                        {title}
-                    </DialogTitle>
-                    {children}
-                    <div className="flex justify-center gap-2">
-                        <RoundedButton
-                            label="キャンセル"
-                            onClick={() => setIsOpen(false)}
-                        />
-                        <RoundedButton
-                            label={primaryButtonLabel}
+                        <DialogTitle className={`text-center font-bold`}>
+                            {title}
+                        </DialogTitle>
+                        <div>{children}</div>
+                        <Buttons
+                            setIsOpen={setIsOpen}
+                            primaryButtonLabel={primaryButtonLabel}
+                            secondaryButtonLabel={secondaryButtonLabel}
+                            handlePrimaryButtonClick={handlePrimaryButtonClick}
                             shouldUseWarningColor={shouldUseWarningColor}
-                            onClick={() => {
-                                onPrimaryButtonClick(setIsOpen);
-                            }}
                         />
-                    </div>
-                </DialogPanel>
+                    </DialogPanel>
+                </div>
             </div>
         </Dialog>
     );
 };
 
 export default DialogView;
+
+/* -------------------------------------------------------------------------- */
+
+const Buttons = ({
+    setIsOpen,
+    primaryButtonLabel,
+    secondaryButtonLabel,
+    handlePrimaryButtonClick,
+    shouldUseWarningColor,
+}: {
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    primaryButtonLabel?: string;
+    secondaryButtonLabel: string;
+    handlePrimaryButtonClick?: () => void;
+    shouldUseWarningColor?: boolean;
+}) => {
+    return (
+        <div className="flex justify-center gap-4">
+            <RoundedButton
+                label={secondaryButtonLabel}
+                onClick={() => setIsOpen(false)}
+            />
+            {primaryButtonLabel != null && (
+                <RoundedButton
+                    label={primaryButtonLabel}
+                    shouldUseWarningColor={shouldUseWarningColor}
+                    onClick={() => handlePrimaryButtonClick?.()}
+                />
+            )}
+        </div>
+    );
+};

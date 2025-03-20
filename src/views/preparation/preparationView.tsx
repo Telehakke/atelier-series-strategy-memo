@@ -1,40 +1,51 @@
-import { PreparationWithID } from "../../models/preparation";
-import { Bg } from "../commons/classNames";
-import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
-import PreparationsLinkList from "./sub/preparationsLinkList";
-import PreparationsList from "./sub/preparationsList";
+import { useAtomValue } from "jotai";
+import { isLeftPanelOpenAtom, isReadonlyAtom } from "../../atoms";
+import { Bg, Border, Divide } from "../commons/classNames";
+import { ReadonlyButton } from "../share";
+import PreparationFilteringTextField from "./sub/preparationFilteringTextField";
+import PreparationLinkView from "./sub/preparationLinkView";
+import PreparationListView from "./sub/preparationLisView";
+import PreparationListController from "./sub/preparationListController";
 
-const PreparationView = ({
-    preparations,
-    isPanelOpen,
-    setIsPanelOpen,
-}: {
-    preparations: PreparationWithID[];
-    isPanelOpen: boolean;
-    setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const PreparationView = () => {
     return (
         <>
-            <div
-                className={`fixed top-0 left-0 z-5 flex h-full max-w-60 gap-2 p-2 pt-13 ${Bg.neutral50}`}
-            >
-                {isPanelOpen && (
-                    <PreparationsLinkList
-                        className="overflow-scroll py-2"
-                        preparations={preparations}
-                    />
-                )}
-                <PanelOpenCloseButton
-                    className="h-full self-center"
-                    isOpen={isPanelOpen}
-                    setIsOpen={setIsPanelOpen}
-                />
-            </div>
-            <div className="ml-11">
-                <PreparationsList preparations={preparations} />
-            </div>
+            <LeftPanel />
+            <PreparationListView />
+            <Controller />
         </>
     );
 };
 
 export default PreparationView;
+
+/* -------------------------------------------------------------------------- */
+
+const LeftPanel = () => {
+    const isLeftPanelOpened = useAtomValue(isLeftPanelOpenAtom);
+
+    return (
+        <div
+            className={`fixed top-0 left-0 z-5 flex h-full border-r-2 p-2 pt-14 ${Bg.neutral50_950} ${Border.neutral300_800} ${isLeftPanelOpened ? "" : "hidden"}`}
+        >
+            <div
+                className={`divide-y-2 overflow-auto ${Divide.neutral300_800}`}
+                style={{ scrollbarWidth: "thin" }}
+            >
+                <div>
+                    <PreparationFilteringTextField className="mb-1" />
+                </div>
+                <PreparationLinkView className="py-2" />
+            </div>
+        </div>
+    );
+};
+
+const Controller = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
+
+    if (isReadonly)
+        return <ReadonlyButton className="fixed right-4 bottom-4" />;
+
+    return <PreparationListController className="fixed right-4 bottom-4" />;
+};

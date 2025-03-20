@@ -1,74 +1,108 @@
-import { isNotNull, isStrings } from "./typeGuards";
+import { GameMapDetailList } from "./gameMapDetail";
+import { GameMapShapeList } from "./gameMapShape";
+import { Id, ListWithId, WithId } from "./id";
 
-export type GameMap = {
+export class GameMapId implements Id {
+    readonly _type: string = "GameMapId";
+    readonly value: string;
+
+    constructor(value: string) {
+        this.value = value;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+
+export class GameMap implements WithId {
+    readonly _type: string = "GameMap";
     readonly name: string;
-    readonly items: string[];
-    readonly monsters: string[];
-    readonly memo: string;
-    readonly icon: string;
-    readonly x: number;
-    readonly y: number;
-};
+    readonly gameMapDetails: GameMapDetailList;
+    readonly gameMapShapes: GameMapShapeList;
+    readonly image: string;
+    readonly id: GameMapId;
 
-export type GameMapWithID = GameMap & {
-    readonly id: string;
-};
-
-export class GameMapUtility {
-    static isGameMap = (value: unknown): value is GameMap => {
-        if (!isNotNull(value)) return false;
-        if (typeof value.name !== "string") return false;
-        if (!isStrings(value.items)) return false;
-        if (!isStrings(value.monsters)) return false;
-        if (typeof value.memo !== "string") return false;
-        if (typeof value.icon !== "string") return false;
-        if (typeof value.x !== "number") return false;
-        if (typeof value.y !== "number") return false;
-        return true;
-    };
-
-    static isGameMaps = (value: unknown): value is GameMap[] => {
-        if (!Array.isArray(value)) return false;
-        return value.every((v) => this.isGameMap(v));
-    };
+    constructor(
+        name: string,
+        gameMapDetails: GameMapDetailList,
+        gameMapShapes: GameMapShapeList,
+        image: string,
+        id: GameMapId,
+    ) {
+        this.name = name;
+        this.gameMapDetails = gameMapDetails;
+        this.gameMapShapes = gameMapShapes;
+        this.image = image;
+        this.id = id;
+    }
 
     static create = (
-        inputName: string,
-        inputItems: string,
-        inputMonsters: string,
-        inputMemo: string,
-        inputIcon: string,
-        inputX: string,
-        inputY: string,
-        id: string,
-    ): GameMapWithID => {
-        const name = inputName.trim();
-        const items = inputItems
-            .split(/[,、]/)
-            .map((v) => v.trim())
-            .filter((v) => v.length > 0);
-        const monsters = inputMonsters
-            .split(/[,、]/)
-            .map((v) => v.trim())
-            .filter((v) => v.length > 0);
-        const icon = inputIcon.trim();
-        let x = parseInt(inputX);
-        if (isNaN(x) || x < 0 || 100 < x) {
-            x = 0;
-        }
-        let y = parseInt(inputY);
-        if (isNaN(y) || y < 0 || 100 < y) {
-            y = 0;
-        }
-        return {
-            name: name,
-            items: items,
-            monsters: monsters,
-            memo: inputMemo,
-            icon: icon,
-            x: x,
-            y: y,
-            id: id,
-        };
+        name: string,
+        gameMapDetails: GameMapDetailList,
+        gameMapShapes: GameMapShapeList,
+        image: string,
+        id: GameMapId,
+    ): GameMap =>
+        new GameMap(name.trim(), gameMapDetails, gameMapShapes, image, id);
+
+    copyWith = (obj?: {
+        name?: string;
+        gameMapDetails?: GameMapDetailList;
+        gameMapShapes?: GameMapShapeList;
+        image?: string;
+        id?: GameMapId;
+    }): GameMap =>
+        obj == null
+            ? this
+            : new GameMap(
+                  obj.name ?? this.name,
+                  obj.gameMapDetails ?? this.gameMapDetails,
+                  obj.gameMapShapes ?? this.gameMapShapes,
+                  obj.image ?? this.image,
+                  obj.id ?? this.id,
+              );
+}
+
+export class GameMapList extends ListWithId<GameMap, GameMapId> {
+    readonly _type: string = "GameMapList";
+
+    filter = (
+        predicate: (
+            value: GameMap,
+            index: number,
+            array: readonly GameMap[],
+        ) => boolean,
+    ): GameMapList => new GameMapList(...this.helperFilter(predicate));
+
+    added = (item: GameMap): GameMapList =>
+        new GameMapList(...this.helperAdded(item));
+
+    replaced = (targetId: GameMapId, newItem: GameMap): GameMapList =>
+        new GameMapList(...this.helperReplaced(targetId, newItem));
+
+    removed = (targetId: GameMapId): GameMapList =>
+        new GameMapList(...this.helperRemoved(targetId));
+
+    movedUp = (targetId: GameMapId): GameMapList =>
+        new GameMapList(...this.helperMovedUp(targetId));
+
+    movedDown = (targetId: GameMapId): GameMapList =>
+        new GameMapList(...this.helperMovedDown(targetId));
+
+    uncheckedAll = (): GameMapList => {
+        const newGameMaps = this.items.map((gameMap) => {
+            const newGameMap: GameMap = {
+                ...gameMap,
+                gameMapDetails: gameMap.gameMapDetails.uncheckedAll(),
+            };
+            return newGameMap;
+        });
+        return new GameMapList(...newGameMaps);
+    };
+
+    findId = (index: number): GameMapId | null => {
+        if (index < 0) return null;
+        if (index >= this.items.length) return null;
+
+        return this.items[index].id;
     };
 }

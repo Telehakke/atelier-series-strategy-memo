@@ -1,101 +1,66 @@
-import { Button } from "@headlessui/react";
-import { useSetAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
-import { GameMapWithID } from "../../../models/gameMap";
-import { GameMapGroupWithID } from "../../../models/gameMapGroup";
-import { StrategyMemoUtility } from "../../../models/strategyMemo";
-import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
-import { Bg, Border, Shadow } from "../../commons/classNames";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useEffect, useRef } from "react";
 import {
-    SquareChevronDownIconButton,
-    SquareChevronLeftIconButton,
-    SquareChevronRightIconButton,
-    SquareChevronUpIconButton,
-} from "../../commons/iconButtons";
+    canvasScaleAtom,
+    gameMapsAtom,
+    isGameMapDetailEditModeAtom,
+    selectedGameMapIdAtom,
+} from "../../../atoms";
 
-const GameMapCanvas = ({
-    gameMapGroup,
-    gameMapGroupsIndex,
-    className,
-}: {
-    gameMapGroup?: GameMapGroupWithID;
-    gameMapGroupsIndex?: number;
-    className?: string;
-}) => {
-    const [selectedID, setSelectedID] = useState<string | null>(null);
-    const canvas = useRef<HTMLCanvasElement>(null);
+import { GameMapId } from "../../../models/gameMap";
+import { Bg, Border } from "../../commons/classNames";
+import GameMapDetailBoard from "./gameMapDetailBoard";
+import GameMapShapeBoard from "./gameMapShapeBoard";
+
+const GameMapCanvas = ({ className }: { className?: string }) => {
+    const divElement = useRef<HTMLDivElement | null>(null);
+    const isGameMapDetailEditMode = useAtomValue(isGameMapDetailEditModeAtom);
+    const selectedGameMapId = useAtomValue(selectedGameMapIdAtom);
+    const setCanvasScale = useSetAtom(canvasScaleAtom);
 
     useEffect(() => {
-        // 方眼を描く
-        const ctx = canvas.current?.getContext("2d");
-        if (ctx == null) return;
-
-        ctx.strokeStyle = "#7f7f7f";
-        ctx.lineWidth = 2;
-        for (let i = 100; i <= 900; i += 100) {
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i, 1000);
-            ctx.stroke();
-
-            ctx.moveTo(0, i);
-            ctx.lineTo(1000, i);
-            ctx.stroke();
+        // キャンバスがリサイズされたら縮小率を記録する
+        const observer = new ResizeObserver((entries) => {
+            entries.forEach((e) => {
+                const width = e.target.getBoundingClientRect().width;
+                setCanvasScale(width / 600);
+            });
+        });
+        if (divElement.current != null) {
+            observer.observe(divElement.current);
         }
-    }, [gameMapGroup]);
 
-    if (gameMapGroup == null || gameMapGroupsIndex == null) return <></>;
+        return () => {
+            observer.disconnect();
+        };
+    }, [setCanvasScale]);
+
+    if (selectedGameMapId == null) return <></>;
 
     return (
-        <>
-            <div
-                className={`relative mx-auto aspect-square max-w-150 overflow-clip border-1 ${Bg.neutral50} ${Border.neutral950} ${className}`}
-            >
-                <canvas
-                    className="size-full opacity-20"
-                    ref={canvas}
-                    width="1000px"
-                    height="1000px"
-                />
-
-                {gameMapGroup.gameMaps.map((v) => (
-                    <Card
-                        className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50}`}
-                        key={v.id}
-                        gameMap={v}
-                        selectedID={selectedID}
-                        setSelectedID={setSelectedID}
-                    />
-                ))}
-                {selectedID != null &&
-                gameMapGroup.gameMaps.some((v) => v.id === selectedID) ? (
-                    <>
-                        <MoveUpButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            selectedID={selectedID}
-                            className={`absolute top-0 left-1/2 -translate-x-1/2 ${Bg.neutral50}`}
-                        />
-                        <MoveLeftButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            selectedID={selectedID}
-                            className={`absolute top-1/2 left-0 -translate-y-1/2 ${Bg.neutral50}`}
-                        />
-
-                        <MoveRightButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            selectedID={selectedID}
-                            className={`absolute top-1/2 right-0 -translate-y-1/2 ${Bg.neutral50}`}
-                        />
-                        <MoveDownButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            selectedID={selectedID}
-                            className={`absolute bottom-0 left-1/2 -translate-x-1/2 ${Bg.neutral50}`}
-                        />
-                    </>
-                ) : (
-                    <></>
-                )}
-            </div>
-        </>
+        <div
+            className={`relative mx-auto max-w-150 overflow-clip border-1 ${Bg.neutral50_950} ${Border.neutral950_300} ${className}`}
+            ref={divElement}
+        >
+            <Canvas />
+            <Image
+                className="absolute inset-0 size-full object-contain"
+                gameMapId={selectedGameMapId}
+            />
+            {/* マップの図形を編集中は、マップ詳細ラベルのレイヤーを下げる */}
+            {!isGameMapDetailEditMode && (
+                <>
+                    <div className="opacity-30">
+                        <GameMapDetailBoard gameMapId={selectedGameMapId} />
+                    </div>
+                    <div className="absolute inset-0 size-full"></div>
+                </>
+            )}
+            <GameMapShapeBoard gameMapId={selectedGameMapId} />
+            {isGameMapDetailEditMode && (
+                <GameMapDetailBoard gameMapId={selectedGameMapId} />
+            )}
+        </div>
     );
 };
 
@@ -103,164 +68,66 @@ export default GameMapCanvas;
 
 /* -------------------------------------------------------------------------- */
 
-const Card = ({
-    gameMap,
-    selectedID,
-    setSelectedID,
-    className,
-}: {
-    gameMap: GameMapWithID;
-    selectedID: string | null;
-    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
-    className?: string;
-}) => {
-    return (
-        <Button
-            className={className}
-            key={gameMap.id}
-            style={{ left: `${gameMap.x}%`, top: `${gameMap.y}%` }}
-            onClick={() => {
-                setSelectedID(gameMap.id === selectedID ? null : gameMap.id);
-            }}
-        >
-            <p>{gameMap.icon}</p>
-            <p>{gameMap.name}</p>
-        </Button>
-    );
-};
+const Canvas = () => {
+    const canvas = useRef<HTMLCanvasElement>(null);
+    const length = 200;
 
-const MoveUpButton = ({
-    gameMapGroupsIndex,
-    selectedID,
-    className,
-}: {
-    gameMapGroupsIndex: number;
-    selectedID: string | null;
-    className?: string;
-}) => {
-    const setStrategyMemoRepository = useSetAtom(strategyMemoRepositoryAtom);
+    useEffect(() => {
+        // 方眼を描く
+        if (canvas.current == null) return;
+
+        const ctx = canvas.current.getContext("2d");
+        if (ctx == null) return;
+
+        ctx.strokeStyle = "#ccc";
+        ctx.lineWidth = 1;
+        const step = length / 10;
+        for (let i = step + 0.5; i <= length; i += step) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, length);
+            ctx.stroke();
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(length, i);
+            ctx.stroke();
+            ctx.closePath();
+        }
+    }, [canvas]);
 
     return (
-        <SquareChevronUpIconButton
-            className={className}
-            onClick={() => {
-                setStrategyMemoRepository((v) => {
-                    const gameMapsIndex = v.gameMapGroups[
-                        gameMapGroupsIndex
-                    ].gameMaps.findIndex((v) => v.id === selectedID);
-                    if (gameMapsIndex < 0) return v;
-
-                    return StrategyMemoUtility.additionGameMapXY(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                        0,
-                        -5,
-                    );
-                });
-            }}
+        <canvas
+            className="size-full dark:invert"
+            ref={canvas}
+            width={`${length}px`}
+            height={`${length}px`}
+            style={{ imageRendering: "pixelated" }}
         />
     );
 };
 
-const MoveLeftButton = ({
-    gameMapGroupsIndex,
-    selectedID,
+/* -------------------------------------------------------------------------- */
+
+const Image = ({
+    gameMapId,
     className,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string | null;
+    gameMapId: GameMapId;
     className?: string;
 }) => {
-    const setStrategyMemoRepository = useSetAtom(strategyMemoRepositoryAtom);
+    const gameMaps = useAtomValue(gameMapsAtom);
+    const gameMap = gameMaps.find(gameMapId);
+    if (gameMap == null) return <></>;
+
+    if (gameMap.image.length === 0) return <></>;
 
     return (
-        <SquareChevronLeftIconButton
+        <img
             className={className}
-            onClick={() => {
-                setStrategyMemoRepository((v) => {
-                    const gameMapsIndex = v.gameMapGroups[
-                        gameMapGroupsIndex
-                    ].gameMaps.findIndex((v) => v.id === selectedID);
-                    if (gameMapsIndex < 0) return v;
-
-                    return StrategyMemoUtility.additionGameMapXY(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                        -5,
-                        0,
-                    );
-                });
-            }}
-        />
-    );
-};
-
-const MoveRightButton = ({
-    gameMapGroupsIndex,
-    selectedID,
-    className,
-}: {
-    gameMapGroupsIndex: number;
-    selectedID: string | null;
-    className?: string;
-}) => {
-    const setStrategyMemoRepository = useSetAtom(strategyMemoRepositoryAtom);
-
-    return (
-        <SquareChevronRightIconButton
-            className={className}
-            onClick={() => {
-                setStrategyMemoRepository((v) => {
-                    const gameMapsIndex = v.gameMapGroups[
-                        gameMapGroupsIndex
-                    ].gameMaps.findIndex((v) => v.id === selectedID);
-                    if (gameMapsIndex < 0) return v;
-
-                    return StrategyMemoUtility.additionGameMapXY(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                        5,
-                        0,
-                    );
-                });
-            }}
-        />
-    );
-};
-
-const MoveDownButton = ({
-    gameMapGroupsIndex,
-    selectedID,
-    className,
-}: {
-    gameMapGroupsIndex: number;
-    selectedID: string | null;
-    className?: string;
-}) => {
-    const setStrategyMemoRepository = useSetAtom(strategyMemoRepositoryAtom);
-
-    return (
-        <SquareChevronDownIconButton
-            className={className}
-            onClick={() => {
-                setStrategyMemoRepository((v) => {
-                    const gameMapsIndex = v.gameMapGroups[
-                        gameMapGroupsIndex
-                    ].gameMaps.findIndex((v) => v.id === selectedID);
-                    if (gameMapsIndex < 0) return v;
-
-                    return StrategyMemoUtility.additionGameMapXY(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                        0,
-                        5,
-                    );
-                });
-            }}
+            style={{ imageRendering: "pixelated" }}
+            src={gameMap.image}
         />
     );
 };

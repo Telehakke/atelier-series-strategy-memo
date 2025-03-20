@@ -12,7 +12,7 @@ const RoundedButton = ({
 }) => {
     return (
         <Button
-            className={`d rounded-full border-2 px-2 ${Border.neutral400} ${Bg.hoverNeutral200} ${shouldUseWarningColor ? Text.red500 : Text.neutral950}`}
+            className={`rounded-full border-2 px-4 py-1 ${Border.neutral400_700} ${Bg.hoverNeutral200_800} ${shouldUseWarningColor ? Text.red500 : Text.neutral950_100}`}
             onClick={onClick}
         >
             {label}

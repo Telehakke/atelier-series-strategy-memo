@@ -1,1050 +1,243 @@
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
+import { Point } from "../dataClasses";
+import { GameMap, GameMapId, GameMapList } from "../gameMap";
 import {
-    StrategyMemo,
-    StrategyMemoUtility,
-    StrategyMemoWithID,
-} from "../strategyMemo";
+    GameMapDetail,
+    GameMapDetailId,
+    GameMapDetailList,
+} from "../gameMapDetail";
+import { GameMapShape, GameMapShapeList } from "../gameMapShape";
+import { Memo, MemoId, MemoList } from "../memo";
+import { Preparation, PreparationId, PreparationList } from "../preparation";
+import { StrategyMemo, StrategyMemoId } from "../strategyMemo";
 
-test("isStrategyMemo", () => {
-    const strategyMemo: StrategyMemo = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-    };
-    expect(StrategyMemoUtility.isStrategyMemo(strategyMemo)).toBeTruthy();
-});
-
-test("changedGameName", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.changedGameName(strategyMemo, "name");
-    const expected: StrategyMemoWithID = {
-        gameName: "name",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-/* -------------------------------------------------------------------------- */
-
-test("addedGameMapGroup", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.addedGameMapGroup(strategyMemo, {
-        name: "",
-        gameMaps: [],
-        id: "",
-    });
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("changedGameMapGroupName", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.changedGameMapGroupName(
-        strategyMemo,
-        0,
-        "name",
+describe("replaced", () => {
+    const strategyMemo = new StrategyMemo(
+        "",
+        new GameMapList(),
+        new PreparationList(),
+        new MemoList(),
+        new StrategyMemoId("id"),
     );
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "name",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
 
-test("removedGameMapGroup", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.removedGameMapGroup(strategyMemo, 0);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("movedGameMapGroupUp", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "1",
-                gameMaps: [],
-                id: "",
-            },
-            {
-                name: "2",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.movedGameMapGroupUp(strategyMemo, 1);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "2",
-                gameMaps: [],
-                id: "",
-            },
-            {
-                name: "1",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("movedGameMapGroupDown", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "1",
-                gameMaps: [],
-                id: "",
-            },
-            {
-                name: "2",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.movedGameMapGroupDown(strategyMemo, 0);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "2",
-                gameMaps: [],
-                id: "",
-            },
-            {
-                name: "1",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-/* -------------------------------------------------------------------------- */
-
-test("addedGameMap", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.addedGameMap(strategyMemo, 0, {
-        name: "",
-        items: [],
-        monsters: [],
-        memo: "",
-        icon: "",
-        x: 0,
-        y: 0,
-        id: "",
+    test("gameName", () => {
+        const name = "name";
+        const result = strategyMemo.replacedGameName(name);
+        const expected = new StrategyMemo(
+            name,
+            new GameMapList(),
+            new PreparationList(),
+            new MemoList(),
+            new StrategyMemoId("id"),
+        );
+        expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
     });
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
 
-test("changedGameMap", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.changedGameMap(strategyMemo, 0, 0, {
-        name: "name",
-        items: ["item"],
-        monsters: ["monster"],
-        memo: "memo",
-        icon: "icon",
-        x: 1,
-        y: 2,
-        id: "",
+    test("gameMaps", () => {
+        const gameMap = new GameMap(
+            "",
+            new GameMapDetailList(),
+            new GameMapShapeList(),
+            "",
+            new GameMapId("id"),
+        );
+        const gameMapList = new GameMapList(gameMap);
+        const result = strategyMemo.replacedGameMaps(gameMapList);
+        const expected = new StrategyMemo(
+            "",
+            gameMapList,
+            new PreparationList(),
+            new MemoList(),
+            new StrategyMemoId("id"),
+        );
+        expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
     });
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "name",
-                        items: ["item"],
-                        monsters: ["monster"],
-                        memo: "memo",
-                        icon: "icon",
-                        x: 1,
-                        y: 2,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
 
-test("removedGameMap", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.removedGameMap(strategyMemo, 0, 0);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("movedGameMapUp", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "1",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                    {
-                        name: "2",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.movedGameMapUp(strategyMemo, 0, 1);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "2",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                    {
-                        name: "1",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("movedGameMapDown", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "1",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                    {
-                        name: "2",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.movedGameMapDown(strategyMemo, 0, 0);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "2",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                    {
-                        name: "1",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-/* -------------------------------------------------------------------------- */
-
-test("addedPreparation", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.addedPreparation(strategyMemo, {
-        name: "",
-        materials: [],
-        categories: [],
-        id: "",
+    test("preparations", () => {
+        const preparation = new Preparation(
+            "",
+            [],
+            [],
+            false,
+            new PreparationId("id"),
+        );
+        const preparationList = new PreparationList(preparation);
+        const result = strategyMemo.replacedPreparations(preparationList);
+        const expected = new StrategyMemo(
+            "",
+            new GameMapList(),
+            preparationList,
+            new MemoList(),
+            new StrategyMemoId("id"),
+        );
+        expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
     });
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [
-            {
-                name: "",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-        ],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toEqual(JSON.stringify(expected));
-});
 
-test("changedPreparation", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [
-            {
-                name: "",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-        ],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.changedPreparation(strategyMemo, 0, {
-        name: "name",
-        materials: ["material"],
-        categories: ["category"],
-        id: "",
+    test("memos", () => {
+        const memo = new Memo("", "", false, new MemoId("id"));
+        const memoList = new MemoList(memo);
+        const result = strategyMemo.replacedMemos(memoList);
+        const expected = new StrategyMemo(
+            "",
+            new GameMapList(),
+            new PreparationList(),
+            memoList,
+            new StrategyMemoId("id"),
+        );
+        expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
     });
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [
-            {
-                name: "name",
-                materials: ["material"],
-                categories: ["category"],
-                id: "",
-            },
-        ],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
 });
 
-test("removedPreparation", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [
-            {
-                name: "",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-        ],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.removedPreparation(strategyMemo, 0);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("movedPreparationUp", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [
-            {
-                name: "1",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-            {
-                name: "2",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-        ],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.movedPreparationUp(strategyMemo, 1);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [
-            {
-                name: "2",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-            {
-                name: "1",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-        ],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("movedPreparationDown", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [
-            {
-                name: "1",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-            {
-                name: "2",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-        ],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.movedPreparationDown(strategyMemo, 0);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [
-            {
-                name: "2",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-            {
-                name: "1",
-                materials: [],
-                categories: [],
-                id: "",
-            },
-        ],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-/* -------------------------------------------------------------------------- */
-
-test("addedMemo", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.addedMemo(strategyMemo, {
-        title: "",
-        text: "",
-        id: "",
-    });
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [
-            {
-                title: "",
-                text: "",
-                id: "",
-            },
-        ],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("changedMemo", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [
-            {
-                title: "",
-                text: "",
-                id: "",
-            },
-        ],
-        id: "",
-    };
-    const result = StrategyMemoUtility.changedMemo(strategyMemo, 0, {
-        title: "title",
-        text: "text",
-        id: "",
-    });
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [
-            {
-                title: "title",
-                text: "text",
-                id: "",
-            },
-        ],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("removedMemo", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [
-            {
-                title: "title",
-                text: "text",
-                id: "",
-            },
-        ],
-        id: "",
-    };
-    const result = StrategyMemoUtility.removedMemo(strategyMemo, 0);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("movedMemoUp", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [
-            {
-                title: "1",
-                text: "",
-                id: "",
-            },
-            {
-                title: "2",
-                text: "",
-                id: "",
-            },
-        ],
-        id: "",
-    };
-    const result = StrategyMemoUtility.movedMemoUp(strategyMemo, 1);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [
-            {
-                title: "2",
-                text: "",
-                id: "",
-            },
-            {
-                title: "1",
-                text: "",
-                id: "",
-            },
-        ],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-test("movedMemoDown", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [
-            {
-                title: "1",
-                text: "",
-                id: "",
-            },
-            {
-                title: "2",
-                text: "",
-                id: "",
-            },
-        ],
-        id: "",
-    };
-    const result = StrategyMemoUtility.movedMemoDown(strategyMemo, 0);
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [
-            {
-                title: "2",
-                text: "",
-                id: "",
-            },
-            {
-                title: "1",
-                text: "",
-                id: "",
-            },
-        ],
-        id: "",
-    };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
-});
-
-/* -------------------------------------------------------------------------- */
-
-test("changedGameMapXY1", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 50,
-                        y: 50,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.additionGameMapXY(
-        strategyMemo,
-        0,
-        0,
-        5,
-        -5,
+describe("replacedGameMap", () => {
+    const strategyMemo = new StrategyMemo(
+        "",
+        new GameMapList(
+            new GameMap(
+                "",
+                new GameMapDetailList(),
+                new GameMapShapeList(),
+                "",
+                new GameMapId("id"),
+            ),
+        ),
+        new PreparationList(),
+        new MemoList(),
+        new StrategyMemoId(""),
     );
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 55,
-                        y: 45,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(result).toEqual(expected);
+
+    test("details", () => {
+        const gameMapDetails = new GameMapDetailList(
+            new GameMapDetail(
+                "",
+                [],
+                [],
+                "",
+                "",
+                new Point(0, 0),
+                new GameMapId(""),
+                false,
+                new GameMapDetailId(""),
+            ),
+        );
+        const gameMap = strategyMemo.gameMaps.find(new GameMapId("id"))!;
+        const result = strategyMemo.replacedGameMapDetails(
+            gameMap,
+            gameMapDetails,
+        );
+        const expected = new StrategyMemo(
+            "",
+            new GameMapList(
+                new GameMap(
+                    "",
+                    gameMapDetails,
+                    new GameMapShapeList(),
+                    "",
+                    new GameMapId("id"),
+                ),
+            ),
+            new PreparationList(),
+            new MemoList(),
+            new StrategyMemoId(""),
+        );
+        expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    });
+
+    test("shapes", () => {
+        const gameMapShapes = new GameMapShapeList(GameMapShape.create());
+        const gameMap = strategyMemo.gameMaps.find(new GameMapId("id"))!;
+        const result = strategyMemo.replacedGameMapShapes(
+            gameMap,
+            gameMapShapes,
+        );
+        const expected = new StrategyMemo(
+            "",
+            new GameMapList(
+                new GameMap(
+                    "",
+                    new GameMapDetailList(),
+                    gameMapShapes,
+                    "",
+                    new GameMapId("id"),
+                ),
+            ),
+            new PreparationList(),
+            new MemoList(),
+            new StrategyMemoId(""),
+        );
+        expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    });
 });
 
-test("changedGameMapXY2", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.additionGameMapXY(
-        strategyMemo,
-        0,
-        0,
-        -1,
-        -1,
+test("uncheckedAll", () => {
+    const checkedGameMapDetail = new GameMapDetail(
+        "",
+        [],
+        [],
+        "",
+        "",
+        new Point(0, 0),
+        new GameMapId(""),
+        true,
+        new GameMapDetailId(""),
     );
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(result).toEqual(expected);
-});
+    const checkedPreparation = new Preparation(
+        "",
+        [],
+        [],
+        true,
+        new PreparationId(""),
+    );
+    const checkedMemo = new Memo("", "", true, new MemoId(""));
+    const checkedStrategyMemo = new StrategyMemo(
+        "",
+        new GameMapList(
+            new GameMap(
+                "",
+                new GameMapDetailList(checkedGameMapDetail),
+                new GameMapShapeList(),
+                "",
+                new GameMapId(""),
+            ),
+        ),
+        new PreparationList(checkedPreparation),
+        new MemoList(checkedMemo),
+        new StrategyMemoId(""),
+    );
+    const result = checkedStrategyMemo.uncheckedAll();
 
-test("changedGameMapXY3", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 100,
-                        y: 100,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    const result = StrategyMemoUtility.additionGameMapXY(
-        strategyMemo,
-        0,
-        0,
-        1,
-        1,
+    const uncheckedGameMapDetail = new GameMapDetail(
+        "",
+        [],
+        [],
+        "",
+        "",
+        new Point(0, 0),
+        new GameMapId(""),
+        false,
+        new GameMapDetailId(""),
     );
-    const expected: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 100,
-                        y: 100,
-                        id: "",
-                    },
-                ],
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
-    };
-    expect(result).toEqual(expected);
+    const uncheckedPreparation = new Preparation(
+        "",
+        [],
+        [],
+        false,
+        new PreparationId(""),
+    );
+    const uncheckedMemo = new Memo("", "", false, new MemoId(""));
+    const uncheckedStrategyMemo = new StrategyMemo(
+        "",
+        new GameMapList(
+            new GameMap(
+                "",
+                new GameMapDetailList(uncheckedGameMapDetail),
+                new GameMapShapeList(),
+                "",
+                new GameMapId(""),
+            ),
+        ),
+        new PreparationList(uncheckedPreparation),
+        new MemoList(uncheckedMemo),
+        new StrategyMemoId(""),
+    );
+    expect(JSON.stringify(result)).toBe(JSON.stringify(uncheckedStrategyMemo));
 });

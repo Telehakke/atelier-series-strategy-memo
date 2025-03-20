@@ -1,49 +1,116 @@
-import { isNotNull, isStrings } from "./typeGuards";
+import { Id, IdList, ListWithId, WithId } from "./id";
+import Split from "./split";
 
-export type Preparation = {
+export class PreparationId implements Id {
+    readonly _type: string = "PreparationId";
+    readonly value: string;
+
+    constructor(value: string) {
+        this.value = value;
+    }
+}
+
+export class PreparationIdList extends IdList<PreparationId> {
+    readonly _type: string = "PreparationIdList";
+
+    added = (id: PreparationId): PreparationIdList =>
+        new PreparationIdList(...this.helperAdded(id));
+
+    removed = (targetId: PreparationId): PreparationIdList =>
+        new PreparationIdList(...this.helperRemoved(targetId));
+}
+
+/* -------------------------------------------------------------------------- */
+
+export class Preparation implements WithId {
+    readonly _type: string = "Preparation";
     readonly name: string;
-    readonly materials: string[];
-    readonly categories: string[];
-};
+    readonly materials: readonly string[];
+    readonly categories: readonly string[];
+    readonly checked: boolean;
+    readonly id: PreparationId;
 
-export type PreparationWithID = Preparation & {
-    readonly id: string;
-};
-
-export class PreparationUtility {
-    static isPreparation = (value: unknown): value is Preparation => {
-        if (!isNotNull(value)) return false;
-        if (typeof value.name !== "string") return false;
-        if (!isStrings(value.materials)) return false;
-        if (!isStrings(value.categories)) return false;
-        return true;
-    };
-
-    static isPreparations = (value: unknown): value is Preparation[] => {
-        if (!Array.isArray(value)) return false;
-        return value.every((v) => this.isPreparation(v));
-    };
+    constructor(
+        name: string,
+        materials: readonly string[],
+        categories: readonly string[],
+        checked: boolean,
+        id: PreparationId,
+    ) {
+        this.name = name;
+        this.materials = materials;
+        this.categories = categories;
+        this.checked = checked;
+        this.id = id;
+    }
 
     static create = (
-        inputName: string,
-        inputMaterials: string,
-        inputCategories: string,
-        id: string,
-    ): PreparationWithID => {
-        const name = inputName.trim();
-        const materials = inputMaterials
-            .split(/[,、]/)
-            .map((v) => v.trim())
-            .filter((v) => v.length > 0);
-        const categories = inputCategories
-            .split(/[,、]/)
-            .map((v) => v.trim())
-            .filter((v) => v.length > 0);
-        return {
-            name: name,
-            materials: materials,
-            categories: categories,
-            id: id,
-        };
+        name: string,
+        materials: string,
+        categories: string,
+        checked: boolean,
+        id: PreparationId,
+    ): Preparation =>
+        new Preparation(
+            name.trim(),
+            Split.byComma(materials),
+            Split.byComma(categories),
+            checked,
+            id,
+        );
+
+    copyWith = (obj?: {
+        name?: string;
+        materials?: readonly string[];
+        categories?: readonly string[];
+        checked?: boolean;
+        id?: PreparationId;
+    }): Preparation =>
+        obj == null
+            ? this
+            : new Preparation(
+                  obj.name ?? this.name,
+                  obj.materials ?? this.materials,
+                  obj.categories ?? this.categories,
+                  obj.checked ?? this.checked,
+                  obj.id ?? this.id,
+              );
+}
+
+export class PreparationList extends ListWithId<Preparation, PreparationId> {
+    readonly _type: string = "PreparationList";
+
+    filter = (
+        predicate: (
+            value: Preparation,
+            index: number,
+            array: readonly Preparation[],
+        ) => boolean,
+    ): PreparationList => new PreparationList(...this.helperFilter(predicate));
+
+    added = (item: Preparation): PreparationList =>
+        new PreparationList(...this.helperAdded(item));
+
+    replaced = (
+        targetId: PreparationId,
+        newItem: Preparation,
+    ): PreparationList =>
+        new PreparationList(...this.helperReplaced(targetId, newItem));
+
+    removed = (targetId: PreparationId): PreparationList =>
+        new PreparationList(...this.helperRemoved(targetId));
+
+    movedUp = (targetId: PreparationId): PreparationList =>
+        new PreparationList(...this.helperMovedUp(targetId));
+
+    movedDown = (targetId: PreparationId): PreparationList =>
+        new PreparationList(...this.helperMovedDown(targetId));
+
+    uncheckedAll = (): PreparationList => {
+        const newItems = this.items.map(
+            (v) =>
+                new Preparation(v.name, v.materials, v.categories, false, v.id),
+        );
+        return new PreparationList(...newItems);
     };
 }

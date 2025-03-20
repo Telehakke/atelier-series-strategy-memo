@@ -1,54 +1,51 @@
-import { useState } from "react";
-import { MemoWithID } from "../../models/memo";
-import MemosFiltering from "../../models/memosFiltering";
-import { Bg, Divide } from "../commons/classNames";
-import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
-import MemosFilteringTextField from "./sub/memosFilteringTextField";
-import MemosLinkList from "./sub/memosLinkList";
-import MemosList from "./sub/memosList";
+import { useAtomValue } from "jotai";
+import { isLeftPanelOpenAtom, isReadonlyAtom } from "../../atoms";
+import { Bg, Border, Divide } from "../commons/classNames";
+import { ReadonlyButton } from "../share";
+import MemoFilteringTextField from "./sub/memoFilteringTextField";
+import MemoLinkView from "./sub/memoLinkView";
+import MemoListController from "./sub/memoListController";
+import MemoListView from "./sub/memoListView";
 
-const MemoView = ({
-    memos,
-    isPanelOpen,
-    setIsPanelOpen,
-}: {
-    memos: MemoWithID[];
-    isPanelOpen: boolean;
-    setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-    const [onFiltering, setOnFiltering] = useState(false);
-    const [filteringValue, setFilteringValue] = useState("");
-    const memosFiltering = new MemosFiltering(memos);
-    const filteredMemos = memosFiltering.filtered(filteringValue);
-
+const MemoView = () => {
     return (
         <>
-            <div
-                className={`fixed top-0 left-0 z-5 flex h-full max-w-60 gap-2 p-2 pt-13 ${Bg.neutral50}`}
-            >
-                {isPanelOpen && (
-                    <div
-                        className={`divide-y-2 overflow-scroll ${Divide.neutral300}`}
-                    >
-                        <MemosFilteringTextField
-                            className="py-2"
-                            filteringValue={filteringValue}
-                            setFilteringValue={setFilteringValue}
-                            setOnFiltering={setOnFiltering}
-                        />
-                        <MemosLinkList className="py-2" memos={filteredMemos} />
-                    </div>
-                )}
-                <PanelOpenCloseButton
-                    isOpen={isPanelOpen}
-                    setIsOpen={setIsPanelOpen}
-                />
-            </div>
-            <div className="ml-11">
-                <MemosList memos={filteredMemos} onFiltering={onFiltering} />
-            </div>
+            <LeftPanel />
+            <MemoListView />
+            <Controller />
         </>
     );
 };
 
 export default MemoView;
+
+/* -------------------------------------------------------------------------- */
+
+const LeftPanel = () => {
+    const isLeftPanelOpened = useAtomValue(isLeftPanelOpenAtom);
+
+    return (
+        <div
+            className={`fixed top-0 left-0 z-5 flex h-full border-r-2 p-2 pt-14 ${Bg.neutral50_950} ${Border.neutral300_800} ${isLeftPanelOpened ? "" : "hidden"}`}
+        >
+            <div
+                className={`divide-y-2 overflow-auto ${Divide.neutral300_800}`}
+                style={{ scrollbarWidth: "thin" }}
+            >
+                <div>
+                    <MemoFilteringTextField className="mb-1" />
+                </div>
+                <MemoLinkView className="py-2" />
+            </div>
+        </div>
+    );
+};
+
+const Controller = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
+
+    if (isReadonly)
+        return <ReadonlyButton className="fixed right-4 bottom-4" />;
+
+    return <MemoListController className="fixed right-4 bottom-4" />;
+};

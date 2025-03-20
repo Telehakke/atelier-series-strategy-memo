@@ -14,13 +14,17 @@ const TextEditor = ({
 }) => {
     return (
         <Field>
-            {label && (
-                <Label className={`block text-sm ${Text.neutral500}`}>
+            {label != null && (
+                <Label
+                    className={`block text-sm ${Text.neutral500}`}
+                    htmlFor="text-editor"
+                >
                     {label}
                 </Label>
             )}
             <textarea
                 className={`w-full resize-none rounded-md border-2 p-1 ${Border.neutral500} ${className}`}
+                id="text-editor"
                 value={value}
                 onChange={onChange}
             />
