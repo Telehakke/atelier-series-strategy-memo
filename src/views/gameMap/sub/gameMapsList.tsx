@@ -3,7 +3,6 @@ import { ReactNode, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
 import { GameMapGroupWithID } from "../../../models/gameMapGroup";
-import { StrategyMemoUtility } from "../../../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
 import { Bg, Border, Divide, Ring, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
@@ -205,7 +204,7 @@ const AddItemDialog = ({
             uuidv4(),
         );
         setStrategyMemo((v) =>
-            StrategyMemoUtility.addedGameMap(v, gameMapGroupsIndex, gameMap),
+            GameMapUtility.added(v, gameMapGroupsIndex, gameMap),
         );
         setIsOpen(false);
     };
@@ -313,12 +312,7 @@ const EditItemDialog = ({
             gameMap.id,
         );
         setStrategyMemo((v) =>
-            StrategyMemoUtility.changedGameMap(
-                v,
-                gameMapGroupsIndex,
-                index,
-                newGameMap,
-            ),
+            GameMapUtility.changed(v, gameMapGroupsIndex, index, newGameMap),
         );
         setIsOpen(false);
     };
@@ -399,11 +393,7 @@ const RemoveItemDialog = ({
             );
             if (index == null) return v;
 
-            return StrategyMemoUtility.removedGameMap(
-                v,
-                gameMapGroupsIndex,
-                index,
-            );
+            return GameMapUtility.removed(v, gameMapGroupsIndex, index);
         });
         setIsOpen(false);
     };
@@ -516,11 +506,7 @@ const MoveItemUpButton = ({
             );
             if (index == null) return v;
 
-            return StrategyMemoUtility.movedGameMapUp(
-                v,
-                gameMapGroupsIndex,
-                index,
-            );
+            return GameMapUtility.movedUp(v, gameMapGroupsIndex, index);
         });
     };
 
@@ -545,11 +531,7 @@ const MoveItemDownButton = ({
             );
             if (index == null) return v;
 
-            return StrategyMemoUtility.movedGameMapDown(
-                v,
-                gameMapGroupsIndex,
-                index,
-            );
+            return GameMapUtility.movedDown(v, gameMapGroupsIndex, index);
         });
     };
 

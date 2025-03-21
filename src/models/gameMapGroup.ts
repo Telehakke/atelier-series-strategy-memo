@@ -1,4 +1,5 @@
 import { GameMap, GameMapUtility, GameMapWithID } from "./gameMap";
+import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull } from "./typeGuards";
 
 export type GameMapGroup = {
@@ -35,5 +36,62 @@ export class GameMapGroupUtility {
             gameMaps: gameMaps,
             id: id,
         };
+    };
+
+    static added = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroup: GameMapGroupWithID,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.gameMapGroups.push(gameMapGroup);
+        return copied;
+    };
+
+    static changedName = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        name: string,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.gameMapGroups[gameMapGroupsIndex] = {
+            ...copied.gameMapGroups[gameMapGroupsIndex],
+            name: name,
+        };
+        return copied;
+    };
+
+    static removed = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.gameMapGroups.splice(gameMapGroupsIndex, 1);
+        return copied;
+    };
+
+    static movedUp = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+    ): StrategyMemoWithID => {
+        const newIndex = gameMapGroupsIndex - 1;
+        if (newIndex < 0) return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const [item] = copied.gameMapGroups.splice(gameMapGroupsIndex, 1);
+        copied.gameMapGroups.splice(newIndex, 0, item);
+        return copied;
+    };
+
+    static movedDown = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+    ): StrategyMemoWithID => {
+        const newIndex = gameMapGroupsIndex + 1;
+        if (newIndex >= strategyMemo.gameMapGroups.length) return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const [item] = copied.gameMapGroups.splice(gameMapGroupsIndex, 1);
+        copied.gameMapGroups.splice(newIndex, 0, item);
+        return copied;
     };
 }

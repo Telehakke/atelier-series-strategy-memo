@@ -6,7 +6,6 @@ import {
     PreparationWithID,
 } from "../../../models/preparation";
 import PreparationsFiltering from "../../../models/preparationsFiltering";
-import { StrategyMemoUtility } from "../../../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
 import { Bg, Border, Divide, Ring, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
@@ -225,9 +224,7 @@ const AddItemDialog = ({
             categories,
             uuidv4(),
         );
-        setStrategyMemo((v) =>
-            StrategyMemoUtility.addedPreparation(v, preparation),
-        );
+        setStrategyMemo((v) => PreparationUtility.added(v, preparation));
         setIsOpen(false);
     };
 
@@ -304,7 +301,7 @@ const EditItemDialog = ({
             preparation.id,
         );
         setStrategyMemo((v) =>
-            StrategyMemoUtility.changedPreparation(v, index, newPreparation),
+            PreparationUtility.changed(v, index, newPreparation),
         );
         setIsOpen(false);
     };
@@ -364,7 +361,7 @@ const RemoveItemDialog = ({
             const index = PreparationUtility.findIndex(v, selectedID);
             if (index == null) return v;
 
-            return StrategyMemoUtility.removedPreparation(v, index);
+            return PreparationUtility.removed(v, index);
         });
 
         setIsOpen(false);
@@ -430,7 +427,7 @@ const MoveItemUpButton = ({ selectedID }: { selectedID: string }) => {
             const index = PreparationUtility.findIndex(v, selectedID);
             if (index == null) return v;
 
-            return StrategyMemoUtility.movedPreparationUp(v, index);
+            return PreparationUtility.movedUp(v, index);
         });
     };
 
@@ -445,7 +442,7 @@ const MoveItemDownButton = ({ selectedID }: { selectedID: string }) => {
             const index = PreparationUtility.findIndex(v, selectedID);
             if (index == null) return v;
 
-            return StrategyMemoUtility.movedPreparationDown(v, index);
+            return PreparationUtility.movedDown(v, index);
         });
     };
 

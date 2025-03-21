@@ -16,7 +16,6 @@ import {
     GameMapGroupUtility,
     GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
-import { StrategyMemoUtility } from "../../../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
 import { Bg, Border, Text } from "../../commons/classNames";
 
@@ -115,9 +114,7 @@ const AddItemDialog = ({
         }
 
         const gameMapGroup = GameMapGroupUtility.create(name, [], uuidv4());
-        setStrategyMemo((v) =>
-            StrategyMemoUtility.addedGameMapGroup(v, gameMapGroup),
-        );
+        setStrategyMemo((v) => GameMapGroupUtility.added(v, gameMapGroup));
         setIsOpen(false);
     };
 
@@ -182,11 +179,7 @@ const EditItemDialog = ({
         }
 
         setStrategyMemo((v) =>
-            StrategyMemoUtility.changedGameMapGroupName(
-                v,
-                gameMapGroupsIndex,
-                name,
-            ),
+            GameMapGroupUtility.changedName(v, gameMapGroupsIndex, name),
         );
         setIsOpen(false);
     };
@@ -249,7 +242,7 @@ const RemoveItemDialog = ({
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         setStrategyMemo((v) =>
-            StrategyMemoUtility.removedGameMapGroup(v, gameMapGroupsIndex),
+            GameMapGroupUtility.removed(v, gameMapGroupsIndex),
         );
         setGameMapGroupsIndex(0);
         setIsOpen(false);
@@ -282,10 +275,7 @@ const MoveItemUpButton = ({
         <ChevronUpIconButton
             onClick={() => {
                 setStrategyMemo((v) =>
-                    StrategyMemoUtility.movedGameMapGroupUp(
-                        v,
-                        gameMapGroupsIndex,
-                    ),
+                    GameMapGroupUtility.movedUp(v, gameMapGroupsIndex),
                 );
                 setGameMapGroupsIndex((v) => {
                     const index = v - 1;
@@ -311,10 +301,7 @@ const MoveItemDownButton = ({
         <ChevronDownIconButton
             onClick={() => {
                 setStrategyMemo((v) =>
-                    StrategyMemoUtility.movedGameMapGroupDown(
-                        v,
-                        gameMapGroupsIndex,
-                    ),
+                    GameMapGroupUtility.movedDown(v, gameMapGroupsIndex),
                 );
                 setGameMapGroupsIndex((v) => {
                     const index = v + 1;

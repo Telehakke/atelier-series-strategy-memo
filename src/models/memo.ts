@@ -1,4 +1,4 @@
-import { StrategyMemoWithID } from "./strategyMemo";
+import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull } from "./typeGuards";
 
 export type Memo = {
@@ -41,5 +41,59 @@ export class MemoUtility {
     ): number | null => {
         const index = strategyMemo.memos.findIndex((v) => v.id === id);
         return index < 0 ? null : index;
+    };
+
+    static added = (
+        strategyMemo: StrategyMemoWithID,
+        memo: MemoWithID,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.memos.push(memo);
+        return copied;
+    };
+
+    static changed = (
+        strategyMemo: StrategyMemoWithID,
+        memosIndex: number,
+        memo: MemoWithID,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.memos[memosIndex] = memo;
+        return copied;
+    };
+
+    static removed = (
+        strategyMemo: StrategyMemoWithID,
+        memosIndex: number,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.memos.splice(memosIndex, 1);
+        return copied;
+    };
+
+    static movedUp = (
+        strategyMemo: StrategyMemoWithID,
+        memosIndex: number,
+    ): StrategyMemoWithID => {
+        const newIndex = memosIndex - 1;
+        if (newIndex < 0) return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const [item] = copied.memos.splice(memosIndex, 1);
+        copied.memos.splice(newIndex, 0, item);
+        return copied;
+    };
+
+    static movedDown = (
+        strategyMemo: StrategyMemoWithID,
+        memosIndex: number,
+    ): StrategyMemoWithID => {
+        const newIndex = memosIndex + 1;
+        if (newIndex >= strategyMemo.memos.length) return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const [item] = copied.memos.splice(memosIndex, 1);
+        copied.memos.splice(newIndex, 0, item);
+        return copied;
     };
 }

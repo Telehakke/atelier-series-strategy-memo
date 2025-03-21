@@ -2,7 +2,6 @@ import { useAtom, useSetAtom } from "jotai";
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MemoUtility, MemoWithID } from "../../../models/memo";
-import { StrategyMemoUtility } from "../../../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
 import { Bg, Border, Ring, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
@@ -126,7 +125,7 @@ const AddItemDialog = ({
         }
 
         const memo = MemoUtility.create(title, text, uuidv4());
-        setStrategyMemo((v) => StrategyMemoUtility.addedMemo(v, memo));
+        setStrategyMemo((v) => MemoUtility.added(v, memo));
         setIsOpen(false);
     };
 
@@ -190,9 +189,7 @@ const EditItemDialog = ({
         }
 
         const newMemo = MemoUtility.create(title, text, memo.id);
-        setStrategyMemo((v) =>
-            StrategyMemoUtility.changedMemo(v, index, newMemo),
-        );
+        setStrategyMemo((v) => MemoUtility.changed(v, index, newMemo));
         setIsOpen(false);
     };
 
@@ -249,7 +246,7 @@ const RemoveItemDialog = ({
             const index = MemoUtility.findIndex(v, selectedID);
             if (index == null) return v;
 
-            return StrategyMemoUtility.removedMemo(v, index);
+            return MemoUtility.removed(v, index);
         });
         setIsOpen(false);
     };
@@ -306,7 +303,7 @@ const MoveItemUpButton = ({ selectedID }: { selectedID: string }) => {
             const index = MemoUtility.findIndex(v, selectedID);
             if (index == null) return v;
 
-            return StrategyMemoUtility.movedMemoUp(v, index);
+            return MemoUtility.movedUp(v, index);
         });
     };
 
@@ -321,7 +318,7 @@ const MoveItemDownButton = ({ selectedID }: { selectedID: string }) => {
             const index = MemoUtility.findIndex(v, selectedID);
             if (index == null) return v;
 
-            return StrategyMemoUtility.movedMemoDown(v, index);
+            return MemoUtility.movedDown(v, index);
         });
     };
 

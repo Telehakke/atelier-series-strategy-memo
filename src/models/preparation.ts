@@ -1,4 +1,4 @@
-import { StrategyMemoWithID } from "./strategyMemo";
+import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull, isStrings } from "./typeGuards";
 
 export type Preparation = {
@@ -54,5 +54,59 @@ export class PreparationUtility {
     ): number | null => {
         const index = strategyMemo.preparations.findIndex((v) => v.id === id);
         return index < 0 ? null : index;
+    };
+
+    static added = (
+        strategyMemo: StrategyMemoWithID,
+        preparation: PreparationWithID,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.preparations.push(preparation);
+        return copied;
+    };
+
+    static changed = (
+        strategyMemo: StrategyMemoWithID,
+        preparationsIndex: number,
+        preparation: PreparationWithID,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.preparations[preparationsIndex] = preparation;
+        return copied;
+    };
+
+    static removed = (
+        strategyMemo: StrategyMemoWithID,
+        preparationsIndex: number,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.preparations.splice(preparationsIndex, 1);
+        return copied;
+    };
+
+    static movedUp = (
+        strategyMemo: StrategyMemoWithID,
+        preparationsIndex: number,
+    ): StrategyMemoWithID => {
+        const newIndex = preparationsIndex - 1;
+        if (newIndex < 0) return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const [item] = copied.preparations.splice(preparationsIndex, 1);
+        copied.preparations.splice(newIndex, 0, item);
+        return copied;
+    };
+
+    static movedDown = (
+        strategyMemo: StrategyMemoWithID,
+        preparationsIndex: number,
+    ): StrategyMemoWithID => {
+        const newIndex = preparationsIndex + 1;
+        if (newIndex >= strategyMemo.preparations.length) return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const [item] = copied.preparations.splice(preparationsIndex, 1);
+        copied.preparations.splice(newIndex, 0, item);
+        return copied;
     };
 }

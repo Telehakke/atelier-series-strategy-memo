@@ -3,7 +3,6 @@ import { useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
 import { GameMapGroupWithID } from "../../../models/gameMapGroup";
-import { StrategyMemoUtility } from "../../../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
 import { Bg, Border, Shadow } from "../../commons/classNames";
 import {
@@ -149,7 +148,7 @@ const MoveUpButton = ({
             );
             if (index == null) return v;
 
-            return StrategyMemoUtility.additionGameMapXY(
+            return GameMapUtility.additionXY(
                 v,
                 gameMapGroupsIndex,
                 index,
@@ -187,7 +186,7 @@ const MoveLeftButton = ({
             );
             if (index == null) return v;
 
-            return StrategyMemoUtility.additionGameMapXY(
+            return GameMapUtility.additionXY(
                 v,
                 gameMapGroupsIndex,
                 index,
@@ -225,7 +224,7 @@ const MoveRightButton = ({
             );
             if (index == null) return v;
 
-            return StrategyMemoUtility.additionGameMapXY(
+            return GameMapUtility.additionXY(
                 v,
                 gameMapGroupsIndex,
                 index,
@@ -263,7 +262,7 @@ const MoveDownButton = ({
             );
             if (index == null) return v;
 
-            return StrategyMemoUtility.additionGameMapXY(
+            return GameMapUtility.additionXY(
                 v,
                 gameMapGroupsIndex,
                 index,

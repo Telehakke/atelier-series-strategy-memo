@@ -1,4 +1,4 @@
-import { StrategyMemoWithID } from "./strategyMemo";
+import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull, isStrings } from "./typeGuards";
 
 export type GameMap = {
@@ -82,5 +82,114 @@ export class GameMapUtility {
             gameMapGroupsIndex
         ].gameMaps.findIndex((v) => v.id === id);
         return index < 0 ? null : index;
+    };
+
+    static added = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        gameMap: GameMapWithID,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps.push(gameMap);
+        return copied;
+    };
+
+    static changed = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        gameMapsIndex: number,
+        gameMap: GameMapWithID,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps[gameMapsIndex] =
+            gameMap;
+        return copied;
+    };
+
+    static removed = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        gameMapsIndex: number,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
+            gameMapsIndex,
+            1,
+        );
+        return copied;
+    };
+
+    static movedUp = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        gameMapsIndex: number,
+    ): StrategyMemoWithID => {
+        const newIndex = gameMapsIndex - 1;
+        if (newIndex < 0) return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const [item] = copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
+            gameMapsIndex,
+            1,
+        );
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
+            newIndex,
+            0,
+            item,
+        );
+        return copied;
+    };
+
+    static movedDown = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        gameMapsIndex: number,
+    ): StrategyMemoWithID => {
+        const newIndex = gameMapsIndex + 1;
+        if (
+            newIndex >=
+            strategyMemo.gameMapGroups[gameMapGroupsIndex].gameMaps.length
+        )
+            return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const [item] = copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
+            gameMapsIndex,
+            1,
+        );
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
+            newIndex,
+            0,
+            item,
+        );
+        return copied;
+    };
+
+    static additionXY = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        gameMapsIndex: number,
+        x: number,
+        y: number,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        const gameMap =
+            copied.gameMapGroups[gameMapGroupsIndex].gameMaps[gameMapsIndex];
+
+        let validX = gameMap.x + x;
+        if (validX < 0) validX = 0;
+        if (validX > 100) validX = 100;
+        let validY = gameMap.y + y;
+        if (validY < 0) validY = 0;
+        if (validY > 100) validY = 100;
+
+        const newGameMap = {
+            ...gameMap,
+            x: validX,
+            y: validY,
+        };
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps[gameMapsIndex] =
+            newGameMap;
+        return copied;
     };
 }
