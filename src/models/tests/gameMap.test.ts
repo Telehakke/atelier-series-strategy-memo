@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { GameMapUtility, GameMapWithID } from "../gameMap";
+import { StrategyMemoWithID } from "../strategyMemo";
 
 test("isGameMap", () => {
     const gameMap = GameMapUtility.create(
@@ -42,4 +43,33 @@ test("create", () => {
         id: "0",
     };
     expect(gameMap).toEqual(expected);
+});
+
+test("findIndex", () => {
+    const strategyMemo: StrategyMemoWithID = {
+        gameName: "",
+        gameMapGroups: [
+            {
+                name: "",
+                gameMaps: [
+                    {
+                        name: "",
+                        items: [],
+                        monsters: [],
+                        memo: "",
+                        icon: "",
+                        x: 0,
+                        y: 0,
+                        id: "id",
+                    },
+                ],
+                id: "",
+            },
+        ],
+        preparations: [],
+        memos: [],
+        id: "",
+    };
+    const result = GameMapUtility.findIndex(strategyMemo, 0, "id");
+    expect(result).toBe(0);
 });

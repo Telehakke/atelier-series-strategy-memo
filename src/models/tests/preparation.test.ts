@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { PreparationUtility, PreparationWithID } from "../preparation";
+import { StrategyMemoWithID } from "../strategyMemo";
 
 test("isPreparation", () => {
     const preparation = PreparationUtility.create(
@@ -30,4 +31,16 @@ test("create", () => {
         id: "0",
     };
     expect(preparation).toEqual(expected);
+});
+
+test("findIndex", () => {
+    const strategyMemo: StrategyMemoWithID = {
+        gameName: "",
+        gameMapGroups: [],
+        preparations: [{ name: "", materials: [], categories: [], id: "id" }],
+        memos: [],
+        id: "",
+    };
+    const result = PreparationUtility.findIndex(strategyMemo, "id");
+    expect(result).toBe(0);
 });

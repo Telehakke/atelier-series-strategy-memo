@@ -1,7 +1,7 @@
 import { Button } from "@headlessui/react";
 import { useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
-import { GameMapWithID } from "../../../models/gameMap";
+import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
 import { GameMapGroupWithID } from "../../../models/gameMapGroup";
 import { StrategyMemoUtility } from "../../../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
@@ -135,30 +135,34 @@ const MoveUpButton = ({
     className,
 }: {
     gameMapGroupsIndex: number;
-    selectedID: string | null;
+    selectedID: string;
     className?: string;
 }) => {
-    const setStrategyMemoRepository = useSetAtom(strategyMemoRepositoryAtom);
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            const index = GameMapUtility.findIndex(
+                v,
+                gameMapGroupsIndex,
+                selectedID,
+            );
+            if (index == null) return v;
+
+            return StrategyMemoUtility.additionGameMapXY(
+                v,
+                gameMapGroupsIndex,
+                index,
+                0,
+                -5,
+            );
+        });
+    };
 
     return (
         <SquareChevronUpIconButton
             className={className}
-            onClick={() => {
-                setStrategyMemoRepository((v) => {
-                    const gameMapsIndex = v.gameMapGroups[
-                        gameMapGroupsIndex
-                    ].gameMaps.findIndex((v) => v.id === selectedID);
-                    if (gameMapsIndex < 0) return v;
-
-                    return StrategyMemoUtility.additionGameMapXY(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                        0,
-                        -5,
-                    );
-                });
-            }}
+            onClick={() => handleButtonClick()}
         />
     );
 };
@@ -169,30 +173,34 @@ const MoveLeftButton = ({
     className,
 }: {
     gameMapGroupsIndex: number;
-    selectedID: string | null;
+    selectedID: string;
     className?: string;
 }) => {
-    const setStrategyMemoRepository = useSetAtom(strategyMemoRepositoryAtom);
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            const index = GameMapUtility.findIndex(
+                v,
+                gameMapGroupsIndex,
+                selectedID,
+            );
+            if (index == null) return v;
+
+            return StrategyMemoUtility.additionGameMapXY(
+                v,
+                gameMapGroupsIndex,
+                index,
+                -5,
+                0,
+            );
+        });
+    };
 
     return (
         <SquareChevronLeftIconButton
             className={className}
-            onClick={() => {
-                setStrategyMemoRepository((v) => {
-                    const gameMapsIndex = v.gameMapGroups[
-                        gameMapGroupsIndex
-                    ].gameMaps.findIndex((v) => v.id === selectedID);
-                    if (gameMapsIndex < 0) return v;
-
-                    return StrategyMemoUtility.additionGameMapXY(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                        -5,
-                        0,
-                    );
-                });
-            }}
+            onClick={() => handleButtonClick()}
         />
     );
 };
@@ -203,30 +211,34 @@ const MoveRightButton = ({
     className,
 }: {
     gameMapGroupsIndex: number;
-    selectedID: string | null;
+    selectedID: string;
     className?: string;
 }) => {
-    const setStrategyMemoRepository = useSetAtom(strategyMemoRepositoryAtom);
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            const index = GameMapUtility.findIndex(
+                v,
+                gameMapGroupsIndex,
+                selectedID,
+            );
+            if (index == null) return v;
+
+            return StrategyMemoUtility.additionGameMapXY(
+                v,
+                gameMapGroupsIndex,
+                index,
+                5,
+                0,
+            );
+        });
+    };
 
     return (
         <SquareChevronRightIconButton
             className={className}
-            onClick={() => {
-                setStrategyMemoRepository((v) => {
-                    const gameMapsIndex = v.gameMapGroups[
-                        gameMapGroupsIndex
-                    ].gameMaps.findIndex((v) => v.id === selectedID);
-                    if (gameMapsIndex < 0) return v;
-
-                    return StrategyMemoUtility.additionGameMapXY(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                        5,
-                        0,
-                    );
-                });
-            }}
+            onClick={() => handleButtonClick()}
         />
     );
 };
@@ -237,30 +249,34 @@ const MoveDownButton = ({
     className,
 }: {
     gameMapGroupsIndex: number;
-    selectedID: string | null;
+    selectedID: string;
     className?: string;
 }) => {
-    const setStrategyMemoRepository = useSetAtom(strategyMemoRepositoryAtom);
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            const index = GameMapUtility.findIndex(
+                v,
+                gameMapGroupsIndex,
+                selectedID,
+            );
+            if (index == null) return v;
+
+            return StrategyMemoUtility.additionGameMapXY(
+                v,
+                gameMapGroupsIndex,
+                index,
+                0,
+                5,
+            );
+        });
+    };
 
     return (
         <SquareChevronDownIconButton
             className={className}
-            onClick={() => {
-                setStrategyMemoRepository((v) => {
-                    const gameMapsIndex = v.gameMapGroups[
-                        gameMapGroupsIndex
-                    ].gameMaps.findIndex((v) => v.id === selectedID);
-                    if (gameMapsIndex < 0) return v;
-
-                    return StrategyMemoUtility.additionGameMapXY(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                        0,
-                        5,
-                    );
-                });
-            }}
+            onClick={() => handleButtonClick()}
         />
     );
 };

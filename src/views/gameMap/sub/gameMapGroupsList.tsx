@@ -104,17 +104,17 @@ const AddItemDialog = ({
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
-    const [value, setValue] = useState("");
+    const [name, setName] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        const gameMapGroup = GameMapGroupUtility.create(value, [], uuidv4());
-        if (!gameMapGroup.name) {
+        if (name.trim().length === 0) {
             setIsOpen(false);
             return;
         }
 
+        const gameMapGroup = GameMapGroupUtility.create(name, [], uuidv4());
         setStrategyMemo((v) =>
             StrategyMemoUtility.addedGameMapGroup(v, gameMapGroup),
         );
@@ -131,8 +131,8 @@ const AddItemDialog = ({
         >
             <TextField
                 label="名前"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
             />
         </DialogView>
     );
@@ -176,7 +176,7 @@ const EditItemDialog = ({
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (!name) {
+        if (name.trim().length == 0) {
             setIsOpen(false);
             return;
         }
@@ -278,8 +278,6 @@ const MoveItemUpButton = ({
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    if (gameMapGroupsIndex < 0) return <></>;
-
     return (
         <ChevronUpIconButton
             onClick={() => {
@@ -308,8 +306,6 @@ const MoveItemDownButton = ({
     setGameMapGroupsIndex: React.Dispatch<React.SetStateAction<number>>;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-
-    if (gameMapGroupsIndex < 0) return <></>;
 
     return (
         <ChevronDownIconButton

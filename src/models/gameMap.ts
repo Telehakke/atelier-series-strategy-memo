@@ -1,3 +1,4 @@
+import { StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull, isStrings } from "./typeGuards";
 
 export type GameMap = {
@@ -70,5 +71,16 @@ export class GameMapUtility {
             y: y,
             id: id,
         };
+    };
+
+    static findIndex = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        id: string,
+    ): number | null => {
+        const index = strategyMemo.gameMapGroups[
+            gameMapGroupsIndex
+        ].gameMaps.findIndex((v) => v.id === id);
+        return index < 0 ? null : index;
     };
 }

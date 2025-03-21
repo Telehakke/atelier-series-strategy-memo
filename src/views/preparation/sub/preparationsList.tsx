@@ -42,22 +42,10 @@ const PreparationsList = ({
             </div>
             {selectedID != null && (
                 <div className="fixed right-4 bottom-4 space-y-4">
-                    <MoveItemUpButton
-                        preparations={preparations}
-                        selectedID={selectedID}
-                    />
-                    <MoveItemDownButton
-                        preparations={preparations}
-                        selectedID={selectedID}
-                    />
-                    <EditItemButton
-                        preparations={preparations}
-                        selectedID={selectedID}
-                    />
-                    <RemoveItemButton
-                        preparations={preparations}
-                        selectedID={selectedID}
-                    />
+                    <MoveItemUpButton selectedID={selectedID} />
+                    <MoveItemDownButton selectedID={selectedID} />
+                    <EditItemButton selectedID={selectedID} />
+                    <RemoveItemButton selectedID={selectedID} />
                 </div>
             )}
         </>
@@ -226,17 +214,17 @@ const AddItemDialog = ({
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
+        if (name.trim().length === 0) {
+            setIsOpen(false);
+            return;
+        }
+
         const preparation = PreparationUtility.create(
             name,
             materials,
             categories,
             uuidv4(),
         );
-        if (!preparation.name) {
-            setIsOpen(false);
-            return;
-        }
-
         setStrategyMemo((v) =>
             StrategyMemoUtility.addedPreparation(v, preparation),
         );
@@ -265,19 +253,8 @@ const AddItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const EditItemButton = ({
-    preparations,
-    selectedID,
-}: {
-    preparations: PreparationWithID[];
-    selectedID: string;
-}) => {
+const EditItemButton = ({ selectedID }: { selectedID: string }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const preparationsIndex = preparations.findIndex(
-        (v) => v.id === selectedID,
-    );
-
-    if (preparationsIndex < 0) return <></>;
 
     return (
         <>
@@ -286,7 +263,7 @@ const EditItemButton = ({
                 key={`${isOpen}`}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                preparationsIndex={preparationsIndex}
+                selectedID={selectedID}
             />
         </>
     );
@@ -295,42 +272,39 @@ const EditItemButton = ({
 const EditItemDialog = ({
     isOpen,
     setIsOpen,
-    preparationsIndex,
+    selectedID,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    preparationsIndex: number;
+    selectedID: string;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const preparation = strategyMemo.preparations[preparationsIndex];
-    const [name, setName] = useState(preparation.name);
+    const index = PreparationUtility.findIndex(strategyMemo, selectedID);
+    const preparation = index == null ? null : strategyMemo.preparations[index];
+    const [name, setName] = useState(preparation?.name ?? "");
     const [materials, setMaterials] = useState(
-        preparation.materials.join("、"),
+        preparation?.materials.join("、") ?? "",
     );
     const [categories, setCategories] = useState(
-        preparation.categories.join("、"),
+        preparation?.categories.join("、") ?? "",
     );
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
+        if (index == null || preparation == null || name.trim().length === 0) {
+            setIsOpen(false);
+            return;
+        }
+
         const newPreparation = PreparationUtility.create(
             name,
             materials,
             categories,
             preparation.id,
         );
-        if (!newPreparation.name) {
-            setIsOpen(false);
-            return;
-        }
-
         setStrategyMemo((v) =>
-            StrategyMemoUtility.changedPreparation(
-                v,
-                preparationsIndex,
-                newPreparation,
-            ),
+            StrategyMemoUtility.changedPreparation(v, index, newPreparation),
         );
         setIsOpen(false);
     };
@@ -357,19 +331,8 @@ const EditItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const RemoveItemButton = ({
-    preparations,
-    selectedID,
-}: {
-    preparations: PreparationWithID[];
-    selectedID: string;
-}) => {
+const RemoveItemButton = ({ selectedID }: { selectedID: string }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const preparationsIndex = preparations.findIndex(
-        (v) => v.id === selectedID,
-    );
-
-    if (preparationsIndex < 0) return <></>;
 
     return (
         <>
@@ -377,7 +340,7 @@ const RemoveItemButton = ({
             <RemoveItemDialog
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                preparationsIndex={preparationsIndex}
+                selectedID={selectedID}
             />
         </>
     );
@@ -386,20 +349,24 @@ const RemoveItemButton = ({
 const RemoveItemDialog = ({
     isOpen,
     setIsOpen,
-    preparationsIndex,
+    selectedID,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    preparationsIndex: number;
+    selectedID: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ): void => {
-        setStrategyMemo((v) =>
-            StrategyMemoUtility.removedPreparation(v, preparationsIndex),
-        );
+        setStrategyMemo((v) => {
+            const index = PreparationUtility.findIndex(v, selectedID);
+            if (index == null) return v;
+
+            return StrategyMemoUtility.removedPreparation(v, index);
+        });
+
         setIsOpen(false);
     };
 
@@ -455,58 +422,32 @@ const PreparationInput = ({
 
 /* -------------------------------------------------------------------------- */
 
-const MoveItemUpButton = ({
-    preparations,
-    selectedID,
-}: {
-    preparations: PreparationWithID[];
-    selectedID: string;
-}) => {
+const MoveItemUpButton = ({ selectedID }: { selectedID: string }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
-    const preparationsIndex = preparations.findIndex(
-        (v) => v.id === selectedID,
-    );
 
-    if (preparationsIndex < 0) return <></>;
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            const index = PreparationUtility.findIndex(v, selectedID);
+            if (index == null) return v;
 
-    return (
-        <ChevronUpIconLargeButton
-            onClick={() => {
-                setStrategyMemo((v) =>
-                    StrategyMemoUtility.movedPreparationUp(
-                        v,
-                        preparationsIndex,
-                    ),
-                );
-            }}
-        />
-    );
+            return StrategyMemoUtility.movedPreparationUp(v, index);
+        });
+    };
+
+    return <ChevronUpIconLargeButton onClick={() => handleButtonClick()} />;
 };
 
-const MoveItemDownButton = ({
-    preparations,
-    selectedID,
-}: {
-    preparations: PreparationWithID[];
-    selectedID: string;
-}) => {
+const MoveItemDownButton = ({ selectedID }: { selectedID: string }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
-    const preparationsIndex = preparations.findIndex(
-        (v) => v.id === selectedID,
-    );
 
-    if (preparationsIndex < 0) return <></>;
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            const index = PreparationUtility.findIndex(v, selectedID);
+            if (index == null) return v;
 
-    return (
-        <ChevronDownIconLargeButton
-            onClick={() => {
-                setStrategyMemo((v) =>
-                    StrategyMemoUtility.movedPreparationDown(
-                        v,
-                        preparationsIndex,
-                    ),
-                );
-            }}
-        />
-    );
+            return StrategyMemoUtility.movedPreparationDown(v, index);
+        });
+    };
+
+    return <ChevronDownIconLargeButton onClick={() => handleButtonClick()} />;
 };

@@ -1,3 +1,4 @@
+import { StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull, isStrings } from "./typeGuards";
 
 export type Preparation = {
@@ -45,5 +46,13 @@ export class PreparationUtility {
             categories: categories,
             id: id,
         };
+    };
+
+    static findIndex = (
+        strategyMemo: StrategyMemoWithID,
+        id: string,
+    ): number | null => {
+        const index = strategyMemo.preparations.findIndex((v) => v.id === id);
+        return index < 0 ? null : index;
     };
 }

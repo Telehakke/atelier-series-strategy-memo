@@ -50,24 +50,20 @@ const GameMapsList = ({
                     {!onFiltering && (
                         <>
                             <MoveItemUpButton
-                                gameMapGroup={gameMapGroup}
                                 gameMapGroupsIndex={gameMapGroupsIndex}
                                 selectedID={selectedID}
                             />
                             <MoveItemDownButton
-                                gameMapGroup={gameMapGroup}
                                 gameMapGroupsIndex={gameMapGroupsIndex}
                                 selectedID={selectedID}
                             />
                         </>
                     )}
                     <EditItemButton
-                        gameMapGroup={gameMapGroup}
                         gameMapGroupsIndex={gameMapGroupsIndex}
                         selectedID={selectedID}
                     />
                     <RemoveItemButton
-                        gameMapGroup={gameMapGroup}
                         gameMapGroupsIndex={gameMapGroupsIndex}
                         selectedID={selectedID}
                     />
@@ -193,6 +189,11 @@ const AddItemDialog = ({
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
+        if (name.trim().length === 0) {
+            setIsOpen(false);
+            return;
+        }
+
         const gameMap = GameMapUtility.create(
             name,
             items,
@@ -203,11 +204,6 @@ const AddItemDialog = ({
             y,
             uuidv4(),
         );
-        if (!gameMap.name) {
-            setIsOpen(false);
-            return;
-        }
-
         setStrategyMemo((v) =>
             StrategyMemoUtility.addedGameMap(v, gameMapGroupsIndex, gameMap),
         );
@@ -245,20 +241,13 @@ const AddItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const EditItemButton = ({
-    gameMapGroup,
     gameMapGroupsIndex,
     selectedID,
 }: {
-    gameMapGroup: GameMapGroupWithID;
     gameMapGroupsIndex: number;
     selectedID: string;
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const gameMapsIndex = gameMapGroup.gameMaps.findIndex(
-        (v) => v.id === selectedID,
-    );
-
-    if (gameMapsIndex < 0) return <></>;
 
     return (
         <>
@@ -268,7 +257,7 @@ const EditItemButton = ({
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 gameMapGroupsIndex={gameMapGroupsIndex}
-                gameMapsIndex={gameMapsIndex}
+                selectedID={selectedID}
             />
         </>
     );
@@ -278,27 +267,41 @@ const EditItemDialog = ({
     isOpen,
     setIsOpen,
     gameMapGroupsIndex,
-    gameMapsIndex,
+    selectedID,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     gameMapGroupsIndex: number;
-    gameMapsIndex: number;
+    selectedID: string;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+    const index = GameMapUtility.findIndex(
+        strategyMemo,
+        gameMapGroupsIndex,
+        selectedID,
+    );
     const gameMap =
-        strategyMemo.gameMapGroups[gameMapGroupsIndex].gameMaps[gameMapsIndex];
-    const [name, setName] = useState(gameMap.name);
-    const [items, setItems] = useState(gameMap.items.join("、"));
-    const [monsters, setMonsters] = useState(gameMap.monsters.join("、"));
-    const [memo, setMemo] = useState(gameMap.memo);
-    const [icon, setIcon] = useState(gameMap.icon);
-    const [x, setX] = useState(gameMap.x.toString());
-    const [y, setY] = useState(gameMap.y.toString());
+        index == null
+            ? null
+            : strategyMemo.gameMapGroups[gameMapGroupsIndex].gameMaps[index];
+    const [name, setName] = useState(gameMap?.name ?? "");
+    const [items, setItems] = useState(gameMap?.items.join("、") ?? "");
+    const [monsters, setMonsters] = useState(
+        gameMap?.monsters.join("、") ?? "",
+    );
+    const [memo, setMemo] = useState(gameMap?.memo ?? "");
+    const [icon, setIcon] = useState(gameMap?.icon ?? "");
+    const [x, setX] = useState(gameMap?.x.toString() ?? "");
+    const [y, setY] = useState(gameMap?.y.toString() ?? "");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
+        if (index == null || gameMap == null || name.trim().length === 0) {
+            setIsOpen(false);
+            return;
+        }
+
         const newGameMap = GameMapUtility.create(
             name,
             items,
@@ -309,16 +312,11 @@ const EditItemDialog = ({
             y,
             gameMap.id,
         );
-        if (!newGameMap.name) {
-            setIsOpen(false);
-            return;
-        }
-
         setStrategyMemo((v) =>
             StrategyMemoUtility.changedGameMap(
                 v,
                 gameMapGroupsIndex,
-                gameMapsIndex,
+                index,
                 newGameMap,
             ),
         );
@@ -356,20 +354,13 @@ const EditItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const RemoveItemButton = ({
-    gameMapGroup,
     gameMapGroupsIndex,
     selectedID,
 }: {
-    gameMapGroup: GameMapGroupWithID;
     gameMapGroupsIndex: number;
     selectedID: string;
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const gameMapsIndex = gameMapGroup.gameMaps.findIndex(
-        (v) => v.id === selectedID,
-    );
-
-    if (gameMapsIndex < 0) return <></>;
 
     return (
         <>
@@ -378,7 +369,7 @@ const RemoveItemButton = ({
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 gameMapGroupsIndex={gameMapGroupsIndex}
-                gameMapsIndex={gameMapsIndex}
+                selectedID={selectedID}
             />
         </>
     );
@@ -388,25 +379,32 @@ const RemoveItemDialog = ({
     isOpen,
     setIsOpen,
     gameMapGroupsIndex,
-    gameMapsIndex,
+    selectedID,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     gameMapGroupsIndex: number;
-    gameMapsIndex: number;
+    selectedID: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        setStrategyMemo((v) =>
-            StrategyMemoUtility.removedGameMap(
+        setStrategyMemo((v) => {
+            const index = GameMapUtility.findIndex(
                 v,
                 gameMapGroupsIndex,
-                gameMapsIndex,
-            ),
-        );
+                selectedID,
+            );
+            if (index == null) return v;
+
+            return StrategyMemoUtility.removedGameMap(
+                v,
+                gameMapGroupsIndex,
+                index,
+            );
+        });
         setIsOpen(false);
     };
 
@@ -501,63 +499,59 @@ const GameMapInput = ({
 /* -------------------------------------------------------------------------- */
 
 const MoveItemUpButton = ({
-    gameMapGroup,
     gameMapGroupsIndex,
     selectedID,
 }: {
-    gameMapGroup: GameMapGroupWithID;
     gameMapGroupsIndex: number;
     selectedID: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
-    const gameMapsIndex = gameMapGroup.gameMaps.findIndex(
-        (v) => v.id === selectedID,
-    );
 
-    if (gameMapsIndex < 0) return <></>;
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            const index = GameMapUtility.findIndex(
+                v,
+                gameMapGroupsIndex,
+                selectedID,
+            );
+            if (index == null) return v;
 
-    return (
-        <ChevronUpIconLargeButton
-            onClick={() => {
-                setStrategyMemo((v) =>
-                    StrategyMemoUtility.movedGameMapUp(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                    ),
-                );
-            }}
-        />
-    );
+            return StrategyMemoUtility.movedGameMapUp(
+                v,
+                gameMapGroupsIndex,
+                index,
+            );
+        });
+    };
+
+    return <ChevronUpIconLargeButton onClick={() => handleButtonClick()} />;
 };
 
 const MoveItemDownButton = ({
-    gameMapGroup,
     gameMapGroupsIndex,
     selectedID,
 }: {
-    gameMapGroup: GameMapGroupWithID;
     gameMapGroupsIndex: number;
     selectedID: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
-    const gameMapsIndex = gameMapGroup.gameMaps.findIndex(
-        (v) => v.id === selectedID,
-    );
 
-    if (gameMapsIndex < 0) return <></>;
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            const index = GameMapUtility.findIndex(
+                v,
+                gameMapGroupsIndex,
+                selectedID,
+            );
+            if (index == null) return v;
 
-    return (
-        <ChevronDownIconLargeButton
-            onClick={() => {
-                setStrategyMemo((v) =>
-                    StrategyMemoUtility.movedGameMapDown(
-                        v,
-                        gameMapGroupsIndex,
-                        gameMapsIndex,
-                    ),
-                );
-            }}
-        />
-    );
+            return StrategyMemoUtility.movedGameMapDown(
+                v,
+                gameMapGroupsIndex,
+                index,
+            );
+        });
+    };
+
+    return <ChevronDownIconLargeButton onClick={() => handleButtonClick()} />;
 };
