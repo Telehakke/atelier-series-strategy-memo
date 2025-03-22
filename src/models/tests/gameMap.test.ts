@@ -23,7 +23,7 @@ test("isGameMaps", () => {
 
 test("create", () => {
     const gameMap = GameMapUtility.create(
-        "雛鳥の森",
+        "雛鳥の林",
         "正体不明のタマゴ、赤うに、うに、夕焼け草",
         "ゴースト、緑プニ、青プニ",
         "",
@@ -33,7 +33,7 @@ test("create", () => {
         "0",
     );
     const expected: GameMapWithID = {
-        name: "雛鳥の森",
+        name: "雛鳥の林",
         items: ["正体不明のタマゴ", "赤うに", "うに", "夕焼け草"],
         monsters: ["ゴースト", "緑プニ", "青プニ"],
         memo: "",

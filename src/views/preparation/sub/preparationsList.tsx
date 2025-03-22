@@ -20,8 +20,10 @@ import TextField from "../../commons/textField";
 
 const PreparationsList = ({
     preparations,
+    onFiltering,
 }: {
     preparations: PreparationWithID[];
+    onFiltering: boolean;
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
 
@@ -32,17 +34,20 @@ const PreparationsList = ({
                     <Card
                         key={v.id}
                         preparation={v}
-                        preparations={preparations}
                         selectedID={selectedID}
                         setSelectedID={setSelectedID}
                     />
                 ))}
-                <AddItemButton />
+                {!onFiltering && <AddItemButton />}
             </div>
             {selectedID != null && (
                 <div className="fixed right-4 bottom-4 space-y-4">
-                    <MoveItemUpButton selectedID={selectedID} />
-                    <MoveItemDownButton selectedID={selectedID} />
+                    {!onFiltering && (
+                        <>
+                            <MoveItemUpButton selectedID={selectedID} />
+                            <MoveItemDownButton selectedID={selectedID} />
+                        </>
+                    )}
                     <EditItemButton selectedID={selectedID} />
                     <RemoveItemButton selectedID={selectedID} />
                 </div>
@@ -57,12 +62,10 @@ export default PreparationsList;
 
 const Card = ({
     preparation,
-    preparations,
     selectedID,
     setSelectedID,
 }: {
     preparation: PreparationWithID;
-    preparations: PreparationWithID[];
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
@@ -86,14 +89,8 @@ const Card = ({
                 </h2>
             </div>
             <div className={`divide-y-2 ${Divide.neutral950}`}>
-                <MaterialsTable
-                    preparation={preparation}
-                    preparations={preparations}
-                />
-                <CategoriesTable
-                    preparation={preparation}
-                    preparations={preparations}
-                />
+                <MaterialsTable preparation={preparation} />
+                <CategoriesTable preparation={preparation} />
             </div>
         </div>
     );
@@ -101,12 +98,13 @@ const Card = ({
 
 const MaterialsTable = ({
     preparation,
-    preparations,
 }: {
     preparation: PreparationWithID;
-    preparations: PreparationWithID[];
 }) => {
-    const preparationsFiltering = new PreparationsFiltering(preparations);
+    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
+    const preparationsFiltering = new PreparationsFiltering(
+        strategyMemo.preparations,
+    );
 
     return (
         <Table header1="材料" header2="材料として使える調合品">
@@ -131,12 +129,13 @@ const MaterialsTable = ({
 
 const CategoriesTable = ({
     preparation,
-    preparations,
 }: {
     preparation: PreparationWithID;
-    preparations: PreparationWithID[];
 }) => {
-    const preparationsFiltering = new PreparationsFiltering(preparations);
+    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
+    const preparationsFiltering = new PreparationsFiltering(
+        strategyMemo.preparations,
+    );
 
     return (
         <Table header1="カテゴリー" header2="調合可能なレシピ">

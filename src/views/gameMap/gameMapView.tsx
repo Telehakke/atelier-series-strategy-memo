@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { GameMapGroupWithID } from "../../models/gameMapGroup";
 import GameMapGroupsFiltering from "../../models/gameMapGroupsFiltering";
+import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
 import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
 import GameMapCanvas from "./sub/gameMapCanvas";
@@ -22,8 +23,9 @@ const GameMapView = ({
     const [onFiltering, setOnFiltering] = useState(false);
     const [filteringValue, setFilteringValue] = useState("");
     const gameMapGroupsFiltering = new GameMapGroupsFiltering(gameMapGroups);
-    const filteredGameMapGroups =
-        gameMapGroupsFiltering.filtered(filteringValue);
+    const filteredGameMapGroups = gameMapGroupsFiltering.filtered(
+        splitByWhiteSpace(filteringValue),
+    );
 
     return (
         <>

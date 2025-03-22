@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MemoWithID } from "../../models/memo";
 import MemosFiltering from "../../models/memosFiltering";
+import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
 import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
 import MemosFilteringTextField from "./sub/memosFilteringTextField";
@@ -19,7 +20,9 @@ const MemoView = ({
     const [onFiltering, setOnFiltering] = useState(false);
     const [filteringValue, setFilteringValue] = useState("");
     const memosFiltering = new MemosFiltering(memos);
-    const filteredMemos = memosFiltering.filtered(filteringValue);
+    const filteredMemos = memosFiltering.filtered(
+        splitByWhiteSpace(filteringValue),
+    );
 
     return (
         <>
