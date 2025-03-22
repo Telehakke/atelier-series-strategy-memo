@@ -3,9 +3,9 @@ import { GameMapGroupWithID } from "../../models/gameMapGroup";
 import GameMapGroupsFiltering from "../../models/gameMapGroupsFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
+import FilteringTextField from "../commons/filteringTextField";
 import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
 import GameMapCanvas from "./sub/gameMapCanvas";
-import GameMapGroupsFilterInput from "./sub/gameMapGroupsFilterInput";
 import GameMapGroupsList from "./sub/gameMapGroupsList";
 import GameMapsLinkList from "./sub/gameMapsLinkList";
 import GameMapsList from "./sub/gameMapsList";
@@ -42,7 +42,7 @@ const GameMapView = ({
                             gameMapGroupsIndex={gameMapGroupsIndex}
                             setGameMapGroupsIndex={setGameMapGroupsIndex}
                         />
-                        <GameMapGroupsFilterInput
+                        <FilteringTextField
                             className="py-2"
                             filteringValue={filteringValue}
                             setFilteringValue={setFilteringValue}

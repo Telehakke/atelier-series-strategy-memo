@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MemoUtility, MemoWithID } from "../../../models/memo";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
-import { Bg, Border, Ring, Text } from "../../commons/classNames";
+import CardBase from "../../commons/cardBase";
 import DialogView from "../../commons/dialogView";
 import {
     ChevronDownIconLargeButton,
@@ -67,24 +67,15 @@ const Card = ({
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     return (
-        <div
-            className={`mx-auto max-w-150 overflow-clip rounded-md border-2 hover:ring-4 ${Border.neutral950} ${Ring.blue500}`}
+        <CardBase
+            title={memo.title}
+            selected={memo.id === selectedID}
             onClick={() =>
                 setSelectedID(memo.id === selectedID ? null : memo.id)
             }
         >
-            <div
-                className={`flex h-9 items-center justify-between gap-2 px-1 ${memo.id === selectedID ? Bg.blue500 : Bg.neutral950}`}
-            >
-                <h2
-                    className={`scroll-mt-14 scroll-pt-14 truncate text-lg font-bold ${Text.neutral50}`}
-                    id={memo.title}
-                >
-                    {memo.title}
-                </h2>
-            </div>
             <p className="p-1 text-sm whitespace-pre-wrap">{memo.text}</p>
-        </div>
+        </CardBase>
     );
 };
 

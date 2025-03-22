@@ -7,7 +7,8 @@ import {
 } from "../../../models/preparation";
 import PreparationsFiltering from "../../../models/preparationsFiltering";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
-import { Bg, Border, Divide, Ring, Text } from "../../commons/classNames";
+import CardBase from "../../commons/cardBase";
+import { Bg, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
 import {
     ChevronDownIconLargeButton,
@@ -70,29 +71,18 @@ const Card = ({
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     return (
-        <div
-            className={`mx-auto max-w-150 overflow-clip rounded-md border-2 hover:ring-4 ${Border.neutral950} ${Ring.blue500}`}
+        <CardBase
+            title={preparation.name}
+            selected={preparation.id === selectedID}
             onClick={() =>
                 setSelectedID(
                     preparation.id === selectedID ? null : preparation.id,
                 )
             }
         >
-            <div
-                className={`flex h-9 items-center justify-between gap-2 px-1 ${preparation.id === selectedID ? Bg.blue500 : Bg.neutral950}`}
-            >
-                <h2
-                    className={`scroll-mt-14 scroll-pt-14 truncate text-lg font-bold ${Text.neutral50}`}
-                    id={preparation.name}
-                >
-                    {preparation.name}
-                </h2>
-            </div>
-            <div className={`divide-y-2 ${Divide.neutral950}`}>
-                <MaterialsTable preparation={preparation} />
-                <CategoriesTable preparation={preparation} />
-            </div>
-        </div>
+            <MaterialsTable preparation={preparation} />
+            <CategoriesTable preparation={preparation} />
+        </CardBase>
     );
 };
 

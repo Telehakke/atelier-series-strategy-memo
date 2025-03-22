@@ -3,8 +3,8 @@ import { PreparationWithID } from "../../models/preparation";
 import PreparationsFiltering from "../../models/preparationsFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
+import FilteringTextField from "../commons/filteringTextField";
 import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
-import PreparationsFilteringTextField from "./sub/preparationsFilteringTextField";
 import PreparationsLinkList from "./sub/preparationsLinkList";
 import PreparationsList from "./sub/preparationsList";
 
@@ -33,7 +33,7 @@ const PreparationView = ({
                     <div
                         className={`divide-y-2 overflow-scroll ${Divide.neutral300}`}
                     >
-                        <PreparationsFilteringTextField
+                        <FilteringTextField
                             className="py-2"
                             filteringValue={filteringValue}
                             setFilteringValue={setFilteringValue}

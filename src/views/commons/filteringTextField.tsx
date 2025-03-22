@@ -1,8 +1,8 @@
 import { Input } from "@headlessui/react";
-import { Border } from "../../commons/classNames";
-import { CircleXIconButton } from "../../commons/iconButtons";
+import { Border } from "./classNames";
+import { CircleXIconButton } from "./iconButtons";
 
-const MemosFilteringTextField = ({
+const FilteringTextField = ({
     filteringValue,
     setFilteringValue,
     setOnFiltering,
@@ -16,7 +16,7 @@ const MemosFilteringTextField = ({
     return (
         <div className={`flex items-center gap-2 ${className}`}>
             <Input
-                className={`w-32 max-w-full rounded-md border-2 p-1 ${Border.neutral500}`}
+                className={`w-32 rounded-md border-2 p-1 ${Border.neutral500}`}
                 type="text"
                 placeholder="フィルタリング"
                 value={filteringValue}
@@ -37,4 +37,4 @@ const MemosFilteringTextField = ({
     );
 };
 
-export default MemosFilteringTextField;
+export default FilteringTextField;

@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
 import { GameMapGroupWithID } from "../../../models/gameMapGroup";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
-import { Bg, Border, Divide, Ring, Text } from "../../commons/classNames";
+import CardBase from "../../commons/cardBase";
+import { Bg, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
 import {
     ChevronDownIconLargeButton,
@@ -86,47 +87,34 @@ const Card = ({
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     return (
-        <div
-            className={`mx-auto max-w-150 overflow-clip rounded-md border-2 hover:ring-4 ${Border.neutral950} ${Ring.blue500}`}
+        <CardBase
+            title={gameMap.name}
+            selected={gameMap.id === selectedID}
             onClick={() =>
                 setSelectedID(gameMap.id === selectedID ? null : gameMap.id)
             }
         >
-            <div
-                className={`flex h-9 items-center justify-between gap-2 px-1 ${gameMap.id === selectedID ? Bg.blue500 : Bg.neutral950}`}
-            >
-                <h2
-                    className={`scroll-mt-14 scroll-pt-14 truncate text-lg font-bold ${Text.neutral50}`}
-                    id={gameMap.name}
-                >
-                    {gameMap.name}
-                </h2>
+            <TextWithLabel label="アイテム">
+                {gameMap.items.map((item, i) => (
+                    <span className="inline-block text-nowrap" key={i}>
+                        {`【${item}】`}
+                    </span>
+                ))}
+            </TextWithLabel>
+            <TextWithLabel label="モンスター">
+                {gameMap.monsters.map((monster, i) => (
+                    <span className="inline-block text-nowrap" key={i}>
+                        {`【${monster}】`}
+                    </span>
+                ))}
+            </TextWithLabel>
+            <TextWithLabel label="メモ">{gameMap.memo}</TextWithLabel>
+            <div className="flex gap-2">
+                <TextWithLabel label="アイコン">{gameMap.icon}</TextWithLabel>
+                <TextWithLabel label="座標x">{gameMap.x}</TextWithLabel>
+                <TextWithLabel label="座標y">{gameMap.y}</TextWithLabel>
             </div>
-            <div className={`divide-y-2 text-sm ${Divide.neutral950}`}>
-                <TextWithLabel label="アイテム">
-                    {gameMap.items.map((item, i) => (
-                        <span className="inline-block text-nowrap" key={i}>
-                            {`【${item}】`}
-                        </span>
-                    ))}
-                </TextWithLabel>
-                <TextWithLabel label="モンスター">
-                    {gameMap.monsters.map((monster, i) => (
-                        <span className="inline-block text-nowrap" key={i}>
-                            {`【${monster}】`}
-                        </span>
-                    ))}
-                </TextWithLabel>
-                <TextWithLabel label="メモ">{gameMap.memo}</TextWithLabel>
-                <div className="flex gap-2">
-                    <TextWithLabel label="アイコン">
-                        {gameMap.icon}
-                    </TextWithLabel>
-                    <TextWithLabel label="座標x">{gameMap.x}</TextWithLabel>
-                    <TextWithLabel label="座標y">{gameMap.y}</TextWithLabel>
-                </div>
-            </div>
-        </div>
+        </CardBase>
     );
 };
 

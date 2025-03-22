@@ -4,7 +4,8 @@ import MemosFiltering from "../../models/memosFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
 import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
-import MemosFilteringTextField from "./sub/memosFilteringTextField";
+
+import FilteringTextField from "../commons/filteringTextField";
 import MemosLinkList from "./sub/memosLinkList";
 import MemosList from "./sub/memosList";
 
@@ -33,7 +34,7 @@ const MemoView = ({
                     <div
                         className={`divide-y-2 overflow-scroll ${Divide.neutral300}`}
                     >
-                        <MemosFilteringTextField
+                        <FilteringTextField
                             className="py-2"
                             filteringValue={filteringValue}
                             setFilteringValue={setFilteringValue}
