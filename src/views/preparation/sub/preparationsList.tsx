@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ReactNode, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -251,7 +251,11 @@ const AddItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const EditItemButton = ({ selectedID }: { selectedID: string }) => {
+    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
+    const index = PreparationUtility.findIndex(strategyMemo, selectedID);
     const [isOpen, setIsOpen] = useState(false);
+
+    if (index == null) return <></>;
 
     return (
         <>
@@ -260,7 +264,7 @@ const EditItemButton = ({ selectedID }: { selectedID: string }) => {
                 key={`${isOpen}`}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                selectedID={selectedID}
+                index={index}
             />
         </>
     );
@@ -269,27 +273,26 @@ const EditItemButton = ({ selectedID }: { selectedID: string }) => {
 const EditItemDialog = ({
     isOpen,
     setIsOpen,
-    selectedID,
+    index,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedID: string;
+    index: number;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const index = PreparationUtility.findIndex(strategyMemo, selectedID);
-    const preparation = index == null ? null : strategyMemo.preparations[index];
-    const [name, setName] = useState(preparation?.name ?? "");
+    const preparation = strategyMemo.preparations[index];
+    const [name, setName] = useState(preparation.name);
     const [materials, setMaterials] = useState(
-        preparation?.materials.join("、") ?? "",
+        preparation.materials.join("、"),
     );
     const [categories, setCategories] = useState(
-        preparation?.categories.join("、") ?? "",
+        preparation.categories.join("、"),
     );
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (index == null || preparation == null || name.trim().length === 0) {
+        if (name.trim().length === 0) {
             setIsOpen(false);
             return;
         }
@@ -329,7 +332,11 @@ const EditItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const RemoveItemButton = ({ selectedID }: { selectedID: string }) => {
+    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
+    const index = PreparationUtility.findIndex(strategyMemo, selectedID);
     const [isOpen, setIsOpen] = useState(false);
+
+    if (index == null) return <></>;
 
     return (
         <>
@@ -337,7 +344,7 @@ const RemoveItemButton = ({ selectedID }: { selectedID: string }) => {
             <RemoveItemDialog
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                selectedID={selectedID}
+                index={index}
             />
         </>
     );
@@ -346,24 +353,18 @@ const RemoveItemButton = ({ selectedID }: { selectedID: string }) => {
 const RemoveItemDialog = ({
     isOpen,
     setIsOpen,
-    selectedID,
+    index,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedID: string;
+    index: number;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ): void => {
-        setStrategyMemo((v) => {
-            const index = PreparationUtility.findIndex(v, selectedID);
-            if (index == null) return v;
-
-            return PreparationUtility.removed(v, index);
-        });
-
+        setStrategyMemo((v) => PreparationUtility.removed(v, index));
         setIsOpen(false);
     };
 
@@ -420,30 +421,26 @@ const PreparationInput = ({
 /* -------------------------------------------------------------------------- */
 
 const MoveItemUpButton = ({ selectedID }: { selectedID: string }) => {
-    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+    const index = PreparationUtility.findIndex(strategyMemo, selectedID);
+
+    if (index == null) return <></>;
 
     const handleButtonClick = () => {
-        setStrategyMemo((v) => {
-            const index = PreparationUtility.findIndex(v, selectedID);
-            if (index == null) return v;
-
-            return PreparationUtility.movedUp(v, index);
-        });
+        setStrategyMemo((v) => PreparationUtility.movedUp(v, index));
     };
 
     return <ChevronUpIconLargeButton onClick={() => handleButtonClick()} />;
 };
 
 const MoveItemDownButton = ({ selectedID }: { selectedID: string }) => {
-    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+    const index = PreparationUtility.findIndex(strategyMemo, selectedID);
+
+    if (index == null) return <></>;
 
     const handleButtonClick = () => {
-        setStrategyMemo((v) => {
-            const index = PreparationUtility.findIndex(v, selectedID);
-            if (index == null) return v;
-
-            return PreparationUtility.movedDown(v, index);
-        });
+        setStrategyMemo((v) => PreparationUtility.movedDown(v, index));
     };
 
     return <ChevronDownIconLargeButton onClick={() => handleButtonClick()} />;

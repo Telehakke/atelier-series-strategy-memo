@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ReactNode, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
@@ -246,7 +246,15 @@ const EditItemButton = ({
     gameMapGroupsIndex: number;
     selectedID: string;
 }) => {
+    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
+    const index = GameMapUtility.findIndex(
+        strategyMemo,
+        gameMapGroupsIndex,
+        selectedID,
+    );
     const [isOpen, setIsOpen] = useState(false);
+
+    if (index == null) return <></>;
 
     return (
         <>
@@ -256,7 +264,7 @@ const EditItemButton = ({
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 gameMapGroupsIndex={gameMapGroupsIndex}
-                selectedID={selectedID}
+                index={index}
             />
         </>
     );
@@ -266,37 +274,28 @@ const EditItemDialog = ({
     isOpen,
     setIsOpen,
     gameMapGroupsIndex,
-    selectedID,
+    index,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     gameMapGroupsIndex: number;
-    selectedID: string;
+    index: number;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const index = GameMapUtility.findIndex(
-        strategyMemo,
-        gameMapGroupsIndex,
-        selectedID,
-    );
     const gameMap =
-        index == null
-            ? null
-            : strategyMemo.gameMapGroups[gameMapGroupsIndex].gameMaps[index];
-    const [name, setName] = useState(gameMap?.name ?? "");
-    const [items, setItems] = useState(gameMap?.items.join("、") ?? "");
-    const [monsters, setMonsters] = useState(
-        gameMap?.monsters.join("、") ?? "",
-    );
-    const [memo, setMemo] = useState(gameMap?.memo ?? "");
-    const [icon, setIcon] = useState(gameMap?.icon ?? "");
-    const [x, setX] = useState(gameMap?.x.toString() ?? "");
-    const [y, setY] = useState(gameMap?.y.toString() ?? "");
+        strategyMemo.gameMapGroups[gameMapGroupsIndex].gameMaps[index];
+    const [name, setName] = useState(gameMap.name);
+    const [items, setItems] = useState(gameMap.items.join("、"));
+    const [monsters, setMonsters] = useState(gameMap.monsters.join("、"));
+    const [memo, setMemo] = useState(gameMap.memo);
+    const [icon, setIcon] = useState(gameMap.icon);
+    const [x, setX] = useState(gameMap.x.toString());
+    const [y, setY] = useState(gameMap.y.toString());
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (index == null || gameMap == null || name.trim().length === 0) {
+        if (name.trim().length === 0) {
             setIsOpen(false);
             return;
         }
@@ -354,7 +353,15 @@ const RemoveItemButton = ({
     gameMapGroupsIndex: number;
     selectedID: string;
 }) => {
+    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
+    const index = GameMapUtility.findIndex(
+        strategyMemo,
+        gameMapGroupsIndex,
+        selectedID,
+    );
     const [isOpen, setIsOpen] = useState(false);
+
+    if (index == null) return <></>;
 
     return (
         <>
@@ -363,7 +370,7 @@ const RemoveItemButton = ({
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 gameMapGroupsIndex={gameMapGroupsIndex}
-                selectedID={selectedID}
+                index={index}
             />
         </>
     );
@@ -373,28 +380,21 @@ const RemoveItemDialog = ({
     isOpen,
     setIsOpen,
     gameMapGroupsIndex,
-    selectedID,
+    index,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     gameMapGroupsIndex: number;
-    selectedID: string;
+    index: number;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        setStrategyMemo((v) => {
-            const index = GameMapUtility.findIndex(
-                v,
-                gameMapGroupsIndex,
-                selectedID,
-            );
-            if (index == null) return v;
-
-            return GameMapUtility.removed(v, gameMapGroupsIndex, index);
-        });
+        setStrategyMemo((v) =>
+            GameMapUtility.removed(v, gameMapGroupsIndex, index),
+        );
         setIsOpen(false);
     };
 
@@ -495,19 +495,19 @@ const MoveItemUpButton = ({
     gameMapGroupsIndex: number;
     selectedID: string;
 }) => {
-    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+    const index = GameMapUtility.findIndex(
+        strategyMemo,
+        gameMapGroupsIndex,
+        selectedID,
+    );
+
+    if (index == null) return <></>;
 
     const handleButtonClick = () => {
-        setStrategyMemo((v) => {
-            const index = GameMapUtility.findIndex(
-                v,
-                gameMapGroupsIndex,
-                selectedID,
-            );
-            if (index == null) return v;
-
-            return GameMapUtility.movedUp(v, gameMapGroupsIndex, index);
-        });
+        setStrategyMemo((v) =>
+            GameMapUtility.movedUp(v, gameMapGroupsIndex, index),
+        );
     };
 
     return <ChevronUpIconLargeButton onClick={() => handleButtonClick()} />;
@@ -520,19 +520,19 @@ const MoveItemDownButton = ({
     gameMapGroupsIndex: number;
     selectedID: string;
 }) => {
-    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+    const index = GameMapUtility.findIndex(
+        strategyMemo,
+        gameMapGroupsIndex,
+        selectedID,
+    );
+
+    if (index == null) return <></>;
 
     const handleButtonClick = () => {
-        setStrategyMemo((v) => {
-            const index = GameMapUtility.findIndex(
-                v,
-                gameMapGroupsIndex,
-                selectedID,
-            );
-            if (index == null) return v;
-
-            return GameMapUtility.movedDown(v, gameMapGroupsIndex, index);
-        });
+        setStrategyMemo((v) =>
+            GameMapUtility.movedDown(v, gameMapGroupsIndex, index),
+        );
     };
 
     return <ChevronDownIconLargeButton onClick={() => handleButtonClick()} />;
