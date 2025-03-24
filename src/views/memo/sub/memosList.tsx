@@ -108,12 +108,13 @@ const AddItemDialog = ({
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
     const [title, setTitle] = useState("");
     const [text, setText] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         if (title.trim().length === 0) {
-            setIsOpen(false);
+            setErrorMessage("タイトルを入力してください");
             return;
         }
 
@@ -135,6 +136,7 @@ const AddItemDialog = ({
                 setTitle={setTitle}
                 text={text}
                 setText={setText}
+                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -175,12 +177,13 @@ const EditItemDialog = ({
     const memo = strategyMemo.memos[index];
     const [title, setTitle] = useState(memo.title);
     const [text, setText] = useState(memo.text);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         if (title.trim().length === 0) {
-            setIsOpen(false);
+            setErrorMessage("タイトルを入力してください");
             return;
         }
 
@@ -202,6 +205,7 @@ const EditItemDialog = ({
                 setTitle={setTitle}
                 text={text}
                 setText={setText}
+                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -265,17 +269,20 @@ const MemoInput = ({
     setTitle,
     text,
     setText,
+    errorMessage,
 }: {
     title: string;
     setTitle: React.Dispatch<React.SetStateAction<string>>;
     text: string;
     setText: React.Dispatch<React.SetStateAction<string>>;
+    errorMessage: string;
 }) => {
     return (
         <div className="space-y-2">
             <TextField
                 label="タイトル"
                 value={title}
+                errorMessage={errorMessage}
                 onChange={(e) => setTitle(e.target.value)}
             />
             <TextEditor

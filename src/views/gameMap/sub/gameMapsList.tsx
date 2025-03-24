@@ -177,12 +177,13 @@ const AddItemDialog = ({
     const [icon, setIcon] = useState("🔴");
     const [x, setX] = useState("50");
     const [y, setY] = useState("50");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         if (name.trim().length === 0) {
-            setIsOpen(false);
+            setErrorMessage("名前を入力してください");
             return;
         }
 
@@ -225,6 +226,7 @@ const AddItemDialog = ({
                 setX={setX}
                 y={y}
                 setY={setY}
+                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -284,12 +286,13 @@ const EditItemDialog = ({
     const [icon, setIcon] = useState(gameMap.icon);
     const [x, setX] = useState(gameMap.x.toString());
     const [y, setY] = useState(gameMap.y.toString());
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         if (name.trim().length === 0) {
-            setIsOpen(false);
+            setErrorMessage("名前を入力してください");
             return;
         }
 
@@ -332,6 +335,7 @@ const EditItemDialog = ({
                 setX={setX}
                 y={y}
                 setY={setY}
+                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -420,6 +424,7 @@ const GameMapInput = ({
     setX,
     y,
     setY,
+    errorMessage,
 }: {
     name: string;
     setName: React.Dispatch<React.SetStateAction<string>>;
@@ -435,12 +440,14 @@ const GameMapInput = ({
     setX: React.Dispatch<React.SetStateAction<string>>;
     y: string;
     setY: React.Dispatch<React.SetStateAction<string>>;
+    errorMessage: string;
 }) => {
     return (
         <div className="space-y-2">
             <TextField
                 label="名前"
                 value={name}
+                errorMessage={errorMessage}
                 onChange={(e) => setName(e.target.value)}
             />
             <TextField

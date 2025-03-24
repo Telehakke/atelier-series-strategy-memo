@@ -200,12 +200,13 @@ const AddItemDialog = ({
     const [name, setName] = useState("");
     const [materials, setMaterials] = useState("");
     const [categories, setCategories] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         if (name.trim().length === 0) {
-            setIsOpen(false);
+            setErrorMessage("名前を入力してください");
             return;
         }
 
@@ -234,6 +235,7 @@ const AddItemDialog = ({
                 setMaterials={setMaterials}
                 categories={categories}
                 setCategories={setCategories}
+                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -279,12 +281,13 @@ const EditItemDialog = ({
     const [categories, setCategories] = useState(
         preparation.categories.join("、"),
     );
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         if (name.trim().length === 0) {
-            setIsOpen(false);
+            setErrorMessage("名前を入力してください");
             return;
         }
 
@@ -315,6 +318,7 @@ const EditItemDialog = ({
                 setMaterials={setMaterials}
                 categories={categories}
                 setCategories={setCategories}
+                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -380,6 +384,7 @@ const PreparationInput = ({
     setMaterials,
     categories,
     setCategories,
+    errorMessage,
 }: {
     name: string;
     setName: React.Dispatch<React.SetStateAction<string>>;
@@ -387,12 +392,14 @@ const PreparationInput = ({
     setMaterials: React.Dispatch<React.SetStateAction<string>>;
     categories: string;
     setCategories: React.Dispatch<React.SetStateAction<string>>;
+    errorMessage: string;
 }) => {
     return (
         <div className="space-y-2">
             <TextField
                 label="名前"
                 value={name}
+                errorMessage={errorMessage}
                 onChange={(e) => setName(e.target.value)}
             />
             <TextField

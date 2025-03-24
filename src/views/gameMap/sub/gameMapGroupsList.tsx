@@ -104,12 +104,13 @@ const AddItemDialog = ({
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
     const [name, setName] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         if (name.trim().length === 0) {
-            setIsOpen(false);
+            setErrorMessage("名前を入力してください");
             return;
         }
 
@@ -129,6 +130,7 @@ const AddItemDialog = ({
             <TextField
                 label="名前"
                 value={name}
+                errorMessage={errorMessage}
                 onChange={(e) => setName(e.target.value)}
             />
         </DialogView>
@@ -169,12 +171,13 @@ const EditItemDialog = ({
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
     const gameMapGroup = strategyMemo.gameMapGroups[gameMapGroupsIndex];
     const [name, setName] = useState(gameMapGroup.name);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
         if (name.trim().length == 0) {
-            setIsOpen(false);
+            setErrorMessage("名前を入力してください");
             return;
         }
 
@@ -195,6 +198,7 @@ const EditItemDialog = ({
             <TextField
                 label="名前"
                 value={name}
+                errorMessage={errorMessage}
                 onChange={(e) => setName(e.target.value)}
             />
         </DialogView>
