@@ -19,7 +19,7 @@ const App = () => {
     return (
         <div className={`${Bg.neutral50} ${Text.neutral950}`}>
             <div
-                className={`fixed top-0 right-0 left-0 z-10 h-11 shadow-md ${Bg.neutral50}`}
+                className={`fixed top-0 right-0 left-0 z-10 h-12 shadow-md ${Bg.neutral50}`}
             />
             <TabGroup>
                 <div className="fixed top-2 right-0 left-0 z-20">
@@ -59,21 +59,21 @@ const App = () => {
                     </div>
                 </div>
                 <TabPanels>
-                    <TabPanel className="p-2 pt-13">
+                    <TabPanel className="p-2 pt-14">
                         <GameMapView
                             gameMapGroups={strategyMemoRepository.gameMapGroups}
                             isPanelOpen={isPanelOpen}
                             setIsPanelOpen={setIsPanelOpen}
                         />
                     </TabPanel>
-                    <TabPanel className="p-2 pt-13">
+                    <TabPanel className="p-2 pt-14">
                         <PreparationView
                             preparations={strategyMemoRepository.preparations}
                             isPanelOpen={isPanelOpen}
                             setIsPanelOpen={setIsPanelOpen}
                         />
                     </TabPanel>
-                    <TabPanel className="p-2 pt-13">
+                    <TabPanel className="p-2 pt-14">
                         <MemoView
                             memos={strategyMemoRepository.memos}
                             isPanelOpen={isPanelOpen}

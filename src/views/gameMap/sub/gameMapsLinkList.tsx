@@ -8,24 +8,18 @@ const GameMapsLinkList = ({
     gameMapGroup?: GameMapGroupWithID;
     className?: string;
 }) => {
-    if (gameMapGroup == null) return <></>;
-
     return (
-        <>
-            {gameMapGroup.gameMaps.length > 0 && (
-                <div className={className}>
-                    {gameMapGroup.gameMaps.map((v) => (
-                        <a
-                            className={`block truncate ${Text.hoverBlue500}`}
-                            key={v.id}
-                            href={`#${v.name}`}
-                        >
-                            {v.name}
-                        </a>
-                    ))}
-                </div>
-            )}
-        </>
+        <div className={`w-45 ${className}`}>
+            {gameMapGroup?.gameMaps.map((v) => (
+                <a
+                    className={`mb-2 block truncate ${Text.hoverBlue500}`}
+                    key={v.id}
+                    href={`#${v.name}`}
+                >
+                    {v.name}
+                </a>
+            ))}
+        </div>
     );
 };
 

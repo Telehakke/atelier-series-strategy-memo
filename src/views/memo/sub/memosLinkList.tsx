@@ -9,21 +9,17 @@ const MemosLinkList = ({
     className?: string;
 }) => {
     return (
-        <>
-            {memos.length > 0 && (
-                <div className={className}>
-                    {memos.map((v) => (
-                        <a
-                            className={`block truncate ${Text.hoverBlue500}`}
-                            key={v.id}
-                            href={`#${v.title}`}
-                        >
-                            {v.title}
-                        </a>
-                    ))}
-                </div>
-            )}
-        </>
+        <div className={`w-45 {${className}`}>
+            {memos.map((v) => (
+                <a
+                    className={`mb-2 block truncate ${Text.hoverBlue500}`}
+                    key={v.id}
+                    href={`#${v.title}`}
+                >
+                    {v.title}
+                </a>
+            ))}
+        </div>
     );
 };
 

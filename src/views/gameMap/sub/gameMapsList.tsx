@@ -42,11 +42,14 @@ const GameMapsList = ({
                     />
                 ))}
                 {!onFiltering && (
-                    <AddItemButton gameMapGroupsIndex={gameMapGroupsIndex} />
+                    <AddItemButton
+                        className="grid justify-items-center"
+                        gameMapGroupsIndex={gameMapGroupsIndex}
+                    />
                 )}
             </div>
             {selectedID != null && (
-                <div className="fixed right-4 bottom-4 space-y-4">
+                <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
                     {!onFiltering && (
                         <>
                             <MoveItemUpButton
@@ -137,13 +140,15 @@ const TextWithLabel = ({
 
 const AddItemButton = ({
     gameMapGroupsIndex,
+    className,
 }: {
     gameMapGroupsIndex: number;
+    className?: string;
 }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <>
+        <div className={className}>
             <PlusIconLargeButton onClick={() => setIsOpen(true)} />
             <AddItemDialog
                 key={`${isOpen}`}
@@ -151,7 +156,7 @@ const AddItemButton = ({
                 setIsOpen={setIsOpen}
                 gameMapGroupsIndex={gameMapGroupsIndex}
             />
-        </>
+        </div>
     );
 };
 
@@ -432,7 +437,7 @@ const GameMapInput = ({
     setY: React.Dispatch<React.SetStateAction<string>>;
 }) => {
     return (
-        <>
+        <div className="space-y-2">
             <TextField
                 label="名前"
                 value={name}
@@ -470,7 +475,7 @@ const GameMapInput = ({
                     onChange={(e) => setY(e.target.value)}
                 />
             </div>
-        </>
+        </div>
     );
 };
 

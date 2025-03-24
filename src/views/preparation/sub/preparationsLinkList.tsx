@@ -9,21 +9,17 @@ const PreparationsLinkList = ({
     className?: string;
 }) => {
     return (
-        <>
-            {preparations.length > 0 && (
-                <div className={className}>
-                    {preparations.map((v) => (
-                        <a
-                            className={`block truncate ${Text.hoverBlue500}`}
-                            key={v.id}
-                            href={`#${v.name}`}
-                        >
-                            {v.name}
-                        </a>
-                    ))}
-                </div>
-            )}
-        </>
+        <div className={`w-45 ${className}`}>
+            {preparations.map((v) => (
+                <a
+                    className={`block truncate pb-2 ${Text.hoverBlue500}`}
+                    key={v.id}
+                    href={`#${v.name}`}
+                >
+                    {v.name}
+                </a>
+            ))}
+        </div>
     );
 };
 

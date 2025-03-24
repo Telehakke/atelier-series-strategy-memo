@@ -39,10 +39,12 @@ const PreparationsList = ({
                         setSelectedID={setSelectedID}
                     />
                 ))}
-                {!onFiltering && <AddItemButton />}
+                {!onFiltering && (
+                    <AddItemButton className="grid justify-items-center" />
+                )}
             </div>
             {selectedID != null && (
-                <div className="fixed right-4 bottom-4 space-y-4">
+                <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
                     {!onFiltering && (
                         <>
                             <MoveItemUpButton selectedID={selectedID} />
@@ -172,18 +174,18 @@ const Table = ({
 
 /* -------------------------------------------------------------------------- */
 
-const AddItemButton = () => {
+const AddItemButton = ({ className }: { className?: string }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <>
+        <div className={className}>
             <PlusIconLargeButton onClick={() => setIsOpen(true)} />
             <AddItemDialog
                 key={`${isOpen}`}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
             />
-        </>
+        </div>
     );
 };
 
@@ -387,7 +389,7 @@ const PreparationInput = ({
     setCategories: React.Dispatch<React.SetStateAction<string>>;
 }) => {
     return (
-        <>
+        <div className="space-y-2">
             <TextField
                 label="名前"
                 value={name}
@@ -403,7 +405,7 @@ const PreparationInput = ({
                 value={categories}
                 onChange={(e) => setCategories(e.target.value)}
             />
-        </>
+        </div>
     );
 };
 

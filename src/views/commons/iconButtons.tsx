@@ -25,7 +25,7 @@ export const ChevronLeftIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 h-full rounded-full p-1 ${Bg.neutral100} ${Bg.hoverNeutral200}`}
+            className={`h-full rounded-full p-2 ${Bg.neutral100} ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <ChevronLeft className={`${Stroke.neutral700}`} />
@@ -40,7 +40,7 @@ export const ChevronRightIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 h-full rounded-full p-1 ${Bg.neutral100} ${Bg.hoverNeutral200}`}
+            className={`h-full rounded-full p-2 ${Bg.neutral100} ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <ChevronRight className={`${Stroke.neutral700}`} />
@@ -55,7 +55,7 @@ export const ClipboardIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <Clipboard className={`${Stroke.neutral700}`} />
@@ -71,7 +71,7 @@ export const PencilIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <Pencil className={`${Stroke.neutral700}`} />
@@ -86,7 +86,7 @@ export const TrashIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <Trash className={`${Stroke.neutral700}`} />
@@ -101,7 +101,7 @@ export const DatabaseIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <Database className={`${Stroke.neutral700}`} />
@@ -116,7 +116,7 @@ export const ChevronUpIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <ChevronUp className={`${Stroke.neutral700}`} />
@@ -131,7 +131,7 @@ export const ChevronDownIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <ChevronDown className={`${Stroke.neutral700}`} />
@@ -146,7 +146,7 @@ export const RotateCCWIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
             onClick={onClick}
         >
             <RotateCcw className={`${Stroke.neutral700}`} />
@@ -163,7 +163,7 @@ export const CircleXIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
             onClick={onClick}
         >
             <CircleX className={`${Stroke.neutral700}`} />
@@ -180,7 +180,7 @@ export const SquareChevronLeftIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
             onClick={onClick}
         >
             <SquareChevronLeft className={`${Stroke.neutral700}`} />
@@ -197,7 +197,7 @@ export const SquareChevronRightIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
             onClick={onClick}
         >
             <SquareChevronRight className={`${Stroke.neutral700}`} />
@@ -214,7 +214,7 @@ export const SquareChevronUpIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
             onClick={onClick}
         >
             <SquareChevronUp className={`${Stroke.neutral700}`} />
@@ -231,7 +231,7 @@ export const SquareChevronDownIconButton = ({
 }) => {
     return (
         <Button
-            className={`size-8 rounded-full p-1 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
             onClick={onClick}
         >
             <SquareChevronDown className={`${Stroke.neutral700}`} />
@@ -246,7 +246,7 @@ export const PlusIconLargeButton = ({
 }) => {
     return (
         <Button
-            className={`mx-auto grid size-10 place-items-center rounded-full ${Bg.blue500} ${Bg.hoverBlue400}`}
+            className={`rounded-full p-2 ${Bg.blue500} ${Bg.hoverBlue400}`}
             onClick={onClick}
         >
             <Plus className={`size-10 ${Stroke.neutral100}`} />
@@ -261,10 +261,10 @@ export const ChevronUpIconLargeButton = ({
 }) => {
     return (
         <Button
-            className={`mx-auto grid size-10 place-items-center rounded-full ${Bg.neutral500} ${Bg.hoverNeutral400}`}
+            className={`rounded-full p-2 ${Bg.neutral500} ${Bg.hoverNeutral400}`}
             onClick={onClick}
         >
-            <ChevronUp className={`size-7 ${Stroke.neutral100}`} />
+            <ChevronUp className={`size-10 ${Stroke.neutral100}`} />
         </Button>
     );
 };
@@ -276,10 +276,10 @@ export const ChevronDownIconLargeButton = ({
 }) => {
     return (
         <Button
-            className={`mx-auto grid size-10 place-items-center rounded-full ${Bg.neutral500} ${Bg.hoverNeutral400}`}
+            className={`rounded-full p-2 ${Bg.neutral500} ${Bg.hoverNeutral400}`}
             onClick={onClick}
         >
-            <ChevronDown className={`size-7 ${Stroke.neutral100}`} />
+            <ChevronDown className={`size-10 ${Stroke.neutral100}`} />
         </Button>
     );
 };
@@ -291,10 +291,10 @@ export const PencilIconLargeButton = ({
 }) => {
     return (
         <Button
-            className={`mx-auto grid size-10 place-items-center rounded-full ${Bg.blue500} ${Bg.hoverBlue400}`}
+            className={`rounded-full p-2 ${Bg.blue500} ${Bg.hoverBlue400}`}
             onClick={onClick}
         >
-            <Pencil className={`size-7 ${Stroke.neutral100}`} />
+            <Pencil className={`size-10 ${Stroke.neutral100}`} />
         </Button>
     );
 };
@@ -306,10 +306,10 @@ export const TrashIconLargeButton = ({
 }) => {
     return (
         <Button
-            className={`mx-auto grid size-10 place-items-center rounded-full ${Bg.red500} ${Bg.hoverRed400}`}
+            className={`rounded-full p-2 ${Bg.red500} ${Bg.hoverRed400}`}
             onClick={onClick}
         >
-            <Trash className={`size-7 ${Stroke.neutral100}`} />
+            <Trash className={`size-10 ${Stroke.neutral100}`} />
         </Button>
     );
 };

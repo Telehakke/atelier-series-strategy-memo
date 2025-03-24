@@ -118,17 +118,21 @@ const BackupDialog = ({
             primaryButtonLabel="更新"
             onPrimaryButtonClick={handleReplaceButtonClick}
         >
-            <div className="flex gap-2">
-                <p className="flex-1">{message}</p>
-                <ClipboardIconButton onClick={() => handleCopyButtonClick()} />
+            <div className="space-y-2">
+                <div className="flex gap-2">
+                    <p className="flex-1">{message}</p>
+                    <ClipboardIconButton
+                        onClick={() => handleCopyButtonClick()}
+                    />
+                </div>
+                <TextEditor
+                    className="h-40"
+                    value={value}
+                    onChange={(e) => {
+                        setValue(e.target.value);
+                    }}
+                />
             </div>
-            <TextEditor
-                className="h-40"
-                value={value}
-                onChange={(e) => {
-                    setValue(e.target.value);
-                }}
-            />
         </DialogView>
     );
 };

@@ -27,7 +27,7 @@ const PreparationView = ({
     return (
         <>
             <div
-                className={`fixed top-0 left-0 z-5 flex h-full max-w-60 gap-2 p-2 pt-13 ${Bg.neutral50}`}
+                className={`fixed top-0 left-0 z-5 flex h-full gap-2 p-2 pt-14 ${Bg.neutral50}`}
             >
                 {isPanelOpen && (
                     <div
@@ -51,7 +51,7 @@ const PreparationView = ({
                     setIsOpen={setIsPanelOpen}
                 />
             </div>
-            <div className="ml-11">
+            <div className="ml-13">
                 <PreparationsList
                     preparations={filteredPreparations}
                     onFiltering={onFiltering}

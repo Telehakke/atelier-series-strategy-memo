@@ -31,10 +31,10 @@ const GameMapGroupsList = ({
     className?: string;
 }) => {
     return (
-        <div className={`space-y-2 ${className}`}>
+        <div className={`flex w-45 flex-col space-y-2 ${className}`}>
             {gameMapGroups.length > 0 && (
                 <>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end">
                         <MoveItemUpButton
                             gameMapGroupsIndex={gameMapGroupsIndex}
                             setGameMapGroupsIndex={setGameMapGroupsIndex}
@@ -57,7 +57,7 @@ const GameMapGroupsList = ({
                         {gameMapGroups.map((v, i) => (
                             <li
                                 key={v.id}
-                                className={`px-2 ${gameMapGroupsIndex === i ? Bg.blue200 : Bg.hoverNeutral200}`}
+                                className={`px-2 py-1 ${gameMapGroupsIndex === i ? Bg.blue200 : Bg.hoverNeutral200}`}
                                 onClick={() => setGameMapGroupsIndex(i)}
                             >
                                 {v.name}
@@ -71,7 +71,7 @@ const GameMapGroupsList = ({
                     </ul>
                 </>
             )}
-            <AddItemButton />
+            <AddItemButton className="mx-auto" />
         </div>
     );
 };
@@ -80,18 +80,18 @@ export default GameMapGroupsList;
 
 /* -------------------------------------------------------------------------- */
 
-const AddItemButton = () => {
+const AddItemButton = ({ className }: { className?: string }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <>
+        <div className={className}>
             <PlusIconLargeButton onClick={() => setIsOpen(true)} />
             <AddItemDialog
                 key={`${isOpen}`}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
             />
-        </>
+        </div>
     );
 };
 

@@ -32,15 +32,15 @@ const DialogView = ({
                 className={`fixed inset-0 flex w-screen items-center justify-center ${Bg.black_25}`}
             >
                 <DialogPanel
-                    className={`m-4 w-full max-w-100 space-y-2 rounded-xl p-4 ${Bg.neutral50}`}
+                    className={`m-4 w-full max-w-100 space-y-4 rounded-xl p-4 ${Bg.neutral50}`}
                 >
                     <DialogTitle
                         className={`text-center font-bold ${Text.neutral950}`}
                     >
                         {title}
                     </DialogTitle>
-                    {children}
-                    <div className="flex justify-center gap-2">
+                    <div>{children}</div>
+                    <div className="flex justify-center gap-4">
                         <RoundedButton
                             label="キャンセル"
                             onClick={() => setIsOpen(false)}
