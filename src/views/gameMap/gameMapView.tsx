@@ -70,7 +70,9 @@ const GameMapView = ({
                 <GameMapCanvas
                     className="mb-2"
                     key={gameMapGroupsIndex}
-                    gameMapGroup={filteredGameMapGroups[gameMapGroupsIndex]}
+                    filteredGameMapGroup={
+                        filteredGameMapGroups[gameMapGroupsIndex]
+                    }
                     gameMapGroupsIndex={gameMapGroupsIndex}
                     selectedID={selectedIDInCanvas}
                     setSelectedID={setSelectedIDInCanvas}

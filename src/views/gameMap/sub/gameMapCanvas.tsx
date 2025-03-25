@@ -1,5 +1,5 @@
 import { Button } from "@headlessui/react";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
 import { GameMapGroupWithID } from "../../../models/gameMapGroup";
@@ -13,18 +13,19 @@ import {
 } from "../../commons/iconButtons";
 
 const GameMapCanvas = ({
-    gameMapGroup,
+    filteredGameMapGroup,
     gameMapGroupsIndex,
     selectedID,
     setSelectedID,
     className,
 }: {
-    gameMapGroup?: GameMapGroupWithID;
+    filteredGameMapGroup?: GameMapGroupWithID;
     gameMapGroupsIndex?: number;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;
 }) => {
+    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
     const canvas = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -43,9 +44,12 @@ const GameMapCanvas = ({
             ctx.lineTo(1000, i);
             ctx.stroke();
         }
-    }, [gameMapGroup]);
+    }, [filteredGameMapGroup]);
 
-    if (gameMapGroup == null || gameMapGroupsIndex == null) return <></>;
+    if (filteredGameMapGroup == null || gameMapGroupsIndex == null)
+        return <></>;
+
+    const gameMapGroup = strategyMemo.gameMapGroups[gameMapGroupsIndex];
 
     return (
         <>
@@ -58,17 +62,27 @@ const GameMapCanvas = ({
                     width="1000px"
                     height="1000px"
                 />
-                {gameMapGroup.gameMaps.map((v) => (
-                    <Card
-                        className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50}`}
-                        key={v.id}
-                        gameMap={v}
-                        selectedID={selectedID}
-                        setSelectedID={setSelectedID}
-                    />
-                ))}
+                {gameMapGroup.gameMaps
+                    .filter((gameMap) => {
+                        if (selectedID != null) return true;
+                        return filteredGameMapGroup.gameMaps.some(
+                            (filteredGameMap) =>
+                                gameMap.id === filteredGameMap.id,
+                        );
+                    })
+                    .map((v) => (
+                        <Card
+                            className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50}`}
+                            key={v.id}
+                            gameMap={v}
+                            selectedID={selectedID}
+                            setSelectedID={setSelectedID}
+                        />
+                    ))}
                 {selectedID != null &&
-                gameMapGroup.gameMaps.some((v) => v.id === selectedID) ? (
+                filteredGameMapGroup.gameMaps.some(
+                    (v) => v.id === selectedID,
+                ) ? (
                     <>
                         <MoveUpButton
                             gameMapGroupsIndex={gameMapGroupsIndex}
