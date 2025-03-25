@@ -20,11 +20,11 @@ import TextField from "../../commons/textField";
 const GameMapsList = ({
     gameMapGroup,
     gameMapGroupsIndex,
-    onFiltering,
+    setSelectedIDInCanvas,
 }: {
     gameMapGroup?: GameMapGroupWithID;
     gameMapGroupsIndex: number;
-    onFiltering: boolean;
+    setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
 
@@ -41,16 +41,10 @@ const GameMapsList = ({
                         setSelectedID={setSelectedID}
                     />
                 ))}
-                {!onFiltering && (
-                    <AddItemButton
-                        className="grid justify-items-center"
-                        gameMapGroupsIndex={gameMapGroupsIndex}
-                    />
-                )}
             </div>
-            {selectedID != null && (
-                <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
-                    {!onFiltering && (
+            <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
+                {selectedID != null &&
+                    gameMapGroup.gameMaps.some((v) => v.id === selectedID) && (
                         <>
                             <MoveItemUpButton
                                 gameMapGroupsIndex={gameMapGroupsIndex}
@@ -60,18 +54,22 @@ const GameMapsList = ({
                                 gameMapGroupsIndex={gameMapGroupsIndex}
                                 selectedID={selectedID}
                             />
+                            <EditItemButton
+                                gameMapGroupsIndex={gameMapGroupsIndex}
+                                selectedID={selectedID}
+                            />
+                            <RemoveItemButton
+                                gameMapGroupsIndex={gameMapGroupsIndex}
+                                selectedID={selectedID}
+                                setSelectedIDInCanvas={setSelectedIDInCanvas}
+                            />
                         </>
                     )}
-                    <EditItemButton
-                        gameMapGroupsIndex={gameMapGroupsIndex}
-                        selectedID={selectedID}
-                    />
-                    <RemoveItemButton
-                        gameMapGroupsIndex={gameMapGroupsIndex}
-                        selectedID={selectedID}
-                    />
-                </div>
-            )}
+                <AddItemButton
+                    className="grid justify-items-center"
+                    gameMapGroupsIndex={gameMapGroupsIndex}
+                />
+            </div>
         </>
     );
 };
@@ -92,6 +90,7 @@ const Card = ({
     return (
         <CardBase
             title={gameMap.name}
+            id={gameMap.id}
             selected={gameMap.id === selectedID}
             onClick={() =>
                 setSelectedID(gameMap.id === selectedID ? null : gameMap.id)
@@ -177,16 +176,10 @@ const AddItemDialog = ({
     const [icon, setIcon] = useState("🔴");
     const [x, setX] = useState("50");
     const [y, setY] = useState("50");
-    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (name.trim().length === 0) {
-            setErrorMessage("名前を入力してください");
-            return;
-        }
-
         const gameMap = GameMapUtility.create(
             name,
             items,
@@ -226,7 +219,6 @@ const AddItemDialog = ({
                 setX={setX}
                 y={y}
                 setY={setY}
-                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -249,18 +241,18 @@ const EditItemButton = ({
     );
     const [isOpen, setIsOpen] = useState(false);
 
-    if (index == null) return <></>;
-
     return (
         <>
             <PencilIconLargeButton onClick={() => setIsOpen(true)} />
-            <EditItemDialog
-                key={`${isOpen}`}
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                gameMapGroupsIndex={gameMapGroupsIndex}
-                index={index}
-            />
+            {index != null && (
+                <EditItemDialog
+                    key={`${isOpen}`}
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    gameMapGroupsIndex={gameMapGroupsIndex}
+                    index={index}
+                />
+            )}
         </>
     );
 };
@@ -286,16 +278,10 @@ const EditItemDialog = ({
     const [icon, setIcon] = useState(gameMap.icon);
     const [x, setX] = useState(gameMap.x.toString());
     const [y, setY] = useState(gameMap.y.toString());
-    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (name.trim().length === 0) {
-            setErrorMessage("名前を入力してください");
-            return;
-        }
-
         const newGameMap = GameMapUtility.create(
             name,
             items,
@@ -335,7 +321,6 @@ const EditItemDialog = ({
                 setX={setX}
                 y={y}
                 setY={setY}
-                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -346,9 +331,11 @@ const EditItemDialog = ({
 const RemoveItemButton = ({
     gameMapGroupsIndex,
     selectedID,
+    setSelectedIDInCanvas,
 }: {
     gameMapGroupsIndex: number;
     selectedID: string;
+    setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
     const index = GameMapUtility.findIndex(
@@ -358,17 +345,18 @@ const RemoveItemButton = ({
     );
     const [isOpen, setIsOpen] = useState(false);
 
-    if (index == null) return <></>;
-
     return (
         <>
             <TrashIconLargeButton onClick={() => setIsOpen(true)} />
-            <RemoveItemDialog
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                gameMapGroupsIndex={gameMapGroupsIndex}
-                index={index}
-            />
+            {index != null && (
+                <RemoveItemDialog
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    gameMapGroupsIndex={gameMapGroupsIndex}
+                    index={index}
+                    setSelectedIDInCanvas={setSelectedIDInCanvas}
+                />
+            )}
         </>
     );
 };
@@ -378,11 +366,13 @@ const RemoveItemDialog = ({
     setIsOpen,
     gameMapGroupsIndex,
     index,
+    setSelectedIDInCanvas,
 }: {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     gameMapGroupsIndex: number;
     index: number;
+    setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
@@ -393,6 +383,7 @@ const RemoveItemDialog = ({
             GameMapUtility.removed(v, gameMapGroupsIndex, index),
         );
         setIsOpen(false);
+        setSelectedIDInCanvas(null);
     };
 
     return (
@@ -424,7 +415,6 @@ const GameMapInput = ({
     setX,
     y,
     setY,
-    errorMessage,
 }: {
     name: string;
     setName: React.Dispatch<React.SetStateAction<string>>;
@@ -440,14 +430,12 @@ const GameMapInput = ({
     setX: React.Dispatch<React.SetStateAction<string>>;
     y: string;
     setY: React.Dispatch<React.SetStateAction<string>>;
-    errorMessage: string;
 }) => {
     return (
         <div className="space-y-2">
             <TextField
                 label="名前"
                 value={name}
-                errorMessage={errorMessage}
                 onChange={(e) => setName(e.target.value)}
             />
             <TextField

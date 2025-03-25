@@ -291,7 +291,7 @@ export const PencilIconLargeButton = ({
 }) => {
     return (
         <Button
-            className={`rounded-full p-2 ${Bg.blue500} ${Bg.hoverBlue400}`}
+            className={`rounded-full p-2 ${Bg.green500} ${Bg.hoverGreen400}`}
             onClick={onClick}
         >
             <Pencil className={`size-10 ${Stroke.neutral100}`} />

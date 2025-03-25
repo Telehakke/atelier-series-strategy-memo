@@ -18,7 +18,6 @@ const MemoView = ({
     isPanelOpen: boolean;
     setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-    const [onFiltering, setOnFiltering] = useState(false);
     const [filteringValue, setFilteringValue] = useState("");
     const memosFiltering = new MemosFiltering(memos);
     const filteredMemos = memosFiltering.filtered(
@@ -38,7 +37,6 @@ const MemoView = ({
                             className="py-2"
                             filteringValue={filteringValue}
                             setFilteringValue={setFilteringValue}
-                            setOnFiltering={setOnFiltering}
                         />
                         <MemosLinkList className="py-2" memos={filteredMemos} />
                     </div>
@@ -49,7 +47,7 @@ const MemoView = ({
                 />
             </div>
             <div className="ml-13">
-                <MemosList memos={filteredMemos} onFiltering={onFiltering} />
+                <MemosList memos={filteredMemos} />
             </div>
         </>
     );

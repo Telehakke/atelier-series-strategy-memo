@@ -20,12 +20,17 @@ const GameMapView = ({
     setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const [gameMapGroupsIndex, setGameMapGroupsIndex] = useState(0);
-    const [onFiltering, setOnFiltering] = useState(false);
     const [filteringValue, setFilteringValue] = useState("");
-    const gameMapGroupsFiltering = new GameMapGroupsFiltering(gameMapGroups);
-    const filteredGameMapGroups = gameMapGroupsFiltering.filtered(
-        splitByWhiteSpace(filteringValue),
+    const [selectedIDInCanvas, setSelectedIDInCanvas] = useState<string | null>(
+        null,
     );
+    const gameMapGroupsFiltering = new GameMapGroupsFiltering(gameMapGroups);
+    const filteredGameMapGroups =
+        selectedIDInCanvas != null
+            ? gameMapGroupsFiltering.filteredByGameMapID(selectedIDInCanvas)
+            : gameMapGroupsFiltering.filtered(
+                  splitByWhiteSpace(filteringValue),
+              );
 
     return (
         <>
@@ -46,7 +51,6 @@ const GameMapView = ({
                             className="py-2"
                             filteringValue={filteringValue}
                             setFilteringValue={setFilteringValue}
-                            setOnFiltering={setOnFiltering}
                         />
                         <GameMapsLinkList
                             className="py-2"
@@ -68,11 +72,13 @@ const GameMapView = ({
                     key={gameMapGroupsIndex}
                     gameMapGroup={filteredGameMapGroups[gameMapGroupsIndex]}
                     gameMapGroupsIndex={gameMapGroupsIndex}
+                    selectedID={selectedIDInCanvas}
+                    setSelectedID={setSelectedIDInCanvas}
                 />
                 <GameMapsList
                     gameMapGroup={filteredGameMapGroups[gameMapGroupsIndex]}
                     gameMapGroupsIndex={gameMapGroupsIndex}
-                    onFiltering={onFiltering}
+                    setSelectedIDInCanvas={setSelectedIDInCanvas}
                 />
             </div>
         </>

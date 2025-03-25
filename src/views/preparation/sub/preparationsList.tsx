@@ -21,10 +21,8 @@ import TextField from "../../commons/textField";
 
 const PreparationsList = ({
     preparations,
-    onFiltering,
 }: {
     preparations: PreparationWithID[];
-    onFiltering: boolean;
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
 
@@ -39,22 +37,19 @@ const PreparationsList = ({
                         setSelectedID={setSelectedID}
                     />
                 ))}
-                {!onFiltering && (
-                    <AddItemButton className="grid justify-items-center" />
-                )}
             </div>
-            {selectedID != null && (
-                <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
-                    {!onFiltering && (
+            <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
+                {selectedID != null &&
+                    preparations.some((v) => v.id === selectedID) && (
                         <>
                             <MoveItemUpButton selectedID={selectedID} />
                             <MoveItemDownButton selectedID={selectedID} />
+                            <EditItemButton selectedID={selectedID} />
+                            <RemoveItemButton selectedID={selectedID} />
                         </>
                     )}
-                    <EditItemButton selectedID={selectedID} />
-                    <RemoveItemButton selectedID={selectedID} />
-                </div>
-            )}
+                <AddItemButton className="grid justify-items-center" />
+            </div>
         </>
     );
 };
@@ -75,6 +70,7 @@ const Card = ({
     return (
         <CardBase
             title={preparation.name}
+            id={preparation.id}
             selected={preparation.id === selectedID}
             onClick={() =>
                 setSelectedID(
@@ -200,16 +196,10 @@ const AddItemDialog = ({
     const [name, setName] = useState("");
     const [materials, setMaterials] = useState("");
     const [categories, setCategories] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (name.trim().length === 0) {
-            setErrorMessage("名前を入力してください");
-            return;
-        }
-
         const preparation = PreparationUtility.create(
             name,
             materials,
@@ -235,7 +225,6 @@ const AddItemDialog = ({
                 setMaterials={setMaterials}
                 categories={categories}
                 setCategories={setCategories}
-                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -248,17 +237,17 @@ const EditItemButton = ({ selectedID }: { selectedID: string }) => {
     const index = PreparationUtility.findIndex(strategyMemo, selectedID);
     const [isOpen, setIsOpen] = useState(false);
 
-    if (index == null) return <></>;
-
     return (
         <>
             <PencilIconLargeButton onClick={() => setIsOpen(true)} />
-            <EditItemDialog
-                key={`${isOpen}`}
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                index={index}
-            />
+            {index != null && (
+                <EditItemDialog
+                    key={`${isOpen}`}
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    index={index}
+                />
+            )}
         </>
     );
 };
@@ -281,16 +270,10 @@ const EditItemDialog = ({
     const [categories, setCategories] = useState(
         preparation.categories.join("、"),
     );
-    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (name.trim().length === 0) {
-            setErrorMessage("名前を入力してください");
-            return;
-        }
-
         const newPreparation = PreparationUtility.create(
             name,
             materials,
@@ -318,7 +301,6 @@ const EditItemDialog = ({
                 setMaterials={setMaterials}
                 categories={categories}
                 setCategories={setCategories}
-                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -331,16 +313,16 @@ const RemoveItemButton = ({ selectedID }: { selectedID: string }) => {
     const index = PreparationUtility.findIndex(strategyMemo, selectedID);
     const [isOpen, setIsOpen] = useState(false);
 
-    if (index == null) return <></>;
-
     return (
         <>
             <TrashIconLargeButton onClick={() => setIsOpen(true)} />
-            <RemoveItemDialog
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                index={index}
-            />
+            {index != null && (
+                <RemoveItemDialog
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    index={index}
+                />
+            )}
         </>
     );
 };
@@ -384,7 +366,6 @@ const PreparationInput = ({
     setMaterials,
     categories,
     setCategories,
-    errorMessage,
 }: {
     name: string;
     setName: React.Dispatch<React.SetStateAction<string>>;
@@ -392,14 +373,12 @@ const PreparationInput = ({
     setMaterials: React.Dispatch<React.SetStateAction<string>>;
     categories: string;
     setCategories: React.Dispatch<React.SetStateAction<string>>;
-    errorMessage: string;
 }) => {
     return (
         <div className="space-y-2">
             <TextField
                 label="名前"
                 value={name}
-                errorMessage={errorMessage}
                 onChange={(e) => setName(e.target.value)}
             />
             <TextField

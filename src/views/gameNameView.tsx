@@ -43,11 +43,6 @@ const EditGameNameDialog = ({
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (!name) {
-            setIsOpen(false);
-            return;
-        }
-
         setStrategyMemo((v) => StrategyMemoUtility.changedGameName(v, name));
         setIsOpen(false);
     };

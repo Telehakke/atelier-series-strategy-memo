@@ -17,7 +17,6 @@ const PreparationView = ({
     isPanelOpen: boolean;
     setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-    const [onFiltering, setOnFiltering] = useState(false);
     const [filteringValue, setFilteringValue] = useState("");
     const preparationsFiltering = new PreparationsFiltering(preparations);
     const filteredPreparations = preparationsFiltering.filtered(
@@ -37,7 +36,6 @@ const PreparationView = ({
                             className="py-2"
                             filteringValue={filteringValue}
                             setFilteringValue={setFilteringValue}
-                            setOnFiltering={setOnFiltering}
                         />
                         <PreparationsLinkList
                             className="py-2"
@@ -52,10 +50,7 @@ const PreparationView = ({
                 />
             </div>
             <div className="ml-13">
-                <PreparationsList
-                    preparations={filteredPreparations}
-                    onFiltering={onFiltering}
-                />
+                <PreparationsList preparations={filteredPreparations} />
             </div>
         </>
     );

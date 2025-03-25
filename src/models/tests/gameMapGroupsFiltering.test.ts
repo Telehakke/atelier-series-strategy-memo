@@ -77,3 +77,26 @@ test("filtered", () => {
     ];
     expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
 });
+
+test("filteredByGameMapID", () => {
+    const result = gameMapGroupsFiltering.filteredByGameMapID("0");
+    const expected: GameMapGroupWithID[] = [
+        {
+            name: "ワールドマップ",
+            gameMaps: [
+                {
+                    name: "キルヘン・ベル",
+                    items: ["井戸水"],
+                    monsters: [],
+                    memo: "",
+                    icon: "🔴",
+                    x: 50,
+                    y: 50,
+                    id: "0",
+                },
+            ],
+            id: "0",
+        },
+    ];
+    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+});

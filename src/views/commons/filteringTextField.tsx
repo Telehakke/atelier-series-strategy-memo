@@ -5,12 +5,10 @@ import { CircleXIconButton } from "./iconButtons";
 const FilteringTextField = ({
     filteringValue,
     setFilteringValue,
-    setOnFiltering,
     className,
 }: {
     filteringValue: string;
     setFilteringValue: React.Dispatch<React.SetStateAction<string>>;
-    setOnFiltering: React.Dispatch<React.SetStateAction<boolean>>;
     className?: string;
 }) => {
     return (
@@ -23,14 +21,12 @@ const FilteringTextField = ({
                 onChange={(e) => {
                     const value = e.target.value;
                     setFilteringValue(value);
-                    setOnFiltering(value !== "");
                 }}
             />
             <CircleXIconButton
                 className={`${filteringValue ? "" : "invisible"}`}
                 onClick={() => {
                     setFilteringValue("");
-                    setOnFiltering(false);
                 }}
             />
         </div>

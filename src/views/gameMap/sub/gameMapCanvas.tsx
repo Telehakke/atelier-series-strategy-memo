@@ -1,6 +1,6 @@
 import { Button } from "@headlessui/react";
 import { useSetAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
 import { GameMapGroupWithID } from "../../../models/gameMapGroup";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
@@ -15,13 +15,16 @@ import {
 const GameMapCanvas = ({
     gameMapGroup,
     gameMapGroupsIndex,
+    selectedID,
+    setSelectedID,
     className,
 }: {
     gameMapGroup?: GameMapGroupWithID;
     gameMapGroupsIndex?: number;
+    selectedID: string | null;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;
 }) => {
-    const [selectedID, setSelectedID] = useState<string | null>(null);
     const canvas = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -55,7 +58,6 @@ const GameMapCanvas = ({
                     width="1000px"
                     height="1000px"
                 />
-
                 {gameMapGroup.gameMaps.map((v) => (
                     <Card
                         className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50}`}
@@ -78,7 +80,6 @@ const GameMapCanvas = ({
                             selectedID={selectedID}
                             className={`absolute top-1/2 left-0 -translate-y-1/2 ${Bg.neutral50}`}
                         />
-
                         <MoveRightButton
                             gameMapGroupsIndex={gameMapGroupsIndex}
                             selectedID={selectedID}

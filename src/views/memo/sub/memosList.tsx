@@ -15,13 +15,7 @@ import {
 import TextEditor from "../../commons/textEditor";
 import TextField from "../../commons/textField";
 
-const MemosList = ({
-    memos,
-    onFiltering,
-}: {
-    memos: MemoWithID[];
-    onFiltering: boolean;
-}) => {
+const MemosList = ({ memos }: { memos: MemoWithID[] }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
 
     return (
@@ -35,22 +29,19 @@ const MemosList = ({
                         setSelectedID={setSelectedID}
                     />
                 ))}
-                {!onFiltering && (
-                    <AddItemButton className="grid justify-items-center" />
-                )}
             </div>
-            {selectedID != null && (
-                <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
-                    {!onFiltering && (
+            <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
+                {selectedID != null &&
+                    memos.some((v) => v.id === selectedID) && (
                         <>
                             <MoveItemUpButton selectedID={selectedID} />
                             <MoveItemDownButton selectedID={selectedID} />
+                            <EditItemButton selectedID={selectedID} />
+                            <RemoveItemButton selectedID={selectedID} />
                         </>
                     )}
-                    <EditItemButton selectedID={selectedID} />
-                    <RemoveItemButton selectedID={selectedID} />
-                </div>
-            )}
+                <AddItemButton className="grid justify-items-center" />
+            </div>
         </>
     );
 };
@@ -71,6 +62,7 @@ const Card = ({
     return (
         <CardBase
             title={memo.title}
+            id={memo.id}
             selected={memo.id === selectedID}
             onClick={() =>
                 setSelectedID(memo.id === selectedID ? null : memo.id)
@@ -108,16 +100,10 @@ const AddItemDialog = ({
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
     const [title, setTitle] = useState("");
     const [text, setText] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (title.trim().length === 0) {
-            setErrorMessage("タイトルを入力してください");
-            return;
-        }
-
         const memo = MemoUtility.create(title, text, uuidv4());
         setStrategyMemo((v) => MemoUtility.added(v, memo));
         setIsOpen(false);
@@ -136,7 +122,6 @@ const AddItemDialog = ({
                 setTitle={setTitle}
                 text={text}
                 setText={setText}
-                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -149,17 +134,17 @@ const EditItemButton = ({ selectedID }: { selectedID: string }) => {
     const index = MemoUtility.findIndex(strategyMemo, selectedID);
     const [isOpen, setIsOpen] = useState(false);
 
-    if (index == null) return <></>;
-
     return (
         <>
             <PencilIconLargeButton onClick={() => setIsOpen(true)} />
-            <EditItemDialog
-                key={`${isOpen}`}
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                index={index}
-            />
+            {index != null && (
+                <EditItemDialog
+                    key={`${isOpen}`}
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    index={index}
+                />
+            )}
         </>
     );
 };
@@ -177,16 +162,10 @@ const EditItemDialog = ({
     const memo = strategyMemo.memos[index];
     const [title, setTitle] = useState(memo.title);
     const [text, setText] = useState(memo.text);
-    const [errorMessage, setErrorMessage] = useState("");
 
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        if (title.trim().length === 0) {
-            setErrorMessage("タイトルを入力してください");
-            return;
-        }
-
         const newMemo = MemoUtility.create(title, text, memo.id);
         setStrategyMemo((v) => MemoUtility.changed(v, index, newMemo));
         setIsOpen(false);
@@ -205,7 +184,6 @@ const EditItemDialog = ({
                 setTitle={setTitle}
                 text={text}
                 setText={setText}
-                errorMessage={errorMessage}
             />
         </DialogView>
     );
@@ -218,16 +196,16 @@ const RemoveItemButton = ({ selectedID }: { selectedID: string }) => {
     const index = MemoUtility.findIndex(strategyMemo, selectedID);
     const [isOpen, setIsOpen] = useState(false);
 
-    if (index == null) return <></>;
-
     return (
         <>
             <TrashIconLargeButton onClick={() => setIsOpen(true)} />
-            <RemoveItemDialog
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                index={index}
-            />
+            {index != null && (
+                <RemoveItemDialog
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    index={index}
+                />
+            )}
         </>
     );
 };
@@ -269,20 +247,17 @@ const MemoInput = ({
     setTitle,
     text,
     setText,
-    errorMessage,
 }: {
     title: string;
     setTitle: React.Dispatch<React.SetStateAction<string>>;
     text: string;
     setText: React.Dispatch<React.SetStateAction<string>>;
-    errorMessage: string;
 }) => {
     return (
         <div className="space-y-2">
             <TextField
                 label="タイトル"
                 value={title}
-                errorMessage={errorMessage}
                 onChange={(e) => setTitle(e.target.value)}
             />
             <TextEditor

@@ -34,4 +34,17 @@ export default class GameMapGroupsFiltering {
             };
         });
     };
+
+    filteredByGameMapID = (id: string): GameMapGroupWithID[] => {
+        return this.gameMapGroups.map((gameMapGroup) => {
+            const gameMaps = gameMapGroup.gameMaps.filter(
+                (gameMap) => gameMap.id === id,
+            );
+            return {
+                name: gameMapGroup.name,
+                gameMaps: gameMaps,
+                id: gameMapGroup.id,
+            };
+        });
+    };
 }
