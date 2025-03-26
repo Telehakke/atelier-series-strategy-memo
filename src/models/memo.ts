@@ -1,5 +1,5 @@
 import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
-import { isNotNull } from "./typeGuards";
+import { isNotNull, isString } from "./typeGuards";
 
 export type Memo = {
     readonly title: string;
@@ -13,8 +13,8 @@ export type MemoWithID = Memo & {
 export class MemoUtility {
     static isMemo = (value: unknown): value is Memo => {
         if (!isNotNull(value)) return false;
-        if (typeof value.title !== "string") return false;
-        if (typeof value.text !== "string") return false;
+        if (!isString(value.title)) return false;
+        if (!isString(value.text)) return false;
         return true;
     };
 

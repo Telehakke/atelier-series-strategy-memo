@@ -1,6 +1,6 @@
 import { GameMap, GameMapUtility, GameMapWithID } from "./gameMap";
 import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
-import { isNotNull } from "./typeGuards";
+import { isNotNull, isString } from "./typeGuards";
 
 export type GameMapGroup = {
     readonly name: string;
@@ -18,9 +18,9 @@ export type GameMapGroupWithID = {
 export class GameMapGroupUtility {
     static isGameMapGroup = (value: unknown): value is GameMapGroup => {
         if (!isNotNull(value)) return false;
-        if (typeof value.name !== "string") return false;
+        if (!isString(value.name)) return false;
         if (!GameMapUtility.isGameMaps(value.gameMaps)) return false;
-        if (typeof value.image !== "string") return false;
+        if (!isString(value.image)) return false;
         return true;
     };
 

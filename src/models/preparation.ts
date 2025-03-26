@@ -1,5 +1,5 @@
 import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
-import { isNotNull, isStrings } from "./typeGuards";
+import { isNotNull, isString, isStrings } from "./typeGuards";
 
 export type Preparation = {
     readonly name: string;
@@ -14,7 +14,7 @@ export type PreparationWithID = Preparation & {
 export class PreparationUtility {
     static isPreparation = (value: unknown): value is Preparation => {
         if (!isNotNull(value)) return false;
-        if (typeof value.name !== "string") return false;
+        if (!isString(value.name)) return false;
         if (!isStrings(value.materials)) return false;
         if (!isStrings(value.categories)) return false;
         return true;

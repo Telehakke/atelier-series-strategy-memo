@@ -37,7 +37,7 @@ export type StrategyMemoWithID = {
 export class StrategyMemoUtility {
     static isStrategyMemo = (value: unknown): value is StrategyMemo => {
         if (!isNotNull(value)) return false;
-        if (typeof value.gameName !== "string") return false;
+        if (!isString(value.gameName)) return false;
         if (!GameMapGroupUtility.isGameMapGroups(value.gameMapGroups))
             return false;
         if (!PreparationUtility.isPreparations(value.preparations))

@@ -1,5 +1,5 @@
 import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
-import { isNotNull, isStrings } from "./typeGuards";
+import { isNotNull, isNumber, isString, isStrings } from "./typeGuards";
 
 export type GameMap = {
     readonly name: string;
@@ -18,13 +18,13 @@ export type GameMapWithID = GameMap & {
 export class GameMapUtility {
     static isGameMap = (value: unknown): value is GameMap => {
         if (!isNotNull(value)) return false;
-        if (typeof value.name !== "string") return false;
+        if (!isString(value.name)) return false;
         if (!isStrings(value.items)) return false;
         if (!isStrings(value.monsters)) return false;
-        if (typeof value.memo !== "string") return false;
-        if (typeof value.icon !== "string") return false;
-        if (typeof value.x !== "number") return false;
-        if (typeof value.y !== "number") return false;
+        if (!isString(value.memo)) return false;
+        if (!isString(value.icon)) return false;
+        if (!isNumber(value.x)) return false;
+        if (!isNumber(value.y)) return false;
         return true;
     };
 
