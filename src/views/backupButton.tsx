@@ -1,18 +1,14 @@
 import { useAtom } from "jotai";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import copyToClipboard from "../models/copyToClipboard";
-import { GameMapUtility } from "../models/gameMap";
-import { GameMapGroupUtility } from "../models/gameMapGroup";
-import { MemoUtility } from "../models/memo";
-import { PreparationUtility } from "../models/preparation";
-import {
-    StrategyMemoUtility,
-    StrategyMemoWithID,
-} from "../models/strategyMemo";
+import { StrategyMemoUtility } from "../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../strategyMemoAtom";
 import DialogView from "./commons/dialogView";
-import { ClipboardIconButton, DatabaseIconButton } from "./commons/iconButtons";
+import {
+    CircleXIconButton,
+    ClipboardIconButton,
+    DatabaseIconButton,
+} from "./commons/iconButtons";
 import TextEditor from "./commons/textEditor";
 
 const BackupButton = () => {
@@ -56,46 +52,7 @@ const BackupDialog = ({
     ): void => {
         try {
             const obj = JSON.parse(value);
-            if (!StrategyMemoUtility.isStrategyMemo(obj)) {
-                setMessage("⚠️入力文字列のフォーマットが正しくありません");
-                return;
-            }
-
-            const strategyMemoWithID: StrategyMemoWithID = {
-                gameName: obj.gameName,
-                gameMapGroups: obj.gameMapGroups.map((v) =>
-                    GameMapGroupUtility.create(
-                        v.name,
-                        v.gameMaps.map((v) =>
-                            GameMapUtility.create(
-                                v.name,
-                                v.items.join(","),
-                                v.monsters.join(","),
-                                v.memo,
-                                v.icon,
-                                v.x.toString(),
-                                v.y.toString(),
-                                uuidv4(),
-                            ),
-                        ),
-                        v.image,
-                        uuidv4(),
-                    ),
-                ),
-                preparations: obj.preparations.map((v) =>
-                    PreparationUtility.create(
-                        v.name,
-                        v.materials.join(","),
-                        v.categories.join(","),
-                        uuidv4(),
-                    ),
-                ),
-                memos: obj.memos.map((v) =>
-                    MemoUtility.create(v.title, v.text, uuidv4()),
-                ),
-                id: uuidv4(),
-            };
-            setStrategyMemoRepository(strategyMemoWithID);
+            setStrategyMemoRepository(StrategyMemoUtility.copied(obj));
             setIsOpen(false);
         } catch {
             setMessage("⚠️入力文字列のフォーマットが正しくありません");
@@ -111,6 +68,10 @@ const BackupDialog = ({
         }
     };
 
+    const handleCircleXButtonClick = () => {
+        setValue("");
+    };
+
     return (
         <DialogView
             isOpen={isOpen}
@@ -120,19 +81,27 @@ const BackupDialog = ({
             onPrimaryButtonClick={handleReplaceButtonClick}
         >
             <div className="space-y-2">
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                     <p className="flex-1">{message}</p>
                     <ClipboardIconButton
                         onClick={() => handleCopyButtonClick()}
                     />
                 </div>
-                <TextEditor
-                    className="h-40"
-                    value={value}
-                    onChange={(e) => {
-                        setValue(e.target.value);
-                    }}
-                />
+                <div className="flex gap-2">
+                    <div className="flex-1">
+                        <TextEditor
+                            className="h-40"
+                            value={value}
+                            onChange={(e) => {
+                                setValue(e.target.value);
+                            }}
+                        />
+                    </div>
+                    <CircleXIconButton
+                        className={`my-auto ${value.length > 0 ? "" : "invisible"}`}
+                        onClick={() => handleCircleXButtonClick()}
+                    />
+                </div>
             </div>
         </DialogView>
     );
