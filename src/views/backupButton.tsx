@@ -78,6 +78,7 @@ const BackupDialog = ({
                                 uuidv4(),
                             ),
                         ),
+                        v.image,
                         uuidv4(),
                     ),
                 ),

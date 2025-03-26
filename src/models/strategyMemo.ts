@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { GameMap, GameMapWithID } from "./gameMap";
 import {
     GameMapGroup,
@@ -10,7 +11,13 @@ import {
     PreparationUtility,
     PreparationWithID,
 } from "./preparation";
-import { isNotNull } from "./typeGuards";
+import {
+    isArray,
+    isNotNull,
+    isNumber,
+    isString,
+    isStrings,
+} from "./typeGuards";
 
 export type StrategyMemo = {
     readonly gameName: string;
@@ -57,6 +64,7 @@ export class StrategyMemoUtility {
                         };
                         return gameMap;
                     }),
+                    image: v.image,
                 };
                 return gameMapGroup;
             }),
@@ -78,47 +86,116 @@ export class StrategyMemoUtility {
         };
     };
 
-    static copied = (value: StrategyMemoWithID): StrategyMemoWithID => {
+    static copied = (value?: unknown, id?: string): StrategyMemoWithID => {
+        if (!isNotNull(value))
+            return {
+                gameName: "",
+                gameMapGroups: [],
+                preparations: [],
+                memos: [],
+                id: id ?? uuidv4(),
+            };
+
         return {
-            gameName: value.gameName,
-            gameMapGroups: value.gameMapGroups.map((v) => {
-                const gameMapGroup: GameMapGroupWithID = {
-                    name: v.name,
-                    gameMaps: v.gameMaps.map((v) => {
-                        const gameMap: GameMapWithID = {
-                            name: v.name,
-                            items: [...v.items],
-                            monsters: [...v.monsters],
-                            memo: v.memo,
-                            icon: v.icon,
-                            x: v.x,
-                            y: v.y,
-                            id: v.id,
-                        };
-                        return gameMap;
-                    }),
-                    id: v.id,
-                };
-                return gameMapGroup;
-            }),
-            preparations: value.preparations.map((v) => {
-                const preparation: PreparationWithID = {
-                    name: v.name,
-                    materials: [...v.materials],
-                    categories: [...v.categories],
-                    id: v.id,
-                };
-                return preparation;
-            }),
-            memos: value.memos.map((v) => {
-                const memo: MemoWithID = {
-                    title: v.title,
-                    text: v.text,
-                    id: v.id,
-                };
-                return memo;
-            }),
-            id: value.id,
+            gameName: isString(value.gameName) ? value.gameName : "",
+            gameMapGroups: isArray(value.gameMapGroups)
+                ? value.gameMapGroups.map((v) => {
+                      if (!isNotNull(v)) {
+                          const gameMapGroup: GameMapGroupWithID = {
+                              name: "",
+                              gameMaps: [],
+                              image: "",
+                              id: id ?? uuidv4(),
+                          };
+                          return gameMapGroup;
+                      }
+
+                      const gameMapGroup: GameMapGroupWithID = {
+                          name: isString(v.name) ? v.name : "",
+                          gameMaps: isArray(v.gameMaps)
+                              ? v.gameMaps.map((v) => {
+                                    if (!isNotNull(v)) {
+                                        const gameMap: GameMapWithID = {
+                                            name: "",
+                                            items: [],
+                                            monsters: [],
+                                            memo: "",
+                                            icon: "",
+                                            x: 0,
+                                            y: 0,
+                                            id: id ?? uuidv4(),
+                                        };
+                                        return gameMap;
+                                    }
+
+                                    const gameMap: GameMapWithID = {
+                                        name: isString(v.name) ? v.name : "",
+                                        items: isStrings(v.items)
+                                            ? v.items
+                                            : [],
+                                        monsters: isStrings(v.monsters)
+                                            ? v.monsters
+                                            : [],
+                                        memo: isString(v.memo) ? v.memo : "",
+                                        icon: isString(v.icon) ? v.icon : "",
+                                        x: isNumber(v.x) ? v.x : 0,
+                                        y: isNumber(v.y) ? v.y : 0,
+                                        id: isString(v.id)
+                                            ? v.id
+                                            : (id ?? uuidv4()),
+                                    };
+                                    return gameMap;
+                                })
+                              : [],
+                          image: isString(v.image) ? v.image : "",
+                          id: isString(v.id) ? v.id : (id ?? uuidv4()),
+                      };
+                      return gameMapGroup;
+                  })
+                : [],
+            preparations: isArray(value.preparations)
+                ? value.preparations.map((v) => {
+                      if (!isNotNull(v)) {
+                          const preparation: PreparationWithID = {
+                              name: "",
+                              materials: [],
+                              categories: [],
+                              id: id ?? uuidv4(),
+                          };
+                          return preparation;
+                      }
+
+                      const preparation: PreparationWithID = {
+                          name: isString(v.name) ? v.name : "",
+                          materials: isStrings(v.materials) ? v.materials : [],
+                          categories: isStrings(v.categories)
+                              ? v.categories
+                              : [],
+                          id: isString(v.id) ? v.id : (id ?? uuidv4()),
+                      };
+                      return preparation;
+                  })
+                : [],
+            memos: isArray(value.memos)
+                ? value.memos.map((v) => {
+                      if (!isNotNull(v)) {
+                          const memo: MemoWithID = {
+                              title: "",
+                              text: "",
+                              id: id ?? uuidv4(),
+                          };
+                          return memo;
+                      }
+
+                      const memo: MemoWithID = {
+                          title: isString(v.title) ? v.title : "",
+                          text: isString(v.text) ? v.text : "",
+                          id: isString(v.id) ? v.id : (id ?? uuidv4()),
+                      };
+                      return memo;
+                  })
+                : [],
+            id: isString(value.id) ? value.id : (id ?? uuidv4()),
         };
     };
 

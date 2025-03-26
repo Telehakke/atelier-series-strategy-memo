@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
     ChevronDownIconButton,
     ChevronUpIconButton,
+    ImageOffIconButton,
     PencilIconButton,
     PlusIconLargeButton,
     TrashIconButton,
@@ -12,12 +13,14 @@ import {
 import DialogView from "../../commons/dialogView";
 import TextField from "../../commons/textField";
 
+import { Image } from "lucide-react";
 import {
     GameMapGroupUtility,
     GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
+import ImageFile from "../../../models/imageFile";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
-import { Bg, Border, Text } from "../../commons/classNames";
+import { Bg, Border, Stroke, Text } from "../../commons/classNames";
 
 const GameMapGroupsList = ({
     gameMapGroups,
@@ -39,16 +42,24 @@ const GameMapGroupsList = ({
                             gameMapGroupsIndex={gameMapGroupsIndex}
                             setGameMapGroupsIndex={setGameMapGroupsIndex}
                         />
-                        <MoveItemDownButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            setGameMapGroupsIndex={setGameMapGroupsIndex}
-                        />
                         <EditItemButton
                             gameMapGroupsIndex={gameMapGroupsIndex}
                         />
                         <RemoveItemButton
                             gameMapGroupsIndex={gameMapGroupsIndex}
                             setGameMapGroupsIndex={setGameMapGroupsIndex}
+                        />
+                    </div>
+                    <div className="flex justify-end">
+                        <MoveItemDownButton
+                            gameMapGroupsIndex={gameMapGroupsIndex}
+                            setGameMapGroupsIndex={setGameMapGroupsIndex}
+                        />
+                        <ImageOpenDialog
+                            gameMapGroupsIndex={gameMapGroupsIndex}
+                        />
+                        <RemoveImageButton
+                            gameMapGroupsIndex={gameMapGroupsIndex}
                         />
                     </div>
                     <ul
@@ -108,7 +119,7 @@ const AddItemDialog = ({
     const handleButtonClick = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
-        const gameMapGroup = GameMapGroupUtility.create(name, [], uuidv4());
+        const gameMapGroup = GameMapGroupUtility.create(name, [], "", uuidv4());
         setStrategyMemo((v) => GameMapGroupUtility.added(v, gameMapGroup));
         setIsOpen(false);
     };
@@ -300,6 +311,102 @@ const MoveItemDownButton = ({
                     return index;
                 });
             }}
+        />
+    );
+};
+
+/* -------------------------------------------------------------------------- */
+
+const ImageOpenDialog = ({
+    gameMapGroupsIndex,
+}: {
+    gameMapGroupsIndex: number;
+}) => {
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+
+    const handleChange: React.ChangeEventHandler<HTMLInputElement> = async (
+        event,
+    ) => {
+        const files = event.target.files;
+        if (files == null || files.length === 0) return;
+
+        const imageFile = new ImageFile(files[0]);
+        const base64 = await imageFile.toBase64(100, 100);
+        if (base64 == null) return;
+
+        setStrategyMemo((v) =>
+            GameMapGroupUtility.changedImage(v, gameMapGroupsIndex, base64),
+        );
+    };
+
+    return (
+        <>
+            <label
+                className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
+                htmlFor="file-open"
+            >
+                <Image className={`${Stroke.neutral700}`} />
+            </label>
+            <input
+                className="hidden"
+                id="file-open"
+                type="file"
+                accept="image/png, image/jpeg"
+                onChange={handleChange}
+            />
+        </>
+    );
+};
+
+/* -------------------------------------------------------------------------- */
+
+const RemoveImageButton = ({
+    gameMapGroupsIndex,
+}: {
+    gameMapGroupsIndex: number;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <>
+            <ImageOffIconButton onClick={() => setIsOpen(true)} />
+            <RemoveImageDialog
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                gameMapGroupsIndex={gameMapGroupsIndex}
+            />
+        </>
+    );
+};
+
+const RemoveImageDialog = ({
+    isOpen,
+    setIsOpen,
+    gameMapGroupsIndex,
+}: {
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    gameMapGroupsIndex: number;
+}) => {
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+
+    const handleButtonClick = (
+        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    ) => {
+        setStrategyMemo((v) =>
+            GameMapGroupUtility.changedImage(v, gameMapGroupsIndex, ""),
+        );
+        setIsOpen(false);
+    };
+
+    return (
+        <DialogView
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            title="マップ画像の削除"
+            primaryButtonLabel="削除"
+            onPrimaryButtonClick={handleButtonClick}
+            shouldUseWarningColor={true}
         />
     );
 };

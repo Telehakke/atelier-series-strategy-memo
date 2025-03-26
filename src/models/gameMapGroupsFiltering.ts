@@ -30,6 +30,7 @@ export default class GameMapGroupsFiltering {
             return {
                 name: gameMapGroup.name,
                 gameMaps: gameMaps,
+                image: gameMapGroup.image,
                 id: gameMapGroup.id,
             };
         });
@@ -43,6 +44,7 @@ export default class GameMapGroupsFiltering {
             return {
                 name: gameMapGroup.name,
                 gameMaps: gameMaps,
+                image: gameMapGroup.image,
                 id: gameMapGroup.id,
             };
         });

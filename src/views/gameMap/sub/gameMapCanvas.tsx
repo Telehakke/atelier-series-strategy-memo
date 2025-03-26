@@ -34,15 +34,19 @@ const GameMapCanvas = ({
         if (ctx == null) return;
 
         ctx.strokeStyle = "#7f7f7f";
-        ctx.lineWidth = 2;
-        for (let i = 100; i <= 900; i += 100) {
+        ctx.lineWidth = 1;
+        for (let i = 20.5; i <= 200; i += 20) {
+            ctx.beginPath();
             ctx.moveTo(i, 0);
-            ctx.lineTo(i, 1000);
+            ctx.lineTo(i, 200);
             ctx.stroke();
+            ctx.closePath();
 
+            ctx.beginPath();
             ctx.moveTo(0, i);
-            ctx.lineTo(1000, i);
+            ctx.lineTo(200, i);
             ctx.stroke();
+            ctx.closePath();
         }
     }, [filteredGameMapGroup]);
 
@@ -59,9 +63,17 @@ const GameMapCanvas = ({
                 <canvas
                     className="size-full opacity-20"
                     ref={canvas}
-                    width="1000px"
-                    height="1000px"
+                    width="200px"
+                    height="200px"
+                    style={{ imageRendering: "pixelated" }}
                 />
+                {gameMapGroup.image.length > 0 && (
+                    <img
+                        className="absolute inset-0 size-full"
+                        style={{ imageRendering: "pixelated" }}
+                        src={gameMapGroup.image}
+                    />
+                )}
                 {gameMapGroup.gameMaps
                     .filter((gameMap) => {
                         if (selectedID != null) return true;

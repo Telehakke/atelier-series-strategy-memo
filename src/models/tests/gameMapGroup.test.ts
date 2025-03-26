@@ -3,7 +3,7 @@ import { GameMapGroupUtility } from "../gameMapGroup";
 import { StrategyMemoWithID } from "../strategyMemo";
 
 test("isGameMapGroup", () => {
-    const gameMapGroup = GameMapGroupUtility.create("name", [], "0");
+    const gameMapGroup = GameMapGroupUtility.create("name", [], "", "0");
     expect(GameMapGroupUtility.isGameMapGroup(gameMapGroup)).toBeTruthy();
 });
 
@@ -23,6 +23,7 @@ test("added", () => {
     const result = GameMapGroupUtility.added(strategyMemo, {
         name: "",
         gameMaps: [],
+        image: "",
         id: "",
     });
     const expected: StrategyMemoWithID = {
@@ -31,6 +32,7 @@ test("added", () => {
             {
                 name: "",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
         ],
@@ -48,6 +50,7 @@ test("changedName", () => {
             {
                 name: "",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
         ],
@@ -62,6 +65,44 @@ test("changedName", () => {
             {
                 name: "name",
                 gameMaps: [],
+                image: "",
+                id: "",
+            },
+        ],
+        preparations: [],
+        memos: [],
+        id: "",
+    };
+    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+});
+
+test("changedImage", () => {
+    const strategyMemo: StrategyMemoWithID = {
+        gameName: "",
+        gameMapGroups: [
+            {
+                name: "",
+                gameMaps: [],
+                image: "",
+                id: "",
+            },
+        ],
+        preparations: [],
+        memos: [],
+        id: "",
+    };
+    const result = GameMapGroupUtility.changedImage(
+        strategyMemo,
+        0,
+        "data:image/png;base64,...",
+    );
+    const expected: StrategyMemoWithID = {
+        gameName: "",
+        gameMapGroups: [
+            {
+                name: "",
+                gameMaps: [],
+                image: "data:image/png;base64,...",
                 id: "",
             },
         ],
@@ -79,6 +120,7 @@ test("removed", () => {
             {
                 name: "",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
         ],
@@ -104,11 +146,13 @@ test("movedUp", () => {
             {
                 name: "1",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
             {
                 name: "2",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
         ],
@@ -123,11 +167,13 @@ test("movedUp", () => {
             {
                 name: "2",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
             {
                 name: "1",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
         ],
@@ -145,11 +191,13 @@ test("movedDown", () => {
             {
                 name: "1",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
             {
                 name: "2",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
         ],
@@ -164,11 +212,13 @@ test("movedDown", () => {
             {
                 name: "2",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
             {
                 name: "1",
                 gameMaps: [],
+                image: "",
                 id: "",
             },
         ],

@@ -1,5 +1,5 @@
 import { atomWithStorage } from "jotai/utils";
-import { StrategyMemoWithID } from "./models/strategyMemo";
+import { StrategyMemoUtility, StrategyMemoWithID } from "./models/strategyMemo";
 
 export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemoWithID>(
     "strategyMemo",
@@ -45,6 +45,7 @@ export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemoWithID>(
                         id: "a05bfe28-a87a-4a46-8607-5e5c0702d59d",
                     },
                 ],
+                image: "",
                 id: "a082cdac-7e45-467f-a18c-12c9e720d3a0",
             },
         ],
@@ -70,5 +71,22 @@ export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemoWithID>(
         ],
         memos: [],
         id: "ed157ee3-b8b5-4d97-a324-a18d2459d287",
+    },
+    {
+        getItem(key, initialValue) {
+            const storedValue = localStorage.getItem(key);
+            try {
+                const json = JSON.parse(storedValue ?? "");
+                return StrategyMemoUtility.copied(json);
+            } catch {
+                return initialValue;
+            }
+        },
+        setItem(key, newValue) {
+            localStorage.setItem(key, JSON.stringify(newValue));
+        },
+        removeItem(key) {
+            localStorage.removeItem(key);
+        },
     },
 );

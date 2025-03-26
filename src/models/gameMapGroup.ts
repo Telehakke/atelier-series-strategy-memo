@@ -5,11 +5,13 @@ import { isNotNull } from "./typeGuards";
 export type GameMapGroup = {
     readonly name: string;
     readonly gameMaps: GameMap[];
+    readonly image: string;
 };
 
 export type GameMapGroupWithID = {
     readonly name: string;
     readonly gameMaps: GameMapWithID[];
+    readonly image: string;
     readonly id: string;
 };
 
@@ -18,6 +20,7 @@ export class GameMapGroupUtility {
         if (!isNotNull(value)) return false;
         if (typeof value.name !== "string") return false;
         if (!GameMapUtility.isGameMaps(value.gameMaps)) return false;
+        if (typeof value.image !== "string") return false;
         return true;
     };
 
@@ -29,11 +32,13 @@ export class GameMapGroupUtility {
     static create = (
         inputName: string,
         gameMaps: GameMapWithID[],
+        image: string,
         id: string,
     ): GameMapGroupWithID => {
         return {
             name: inputName.trim(),
             gameMaps: gameMaps,
+            image: image,
             id: id,
         };
     };
@@ -56,6 +61,19 @@ export class GameMapGroupUtility {
         copied.gameMapGroups[gameMapGroupsIndex] = {
             ...copied.gameMapGroups[gameMapGroupsIndex],
             name: name,
+        };
+        return copied;
+    };
+
+    static changedImage = (
+        strategyMemo: StrategyMemoWithID,
+        gameMapGroupsIndex: number,
+        image: string,
+    ): StrategyMemoWithID => {
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.gameMapGroups[gameMapGroupsIndex] = {
+            ...copied.gameMapGroups[gameMapGroupsIndex],
+            image: image,
         };
         return copied;
     };

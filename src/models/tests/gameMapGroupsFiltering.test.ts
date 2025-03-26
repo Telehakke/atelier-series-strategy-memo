@@ -37,6 +37,7 @@ const gameMapGroups: GameMapGroupWithID[] = [
                 id: "2",
             },
         ],
+        image: "",
         id: "0",
     },
 ];
@@ -72,6 +73,7 @@ test("filtered", () => {
                     id: "1",
                 },
             ],
+            image: "",
             id: "0",
         },
     ];
@@ -95,6 +97,7 @@ test("filteredByGameMapID", () => {
                     id: "0",
                 },
             ],
+            image: "",
             id: "0",
         },
     ];
