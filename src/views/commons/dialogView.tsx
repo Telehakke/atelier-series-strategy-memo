@@ -8,6 +8,7 @@ const DialogView = ({
     setIsOpen,
     title,
     primaryButtonLabel,
+    secondaryButtonLabel,
     onPrimaryButtonClick,
     shouldUseWarningColor,
     children,
@@ -15,10 +16,9 @@ const DialogView = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     title: string;
-    primaryButtonLabel: string;
-    onPrimaryButtonClick: (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => void;
+    primaryButtonLabel?: string;
+    secondaryButtonLabel: string;
+    onPrimaryButtonClick?: () => void;
     shouldUseWarningColor?: boolean;
     children?: ReactNode;
 }) => {
@@ -42,16 +42,20 @@ const DialogView = ({
                     <div>{children}</div>
                     <div className="flex justify-center gap-4">
                         <RoundedButton
-                            label="キャンセル"
+                            label={secondaryButtonLabel}
                             onClick={() => setIsOpen(false)}
                         />
-                        <RoundedButton
-                            label={primaryButtonLabel}
-                            shouldUseWarningColor={shouldUseWarningColor}
-                            onClick={() => {
-                                onPrimaryButtonClick(setIsOpen);
-                            }}
-                        />
+                        {primaryButtonLabel != null && (
+                            <RoundedButton
+                                label={primaryButtonLabel}
+                                shouldUseWarningColor={shouldUseWarningColor}
+                                onClick={() =>
+                                    onPrimaryButtonClick != null
+                                        ? onPrimaryButtonClick()
+                                        : () => {}
+                                }
+                            />
+                        )}
                     </div>
                 </DialogPanel>
             </div>

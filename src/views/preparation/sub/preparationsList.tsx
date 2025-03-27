@@ -197,9 +197,7 @@ const AddItemDialog = ({
     const [materials, setMaterials] = useState("");
     const [categories, setCategories] = useState("");
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         const preparation = PreparationUtility.create(
             name,
             materials,
@@ -216,6 +214,7 @@ const AddItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の追加"
             primaryButtonLabel="追加"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <PreparationInput
@@ -271,9 +270,7 @@ const EditItemDialog = ({
         preparation.categories.join("、"),
     );
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         const newPreparation = PreparationUtility.create(
             name,
             materials,
@@ -292,6 +289,7 @@ const EditItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の編集"
             primaryButtonLabel="変更"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <PreparationInput
@@ -338,9 +336,7 @@ const RemoveItemDialog = ({
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ): void => {
+    const handleButtonClick = (): void => {
         setStrategyMemo((v) => PreparationUtility.removed(v, index));
         setIsOpen(false);
     };
@@ -351,6 +347,7 @@ const RemoveItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の削除"
             primaryButtonLabel="削除"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
             shouldUseWarningColor={true}
         ></DialogView>

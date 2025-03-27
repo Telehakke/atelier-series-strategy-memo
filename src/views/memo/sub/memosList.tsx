@@ -101,9 +101,7 @@ const AddItemDialog = ({
     const [title, setTitle] = useState("");
     const [text, setText] = useState("");
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         const memo = MemoUtility.create(title, text, uuidv4());
         setStrategyMemo((v) => MemoUtility.added(v, memo));
         setIsOpen(false);
@@ -115,6 +113,7 @@ const AddItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の追加"
             primaryButtonLabel="追加"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <MemoInput
@@ -163,9 +162,7 @@ const EditItemDialog = ({
     const [title, setTitle] = useState(memo.title);
     const [text, setText] = useState(memo.text);
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         const newMemo = MemoUtility.create(title, text, memo.id);
         setStrategyMemo((v) => MemoUtility.changed(v, index, newMemo));
         setIsOpen(false);
@@ -177,6 +174,7 @@ const EditItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の編集"
             primaryButtonLabel="変更"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <MemoInput
@@ -221,9 +219,7 @@ const RemoveItemDialog = ({
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         setStrategyMemo((v) => MemoUtility.removed(v, index));
         setIsOpen(false);
     };
@@ -234,6 +230,7 @@ const RemoveItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の削除"
             primaryButtonLabel="削除"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
             shouldUseWarningColor={true}
         />

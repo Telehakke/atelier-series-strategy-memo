@@ -35,6 +35,7 @@ const ResetDialog = ({
             setIsOpen={setIsOpen}
             title="データのリセット"
             primaryButtonLabel="リセット"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={() => {
                 setStrategyMemo(RESET);
                 setIsOpen(false);

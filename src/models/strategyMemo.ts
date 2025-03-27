@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import dateNow from "./dateNow";
 import { GameMap, GameMapWithID } from "./gameMap";
 import {
     GameMapGroup,
@@ -208,5 +209,14 @@ export class StrategyMemoUtility {
             ...copied,
             gameName: name,
         };
+    };
+
+    static download = (strategyMemo: StrategyMemo): void => {
+        const jsonStr = JSON.stringify(strategyMemo);
+        const dataURL = `data:,${encodeURIComponent(jsonStr)}`;
+        const anchor = document.createElement("a");
+        anchor.href = dataURL;
+        anchor.download = `${strategyMemo.gameName}_${dateNow()}.json`;
+        anchor.click();
     };
 }

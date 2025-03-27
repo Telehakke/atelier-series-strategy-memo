@@ -116,9 +116,7 @@ const AddItemDialog = ({
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
     const [name, setName] = useState("");
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         const gameMapGroup = GameMapGroupUtility.create(name, [], "", uuidv4());
         setStrategyMemo((v) => GameMapGroupUtility.added(v, gameMapGroup));
         setIsOpen(false);
@@ -130,6 +128,7 @@ const AddItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の追加"
             primaryButtonLabel="追加"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <TextField
@@ -176,9 +175,7 @@ const EditItemDialog = ({
     const gameMapGroup = strategyMemo.gameMapGroups[gameMapGroupsIndex];
     const [name, setName] = useState(gameMapGroup.name);
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         setStrategyMemo((v) =>
             GameMapGroupUtility.changedName(v, gameMapGroupsIndex, name),
         );
@@ -191,6 +188,7 @@ const EditItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の編集"
             primaryButtonLabel="変更"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <TextField
@@ -239,9 +237,7 @@ const RemoveItemDialog = ({
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         setStrategyMemo((v) =>
             GameMapGroupUtility.removed(v, gameMapGroupsIndex),
         );
@@ -255,6 +251,7 @@ const RemoveItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の削除"
             primaryButtonLabel="削除"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
             shouldUseWarningColor={true}
         ></DialogView>
@@ -343,13 +340,13 @@ const ImageOpenDialog = ({
         <>
             <label
                 className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
-                htmlFor="file-open"
+                htmlFor="image-file-open"
             >
                 <Image className={`${Stroke.neutral700}`} />
             </label>
             <input
                 className="hidden"
-                id="file-open"
+                id="image-file-open"
                 type="file"
                 accept="image/png, image/jpeg"
                 onChange={handleChange}
@@ -390,9 +387,7 @@ const RemoveImageDialog = ({
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         setStrategyMemo((v) =>
             GameMapGroupUtility.changedImage(v, gameMapGroupsIndex, ""),
         );
@@ -405,6 +400,7 @@ const RemoveImageDialog = ({
             setIsOpen={setIsOpen}
             title="マップ画像の削除"
             primaryButtonLabel="削除"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
             shouldUseWarningColor={true}
         />

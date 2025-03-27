@@ -40,9 +40,7 @@ const EditGameNameDialog = ({
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
     const [name, setName] = useState(strategyMemo.gameName);
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         setStrategyMemo((v) => StrategyMemoUtility.changedGameName(v, name));
         setIsOpen(false);
     };
@@ -53,6 +51,7 @@ const EditGameNameDialog = ({
             setIsOpen={setIsOpen}
             title="ゲーム名の編集"
             primaryButtonLabel="変更"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <TextField

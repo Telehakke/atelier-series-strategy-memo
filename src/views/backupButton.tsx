@@ -1,15 +1,11 @@
+import { Button } from "@headlessui/react";
 import { useAtom } from "jotai";
 import { useState } from "react";
-import copyToClipboard from "../models/copyToClipboard";
 import { StrategyMemoUtility } from "../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../strategyMemoAtom";
+import { Bg, Border } from "./commons/classNames";
 import DialogView from "./commons/dialogView";
-import {
-    CircleXIconButton,
-    ClipboardIconButton,
-    DatabaseIconButton,
-} from "./commons/iconButtons";
-import TextEditor from "./commons/textEditor";
+import { DatabaseIconButton } from "./commons/iconButtons";
 
 const BackupButton = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -40,36 +36,44 @@ const BackupDialog = ({
     const [strategyMemoRepository, setStrategyMemoRepository] = useAtom(
         strategyMemoRepositoryAtom,
     );
-    const strategyMemo = StrategyMemoUtility.toStrategyMemo(
-        strategyMemoRepository,
-    );
-    const strategyMemoJsonStr = JSON.stringify(strategyMemo, null, 4);
-    const [value, setValue] = useState(strategyMemoJsonStr);
     const [message, setMessage] = useState("");
 
-    const handleReplaceButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ): void => {
-        try {
-            const obj = JSON.parse(value);
-            setStrategyMemoRepository(StrategyMemoUtility.copied(obj));
-            setIsOpen(false);
-        } catch {
-            setMessage("⚠️入力文字列のフォーマットが正しくありません");
-        }
+    const handleDownloadButtonClick = () => {
+        const strategyMemo = StrategyMemoUtility.toStrategyMemo(
+            strategyMemoRepository,
+        );
+        StrategyMemoUtility.download(strategyMemo);
     };
 
-    const handleCopyButtonClick = async (): Promise<void> => {
-        const result = await copyToClipboard(strategyMemoJsonStr);
-        if (result) {
-            setMessage("✅クリップボードにコピーされました");
-        } else {
-            setMessage("❌コピーに失敗しました");
-        }
-    };
+    const handleFileOpen: React.ChangeEventHandler<HTMLInputElement> = (
+        event,
+    ) => {
+        const files = event.target.files;
+        if (files == null || files.length === 0) return;
 
-    const handleCircleXButtonClick = () => {
-        setValue("");
+        const file = files[0];
+        if (file.type !== "application/json") {
+            setMessage("⚠️.jsonファイルを選択してください");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsText(file);
+        reader.addEventListener("load", () => {
+            const text = reader.result;
+            if (typeof text !== "string") {
+                setMessage("⚠️ファイルの読み込みに失敗しました");
+                return;
+            }
+
+            try {
+                const obj = JSON.parse(text);
+                setStrategyMemoRepository(StrategyMemoUtility.copied(obj));
+                setIsOpen(false);
+            } catch {
+                setMessage("⚠️ファイルのフォーマットが正しくありません");
+            }
+        });
     };
 
     return (
@@ -77,31 +81,29 @@ const BackupDialog = ({
             isOpen={isOpen}
             setIsOpen={setIsOpen}
             title="データのバックアップ"
-            primaryButtonLabel="更新"
-            onPrimaryButtonClick={handleReplaceButtonClick}
+            secondaryButtonLabel="閉じる"
         >
             <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                    <p className="flex-1">{message}</p>
-                    <ClipboardIconButton
-                        onClick={() => handleCopyButtonClick()}
-                    />
-                </div>
-                <div className="flex gap-2">
-                    <div className="flex-1">
-                        <TextEditor
-                            className="h-40"
-                            value={value}
-                            onChange={(e) => {
-                                setValue(e.target.value);
-                            }}
-                        />
-                    </div>
-                    <CircleXIconButton
-                        className={`my-auto ${value.length > 0 ? "" : "invisible"}`}
-                        onClick={() => handleCircleXButtonClick()}
-                    />
-                </div>
+                <Button
+                    className={`rounded-md border-2 px-2 py-1 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                    onClick={() => handleDownloadButtonClick()}
+                >
+                    ファイルをダウンロード
+                </Button>
+                <p>{message}</p>
+                <label
+                    className={`rounded-md border-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                    htmlFor="json-file-open"
+                >
+                    ファイルを開く
+                </label>
+                <input
+                    className="hidden"
+                    id="json-file-open"
+                    type="file"
+                    accept=".json"
+                    onChange={handleFileOpen}
+                />
             </div>
         </DialogView>
     );

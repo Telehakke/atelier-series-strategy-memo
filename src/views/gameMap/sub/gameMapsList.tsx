@@ -177,9 +177,7 @@ const AddItemDialog = ({
     const [x, setX] = useState("50");
     const [y, setY] = useState("50");
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         const gameMap = GameMapUtility.create(
             name,
             items,
@@ -202,6 +200,7 @@ const AddItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の追加"
             primaryButtonLabel="追加"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <GameMapInput
@@ -279,9 +278,7 @@ const EditItemDialog = ({
     const [x, setX] = useState(gameMap.x.toString());
     const [y, setY] = useState(gameMap.y.toString());
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         const newGameMap = GameMapUtility.create(
             name,
             items,
@@ -304,6 +301,7 @@ const EditItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の編集"
             primaryButtonLabel="変更"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
             <GameMapInput
@@ -376,9 +374,7 @@ const RemoveItemDialog = ({
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = (
-        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
+    const handleButtonClick = () => {
         setStrategyMemo((v) =>
             GameMapUtility.removed(v, gameMapGroupsIndex, index),
         );
@@ -392,6 +388,7 @@ const RemoveItemDialog = ({
             setIsOpen={setIsOpen}
             title="項目の削除"
             primaryButtonLabel="削除"
+            secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
             shouldUseWarningColor={true}
         />
