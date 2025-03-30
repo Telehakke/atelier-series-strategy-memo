@@ -25,6 +25,7 @@ const PreparationsList = ({
     preparations: PreparationWithID[];
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     return (
         <>
@@ -35,6 +36,7 @@ const PreparationsList = ({
                         preparation={v}
                         selectedID={selectedID}
                         setSelectedID={setSelectedID}
+                        setIsEditDialogOpen={setIsEditDialogOpen}
                     />
                 ))}
             </div>
@@ -44,7 +46,11 @@ const PreparationsList = ({
                         <>
                             <MoveItemUpButton selectedID={selectedID} />
                             <MoveItemDownButton selectedID={selectedID} />
-                            <EditItemButton selectedID={selectedID} />
+                            <EditItemButton
+                                selectedID={selectedID}
+                                isEditDialogOpen={isEditDialogOpen}
+                                setIsEditDialogOpen={setIsEditDialogOpen}
+                            />
                             <RemoveItemButton selectedID={selectedID} />
                         </>
                     )}
@@ -62,10 +68,12 @@ const Card = ({
     preparation,
     selectedID,
     setSelectedID,
+    setIsEditDialogOpen,
 }: {
     preparation: PreparationWithID;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     return (
         <CardBase
@@ -77,6 +85,10 @@ const Card = ({
                     preparation.id === selectedID ? null : preparation.id,
                 )
             }
+            onDoubleClick={() => {
+                setSelectedID(preparation.id);
+                setIsEditDialogOpen(true);
+            }}
         >
             <MaterialsTable preparation={preparation} />
             <CategoriesTable preparation={preparation} />
@@ -231,19 +243,26 @@ const AddItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const EditItemButton = ({ selectedID }: { selectedID: string }) => {
+const EditItemButton = ({
+    selectedID,
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+}: {
+    selectedID: string;
+    isEditDialogOpen: boolean;
+    setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
     const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
     const index = PreparationUtility.findIndex(strategyMemo, selectedID);
-    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
-            <PencilIconLargeButton onClick={() => setIsOpen(true)} />
+            <PencilIconLargeButton onClick={() => setIsEditDialogOpen(true)} />
             {index != null && (
                 <EditItemDialog
-                    key={`${isOpen}`}
-                    isOpen={isOpen}
-                    setIsOpen={setIsOpen}
+                    key={`${isEditDialogOpen}`}
+                    isOpen={isEditDialogOpen}
+                    setIsOpen={setIsEditDialogOpen}
                     index={index}
                 />
             )}

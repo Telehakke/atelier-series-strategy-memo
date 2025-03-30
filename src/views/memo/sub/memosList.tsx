@@ -17,6 +17,7 @@ import TextField from "../../commons/textField";
 
 const MemosList = ({ memos }: { memos: MemoWithID[] }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     return (
         <>
@@ -27,6 +28,7 @@ const MemosList = ({ memos }: { memos: MemoWithID[] }) => {
                         memo={v}
                         selectedID={selectedID}
                         setSelectedID={setSelectedID}
+                        setIsEditDialogOpen={setIsEditDialogOpen}
                     />
                 ))}
             </div>
@@ -36,7 +38,11 @@ const MemosList = ({ memos }: { memos: MemoWithID[] }) => {
                         <>
                             <MoveItemUpButton selectedID={selectedID} />
                             <MoveItemDownButton selectedID={selectedID} />
-                            <EditItemButton selectedID={selectedID} />
+                            <EditItemButton
+                                selectedID={selectedID}
+                                isEditDialogOpen={isEditDialogOpen}
+                                setIsEditDialogOpen={setIsEditDialogOpen}
+                            />
                             <RemoveItemButton selectedID={selectedID} />
                         </>
                     )}
@@ -54,10 +60,12 @@ const Card = ({
     memo,
     selectedID,
     setSelectedID,
+    setIsEditDialogOpen,
 }: {
     memo: MemoWithID;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     return (
         <CardBase
@@ -67,6 +75,10 @@ const Card = ({
             onClick={() =>
                 setSelectedID(memo.id === selectedID ? null : memo.id)
             }
+            onDoubleClick={() => {
+                setSelectedID(memo.id);
+                setIsEditDialogOpen(true);
+            }}
         >
             <p className="p-1 text-sm whitespace-pre-wrap">{memo.text}</p>
         </CardBase>
@@ -128,19 +140,26 @@ const AddItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const EditItemButton = ({ selectedID }: { selectedID: string }) => {
+const EditItemButton = ({
+    selectedID,
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+}: {
+    selectedID: string;
+    isEditDialogOpen: boolean;
+    setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
     const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
     const index = MemoUtility.findIndex(strategyMemo, selectedID);
-    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
-            <PencilIconLargeButton onClick={() => setIsOpen(true)} />
+            <PencilIconLargeButton onClick={() => setIsEditDialogOpen(true)} />
             {index != null && (
                 <EditItemDialog
-                    key={`${isOpen}`}
-                    isOpen={isOpen}
-                    setIsOpen={setIsOpen}
+                    key={`${isEditDialogOpen}`}
+                    isOpen={isEditDialogOpen}
+                    setIsOpen={setIsEditDialogOpen}
                     index={index}
                 />
             )}

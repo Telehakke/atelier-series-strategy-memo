@@ -27,6 +27,7 @@ const GameMapsList = ({
     setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
+    const [isEditItemDialogOpen, setIsEditDialogOpen] = useState(false);
 
     if (gameMapGroup == null) return;
 
@@ -39,6 +40,7 @@ const GameMapsList = ({
                         gameMap={v}
                         selectedID={selectedID}
                         setSelectedID={setSelectedID}
+                        setIsEditDialogOpen={setIsEditDialogOpen}
                     />
                 ))}
             </div>
@@ -57,6 +59,8 @@ const GameMapsList = ({
                             <EditItemButton
                                 gameMapGroupsIndex={gameMapGroupsIndex}
                                 selectedID={selectedID}
+                                isEditItemDialogOpen={isEditItemDialogOpen}
+                                setIsEditItemDialogOpen={setIsEditDialogOpen}
                             />
                             <RemoveItemButton
                                 gameMapGroupsIndex={gameMapGroupsIndex}
@@ -82,19 +86,25 @@ const Card = ({
     gameMap,
     selectedID,
     setSelectedID,
+    setIsEditDialogOpen,
 }: {
     gameMap: GameMapWithID;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     return (
         <CardBase
             title={gameMap.name}
             id={gameMap.id}
             selected={gameMap.id === selectedID}
-            onClick={() =>
-                setSelectedID(gameMap.id === selectedID ? null : gameMap.id)
-            }
+            onClick={() => {
+                setSelectedID(gameMap.id === selectedID ? null : gameMap.id);
+            }}
+            onDoubleClick={() => {
+                setSelectedID(gameMap.id);
+                setIsEditDialogOpen(true);
+            }}
         >
             <TextWithLabel label="アイテム">
                 {gameMap.items.map((item, i) => (
@@ -228,9 +238,13 @@ const AddItemDialog = ({
 const EditItemButton = ({
     gameMapGroupsIndex,
     selectedID,
+    isEditItemDialogOpen,
+    setIsEditItemDialogOpen,
 }: {
     gameMapGroupsIndex: number;
     selectedID: string;
+    isEditItemDialogOpen: boolean;
+    setIsEditItemDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
     const index = GameMapUtility.findIndex(
@@ -238,16 +252,17 @@ const EditItemButton = ({
         gameMapGroupsIndex,
         selectedID,
     );
-    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
-            <PencilIconLargeButton onClick={() => setIsOpen(true)} />
+            <PencilIconLargeButton
+                onClick={() => setIsEditItemDialogOpen(true)}
+            />
             {index != null && (
                 <EditItemDialog
-                    key={`${isOpen}`}
-                    isOpen={isOpen}
-                    setIsOpen={setIsOpen}
+                    key={`${isEditItemDialogOpen}`}
+                    isOpen={isEditItemDialogOpen}
+                    setIsOpen={setIsEditItemDialogOpen}
                     gameMapGroupsIndex={gameMapGroupsIndex}
                     index={index}
                 />

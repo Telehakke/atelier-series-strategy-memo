@@ -6,18 +6,21 @@ const CardBase = ({
     id,
     selected,
     onClick,
+    onDoubleClick,
     children,
 }: {
     title: string;
     id: string;
     selected: boolean;
     onClick: React.MouseEventHandler<HTMLDivElement>;
+    onDoubleClick: React.MouseEventHandler<HTMLDivElement>;
     children?: ReactNode;
 }) => {
     return (
         <div
             className={`mx-auto max-w-150 overflow-clip rounded-md border-2 hover:ring-4 ${Border.neutral950} ${Ring.blue500}`}
             onClick={onClick}
+            onDoubleClick={onDoubleClick}
         >
             <div
                 className={`flex h-9 items-center justify-between gap-2 px-1 ${selected ? Bg.blue500 : Bg.neutral950}`}
