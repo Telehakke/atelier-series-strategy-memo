@@ -46,6 +46,7 @@ const GameMapView = ({
                             gameMapGroups={filteredGameMapGroups}
                             gameMapGroupsIndex={gameMapGroupsIndex}
                             setGameMapGroupsIndex={setGameMapGroupsIndex}
+                            setSelectedIDInCanvas={setSelectedIDInCanvas}
                         />
                         <FilteringTextField
                             className="py-2"

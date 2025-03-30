@@ -84,7 +84,7 @@ const GameMapCanvas = ({
                     })
                     .map((v) => (
                         <Card
-                            className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50}`}
+                            className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50} ${selectedID == null || v.id === selectedID ? "" : "opacity-50"}`}
                             key={v.id}
                             gameMap={v}
                             selectedID={selectedID}
