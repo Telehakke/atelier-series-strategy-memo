@@ -70,8 +70,19 @@ const BackupDialog = ({
                 const obj = JSON.parse(text);
                 setStrategyMemoRepository(StrategyMemoUtility.copied(obj));
                 setIsOpen(false);
-            } catch {
-                setMessage("⚠️ファイルのフォーマットが正しくありません");
+            } catch (error) {
+                if (String(error).includes("QuotaExceededError")) {
+                    setMessage(
+                        "⚠️データ量の上限に達したため保存に失敗しました",
+                    );
+                    return;
+                }
+
+                if (error instanceof SyntaxError) {
+                    setMessage("⚠️ファイルのフォーマットが正しくありません");
+                }
+
+                console.log(error);
             }
         });
     };

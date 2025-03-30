@@ -186,6 +186,7 @@ const AddItemDialog = ({
     const [icon, setIcon] = useState("🔴");
     const [x, setX] = useState("50");
     const [y, setY] = useState("50");
+    const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
         const gameMap = GameMapUtility.create(
@@ -198,10 +199,20 @@ const AddItemDialog = ({
             y,
             uuidv4(),
         );
-        setStrategyMemo((v) =>
-            GameMapUtility.added(v, gameMapGroupsIndex, gameMap),
-        );
-        setIsOpen(false);
+
+        try {
+            setStrategyMemo((v) =>
+                GameMapUtility.added(v, gameMapGroupsIndex, gameMap),
+            );
+            setIsOpen(false);
+        } catch (error) {
+            if (String(error).includes("QuotaExceededError")) {
+                setMessage("⚠️データ量の上限に達したため保存に失敗しました");
+                return;
+            }
+
+            console.log(error);
+        }
     };
 
     return (
@@ -213,22 +224,25 @@ const AddItemDialog = ({
             secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
-            <GameMapInput
-                name={name}
-                setName={setName}
-                items={items}
-                setItems={setItems}
-                monsters={monsters}
-                setMonsters={setMonsters}
-                memo={memo}
-                setMemo={setMemo}
-                icon={icon}
-                setIcon={setIcon}
-                x={x}
-                setX={setX}
-                y={y}
-                setY={setY}
-            />
+            <div className="space-y-2">
+                <p>{message}</p>
+                <GameMapInput
+                    name={name}
+                    setName={setName}
+                    items={items}
+                    setItems={setItems}
+                    monsters={monsters}
+                    setMonsters={setMonsters}
+                    memo={memo}
+                    setMemo={setMemo}
+                    icon={icon}
+                    setIcon={setIcon}
+                    x={x}
+                    setX={setX}
+                    y={y}
+                    setY={setY}
+                />
+            </div>
         </DialogView>
     );
 };
@@ -292,6 +306,7 @@ const EditItemDialog = ({
     const [icon, setIcon] = useState(gameMap.icon);
     const [x, setX] = useState(gameMap.x.toString());
     const [y, setY] = useState(gameMap.y.toString());
+    const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
         const newGameMap = GameMapUtility.create(
@@ -304,10 +319,25 @@ const EditItemDialog = ({
             y,
             gameMap.id,
         );
-        setStrategyMemo((v) =>
-            GameMapUtility.changed(v, gameMapGroupsIndex, index, newGameMap),
-        );
-        setIsOpen(false);
+
+        try {
+            setStrategyMemo((v) =>
+                GameMapUtility.changed(
+                    v,
+                    gameMapGroupsIndex,
+                    index,
+                    newGameMap,
+                ),
+            );
+            setIsOpen(false);
+        } catch (error) {
+            if (String(error).includes("QuotaExceededError")) {
+                setMessage("⚠️データ量の上限に達したため保存に失敗しました");
+                return;
+            }
+
+            console.log(error);
+        }
     };
 
     return (
@@ -319,22 +349,25 @@ const EditItemDialog = ({
             secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
-            <GameMapInput
-                name={name}
-                setName={setName}
-                items={items}
-                setItems={setItems}
-                monsters={monsters}
-                setMonsters={setMonsters}
-                memo={memo}
-                setMemo={setMemo}
-                icon={icon}
-                setIcon={setIcon}
-                x={x}
-                setX={setX}
-                y={y}
-                setY={setY}
-            />
+            <div className="space-y-2">
+                <p>{message}</p>
+                <GameMapInput
+                    name={name}
+                    setName={setName}
+                    items={items}
+                    setItems={setItems}
+                    monsters={monsters}
+                    setMonsters={setMonsters}
+                    memo={memo}
+                    setMemo={setMemo}
+                    icon={icon}
+                    setIcon={setIcon}
+                    x={x}
+                    setX={setX}
+                    y={y}
+                    setY={setY}
+                />
+            </div>
         </DialogView>
     );
 };

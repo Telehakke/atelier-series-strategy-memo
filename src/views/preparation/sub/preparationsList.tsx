@@ -208,6 +208,7 @@ const AddItemDialog = ({
     const [name, setName] = useState("");
     const [materials, setMaterials] = useState("");
     const [categories, setCategories] = useState("");
+    const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
         const preparation = PreparationUtility.create(
@@ -216,8 +217,18 @@ const AddItemDialog = ({
             categories,
             uuidv4(),
         );
-        setStrategyMemo((v) => PreparationUtility.added(v, preparation));
-        setIsOpen(false);
+
+        try {
+            setStrategyMemo((v) => PreparationUtility.added(v, preparation));
+            setIsOpen(false);
+        } catch (error) {
+            if (String(error).includes("QuotaExceededError")) {
+                setMessage("⚠️データ量の上限に達したため保存に失敗しました");
+                return;
+            }
+
+            console.log(error);
+        }
     };
 
     return (
@@ -229,14 +240,17 @@ const AddItemDialog = ({
             secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
-            <PreparationInput
-                name={name}
-                setName={setName}
-                materials={materials}
-                setMaterials={setMaterials}
-                categories={categories}
-                setCategories={setCategories}
-            />
+            <div className="space-y-2">
+                <p>{message}</p>
+                <PreparationInput
+                    name={name}
+                    setName={setName}
+                    materials={materials}
+                    setMaterials={setMaterials}
+                    categories={categories}
+                    setCategories={setCategories}
+                />
+            </div>
         </DialogView>
     );
 };
@@ -288,6 +302,7 @@ const EditItemDialog = ({
     const [categories, setCategories] = useState(
         preparation.categories.join("、"),
     );
+    const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
         const newPreparation = PreparationUtility.create(
@@ -296,10 +311,20 @@ const EditItemDialog = ({
             categories,
             preparation.id,
         );
-        setStrategyMemo((v) =>
-            PreparationUtility.changed(v, index, newPreparation),
-        );
-        setIsOpen(false);
+
+        try {
+            setStrategyMemo((v) =>
+                PreparationUtility.changed(v, index, newPreparation),
+            );
+            setIsOpen(false);
+        } catch (error) {
+            if (String(error).includes("QuotaExceededError")) {
+                setMessage("⚠️データ量の上限に達したため保存に失敗しました");
+                return;
+            }
+
+            console.log(error);
+        }
     };
 
     return (
@@ -311,14 +336,17 @@ const EditItemDialog = ({
             secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
-            <PreparationInput
-                name={name}
-                setName={setName}
-                materials={materials}
-                setMaterials={setMaterials}
-                categories={categories}
-                setCategories={setCategories}
-            />
+            <div className="space-y-2">
+                <p>{message}</p>
+                <PreparationInput
+                    name={name}
+                    setName={setName}
+                    materials={materials}
+                    setMaterials={setMaterials}
+                    categories={categories}
+                    setCategories={setCategories}
+                />
+            </div>
         </DialogView>
     );
 };

@@ -112,11 +112,22 @@ const AddItemDialog = ({
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
     const [title, setTitle] = useState("");
     const [text, setText] = useState("");
+    const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
         const memo = MemoUtility.create(title, text, uuidv4());
-        setStrategyMemo((v) => MemoUtility.added(v, memo));
-        setIsOpen(false);
+
+        try {
+            setStrategyMemo((v) => MemoUtility.added(v, memo));
+            setIsOpen(false);
+        } catch (error) {
+            if (String(error).includes("QuotaExceededError")) {
+                setMessage("⚠️データ量の上限に達したため保存に失敗しました");
+                return;
+            }
+
+            console.log(error);
+        }
     };
 
     return (
@@ -128,12 +139,15 @@ const AddItemDialog = ({
             secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
-            <MemoInput
-                title={title}
-                setTitle={setTitle}
-                text={text}
-                setText={setText}
-            />
+            <div className="space-y-2">
+                <p>{message}</p>
+                <MemoInput
+                    title={title}
+                    setTitle={setTitle}
+                    text={text}
+                    setText={setText}
+                />
+            </div>
         </DialogView>
     );
 };
@@ -180,11 +194,22 @@ const EditItemDialog = ({
     const memo = strategyMemo.memos[index];
     const [title, setTitle] = useState(memo.title);
     const [text, setText] = useState(memo.text);
+    const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
         const newMemo = MemoUtility.create(title, text, memo.id);
-        setStrategyMemo((v) => MemoUtility.changed(v, index, newMemo));
-        setIsOpen(false);
+
+        try {
+            setStrategyMemo((v) => MemoUtility.changed(v, index, newMemo));
+            setIsOpen(false);
+        } catch (error) {
+            if (String(error).includes("QuotaExceededError")) {
+                setMessage("⚠️データ量の上限に達したため保存に失敗しました");
+                return;
+            }
+
+            console.log(error);
+        }
     };
 
     return (
@@ -196,12 +221,15 @@ const EditItemDialog = ({
             secondaryButtonLabel="キャンセル"
             onPrimaryButtonClick={handleButtonClick}
         >
-            <MemoInput
-                title={title}
-                setTitle={setTitle}
-                text={text}
-                setText={setText}
-            />
+            <div className="space-y-2">
+                <p>{message}</p>
+                <MemoInput
+                    title={title}
+                    setTitle={setTitle}
+                    text={text}
+                    setText={setText}
+                />
+            </div>
         </DialogView>
     );
 };

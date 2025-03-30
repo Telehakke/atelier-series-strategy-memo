@@ -5,9 +5,9 @@ export default class ImageFile {
         this.file = file;
     }
 
-    private isImage = (): boolean => {
-        if (this.file.type === "image/jpeg") return true;
-        if (this.file.type === "image/png") return true;
+    static isImage = (file: File): boolean => {
+        if (file.type === "image/jpeg") return true;
+        if (file.type === "image/png") return true;
         return false;
     };
 
@@ -15,7 +15,7 @@ export default class ImageFile {
         width: number,
         height: number,
     ): Promise<string | null> => {
-        if (!this.isImage()) return null;
+        if (!ImageFile.isImage(this.file)) return null;
 
         const img = document.createElement("img");
         img.src = URL.createObjectURL(this.file);

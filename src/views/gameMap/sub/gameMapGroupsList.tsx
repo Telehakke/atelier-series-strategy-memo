@@ -2,25 +2,23 @@ import { useAtom, useSetAtom } from "jotai";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
-    ChevronDownIconButton,
-    ChevronUpIconButton,
-    ImageOffIconButton,
-    PencilIconButton,
-    PlusIconLargeButton,
-    TrashIconButton,
-} from "../../commons/iconButtons";
-
-import DialogView from "../../commons/dialogView";
-import TextField from "../../commons/textField";
-
-import { Image } from "lucide-react";
-import {
     GameMapGroupUtility,
     GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
 import ImageFile from "../../../models/imageFile";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
-import { Bg, Border, Stroke, Text } from "../../commons/classNames";
+import { Bg, Border, Text } from "../../commons/classNames";
+import DialogView from "../../commons/dialogView";
+import {
+    ChevronDownIconButton,
+    ChevronUpIconButton,
+    ImageIconButton,
+    ImageOffIconButton,
+    PencilIconButton,
+    PlusIconLargeButton,
+    TrashIconButton,
+} from "../../commons/iconButtons";
+import TextField from "../../commons/textField";
 
 const GameMapGroupsList = ({
     gameMapGroups,
@@ -57,7 +55,7 @@ const GameMapGroupsList = ({
                             gameMapGroupsIndex={gameMapGroupsIndex}
                             setGameMapGroupsIndex={setGameMapGroupsIndex}
                         />
-                        <ImageOpenDialog
+                        <AddImageButton
                             gameMapGroupsIndex={gameMapGroupsIndex}
                         />
                         <RemoveImageButton
@@ -319,12 +317,37 @@ const MoveItemDownButton = ({
 
 /* -------------------------------------------------------------------------- */
 
-const ImageOpenDialog = ({
+const AddImageButton = ({
     gameMapGroupsIndex,
 }: {
     gameMapGroupsIndex: number;
 }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <>
+            <ImageIconButton onClick={() => setIsOpen(true)} />
+            <AddImageDialog
+                key={`${isOpen}`}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                gameMapGroupsIndex={gameMapGroupsIndex}
+            />
+        </>
+    );
+};
+
+const AddImageDialog = ({
+    isOpen,
+    setIsOpen,
+    gameMapGroupsIndex,
+}: {
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    gameMapGroupsIndex: number;
+}) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+    const [message, setMessage] = useState("");
 
     const handleChange: React.ChangeEventHandler<HTMLInputElement> = async (
         event,
@@ -332,31 +355,54 @@ const ImageOpenDialog = ({
         const files = event.target.files;
         if (files == null || files.length === 0) return;
 
+        const file = files[0];
+        if (!ImageFile.isImage(file)) {
+            setMessage("⚠️JPEGまたはPNGファイルを選択してください");
+            return;
+        }
+
         const imageFile = new ImageFile(files[0]);
         const base64 = await imageFile.toBase64(100, 100);
         if (base64 == null) return;
 
-        setStrategyMemo((v) =>
-            GameMapGroupUtility.changedImage(v, gameMapGroupsIndex, base64),
-        );
+        try {
+            setStrategyMemo((v) =>
+                GameMapGroupUtility.changedImage(v, gameMapGroupsIndex, base64),
+            );
+        } catch (error) {
+            if (String(error).includes("QuotaExceededError")) {
+                setMessage("⚠️データ量の上限に達したため保存に失敗しました");
+                return;
+            }
+
+            console.log(error);
+        }
     };
 
     return (
-        <>
-            <label
-                className={`rounded-full p-2 ${Bg.hoverNeutral200}`}
-                htmlFor="image-file-open"
-            >
-                <Image className={`${Stroke.neutral700}`} />
-            </label>
-            <input
-                className="hidden"
-                id="image-file-open"
-                type="file"
-                accept="image/png, image/jpeg"
-                onChange={handleChange}
-            />
-        </>
+        <DialogView
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            title="マップ画像の追加"
+            secondaryButtonLabel="閉じる"
+        >
+            <div className="space-y-2">
+                <p>{message}</p>
+                <label
+                    className={`rounded-md border-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                    htmlFor="image-file-open"
+                >
+                    ファイルを開く
+                </label>
+                <input
+                    className="hidden"
+                    id="image-file-open"
+                    type="file"
+                    accept="image/png, image/jpeg"
+                    onChange={handleChange}
+                />
+            </div>
+        </DialogView>
     );
 };
 

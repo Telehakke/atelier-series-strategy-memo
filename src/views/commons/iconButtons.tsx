@@ -7,6 +7,7 @@ import {
     CircleX,
     Clipboard,
     Database,
+    Image,
     ImageOff,
     Pencil,
     Plus,
@@ -236,6 +237,23 @@ export const SquareChevronDownIconButton = ({
             onClick={onClick}
         >
             <SquareChevronDown className={`${Stroke.neutral700}`} />
+        </Button>
+    );
+};
+
+export const ImageIconButton = ({
+    onClick,
+    className,
+}: {
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    className?: string;
+}) => {
+    return (
+        <Button
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
+            onClick={onClick}
+        >
+            <Image className={`${Stroke.neutral700}`} />
         </Button>
     );
 };
