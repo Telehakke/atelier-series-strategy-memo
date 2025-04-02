@@ -69,7 +69,7 @@ const GameMapCanvas = ({
                 />
                 {gameMapGroup.image.length > 0 && (
                     <img
-                        className="absolute inset-0 size-full"
+                        className="absolute inset-0 size-full object-contain"
                         style={{ imageRendering: "pixelated" }}
                         src={gameMapGroup.image}
                     />

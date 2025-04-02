@@ -219,4 +219,9 @@ export class StrategyMemoUtility {
         anchor.download = `${strategyMemo.gameName}_${dateNow()}.json`;
         anchor.click();
     };
+
+    static dataSize = (strategyMemo: StrategyMemoWithID): string => {
+        const size = new Blob([JSON.stringify(strategyMemo)]).size;
+        return `データサイズ：${Math.trunc((size * 1000) / 1000000) / 1000} MB`;
+    };
 }

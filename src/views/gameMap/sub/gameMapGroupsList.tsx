@@ -1,3 +1,4 @@
+import { Button, Field, Label, Select } from "@headlessui/react";
 import { useAtom, useSetAtom } from "jotai";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -5,7 +6,14 @@ import {
     GameMapGroupUtility,
     GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
-import ImageFile from "../../../models/imageFile";
+import ImageFile, {
+    ClipMode,
+    ClipModeEnum,
+    ClipModeJA,
+    isClipMode,
+    JpegQuality,
+} from "../../../models/imageFile";
+import { StrategyMemoUtility } from "../../../models/strategyMemo";
 import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
 import { Bg, Border, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
@@ -346,8 +354,12 @@ const AddImageDialog = ({
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     gameMapGroupsIndex: number;
 }) => {
-    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
-    const [message, setMessage] = useState("");
+    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+    const [message, setMessage] = useState(
+        StrategyMemoUtility.dataSize(strategyMemo),
+    );
+    const [jpegQuality, setJpegQuality] = useState<number>(JpegQuality.middle);
+    const [clipMode, setClipMode] = useState<ClipMode>(ClipModeEnum.all);
 
     const handleChange: React.ChangeEventHandler<HTMLInputElement> = async (
         event,
@@ -362,13 +374,19 @@ const AddImageDialog = ({
         }
 
         const imageFile = new ImageFile(files[0]);
-        const base64 = await imageFile.toBase64(100, 100);
+        const base64 = await imageFile.toBase64(jpegQuality / 100, clipMode);
         if (base64 == null) return;
 
         try {
-            setStrategyMemo((v) =>
-                GameMapGroupUtility.changedImage(v, gameMapGroupsIndex, base64),
-            );
+            setStrategyMemo((v) => {
+                const obj = GameMapGroupUtility.changedImage(
+                    v,
+                    gameMapGroupsIndex,
+                    base64,
+                );
+                setMessage(StrategyMemoUtility.dataSize(obj));
+                return obj;
+            });
         } catch (error) {
             if (String(error).includes("QuotaExceededError")) {
                 setMessage("⚠️データ量の上限に達したため保存に失敗しました");
@@ -376,6 +394,8 @@ const AddImageDialog = ({
             }
 
             console.log(error);
+        } finally {
+            event.target.value = "";
         }
     };
 
@@ -386,21 +406,73 @@ const AddImageDialog = ({
             title="マップ画像の追加"
             secondaryButtonLabel="閉じる"
         >
-            <div className="space-y-2">
+            <div className="space-y-4">
                 <p>{message}</p>
-                <label
-                    className={`rounded-md border-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
-                    htmlFor="image-file-open"
-                >
-                    ファイルを開く
-                </label>
-                <input
-                    className="hidden"
-                    id="image-file-open"
-                    type="file"
-                    accept="image/png, image/jpeg"
-                    onChange={handleChange}
-                />
+                <div>
+                    <label
+                        className={`rounded-md border-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                        htmlFor="image-file-open"
+                    >
+                        ファイルを開く
+                    </label>
+                    <input
+                        className="hidden"
+                        id="image-file-open"
+                        type="file"
+                        accept="image/png, image/jpeg"
+                        onChange={handleChange}
+                    />
+                </div>
+                <div className="flex items-center gap-4">
+                    <div>
+                        <Button
+                            className={`rounded-l-md border-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                            onClick={() => setJpegQuality(JpegQuality.low)}
+                        >
+                            低
+                        </Button>
+                        <Button
+                            className={`border-y-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                            onClick={() => setJpegQuality(JpegQuality.middle)}
+                        >
+                            中
+                        </Button>
+                        <Button
+                            className={`rounded-r-md border-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                            onClick={() => setJpegQuality(JpegQuality.high)}
+                        >
+                            高
+                        </Button>
+                    </div>
+                    <p>品質：{jpegQuality}</p>
+                </div>
+                <div>
+                    <Field className="space-x-2">
+                        <Label>切り取り位置</Label>
+                        <Select
+                            className={`rounded-md border-2 px-2 py-1.5 ${Border.neutral400}`}
+                            value={clipMode}
+                            onChange={(event) => {
+                                if (!isClipMode(event.target.value)) return;
+
+                                setClipMode(event.target.value);
+                            }}
+                        >
+                            <option value={ClipModeEnum.all}>
+                                {ClipModeJA.all}
+                            </option>
+                            <option value={ClipModeEnum.left}>
+                                {ClipModeJA.left}
+                            </option>
+                            <option value={ClipModeEnum.right}>
+                                {ClipModeJA.right}
+                            </option>
+                            <option value={ClipModeEnum.center}>
+                                {ClipModeJA.center}
+                            </option>
+                        </Select>
+                    </Field>
+                </div>
             </div>
         </DialogView>
     );
