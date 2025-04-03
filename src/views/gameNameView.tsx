@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { useState } from "react";
+import { strategyMemoRepositoryAtom } from "../atoms";
 import { StrategyMemoUtility } from "../models/strategyMemo";
-import { strategyMemoRepositoryAtom } from "../strategyMemoAtom";
 import DialogView from "./commons/dialogView";
 import { PencilIconButton } from "./commons/iconButtons";
 import TextField from "./commons/textField";

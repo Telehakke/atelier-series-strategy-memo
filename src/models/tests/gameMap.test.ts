@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { GameMapUtility, GameMapWithID } from "../gameMap";
+import { GameMapGroupWithID } from "../gameMapGroup";
 import { StrategyMemoWithID } from "../strategyMemo";
 
 test("isGameMap", () => {
@@ -23,56 +24,132 @@ test("isGameMaps", () => {
 
 test("create", () => {
     const gameMap = GameMapUtility.create(
-        "雛鳥の林",
-        "正体不明のタマゴ、赤うに、うに、夕焼け草",
-        "ゴースト、緑プニ、青プニ",
-        "",
-        "🔴",
-        "50",
-        "50",
-        "0",
+        "name",
+        "item1、item2",
+        "monster1、monster2",
+        "memo",
+        "icon",
+        "1",
+        "2",
+        "id1",
     );
     const expected: GameMapWithID = {
-        name: "雛鳥の林",
-        items: ["正体不明のタマゴ", "赤うに", "うに", "夕焼け草"],
-        monsters: ["ゴースト", "緑プニ", "青プニ"],
-        memo: "",
-        icon: "🔴",
-        x: 50,
-        y: 50,
-        id: "0",
+        name: "name",
+        items: ["item1", "item2"],
+        monsters: ["monster1", "monster2"],
+        memo: "memo",
+        icon: "icon",
+        x: 1,
+        y: 2,
+        id: "id1",
     };
     expect(gameMap).toEqual(expected);
 });
 
-test("findIndex", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [
-            {
-                name: "",
-                gameMaps: [
-                    {
-                        name: "",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "id",
-                    },
-                ],
-                image: "",
-                id: "",
-            },
-        ],
-        preparations: [],
-        memos: [],
-        id: "",
+test("find1", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "",
+            gameMaps: [
+                {
+                    name: "name",
+                    items: [],
+                    monsters: [],
+                    memo: "memo",
+                    icon: "icon",
+                    x: 1,
+                    y: 2,
+                    id: "id",
+                },
+            ],
+            image: "",
+            id: "groupID",
+        },
+    ];
+    const result = GameMapUtility.find(gameMapGroups, "groupID", "id");
+    const expected: GameMapWithID = {
+        name: "name",
+        items: [],
+        monsters: [],
+        memo: "memo",
+        icon: "icon",
+        x: 1,
+        y: 2,
+        id: "id",
     };
-    const result = GameMapUtility.findIndex(strategyMemo, 0, "id");
+    expect(result).toEqual(expected);
+});
+
+test("find2", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "",
+            gameMaps: [
+                {
+                    name: "name",
+                    items: [],
+                    monsters: [],
+                    memo: "memo",
+                    icon: "icon",
+                    x: 1,
+                    y: 2,
+                    id: "id",
+                },
+            ],
+            image: "",
+            id: "groupID",
+        },
+    ];
+    const result = GameMapUtility.find(gameMapGroups, "groupID", "id1");
+    expect(result).toBeNull();
+});
+
+test("findIndex1", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "",
+            gameMaps: [
+                {
+                    name: "name",
+                    items: [],
+                    monsters: [],
+                    memo: "memo",
+                    icon: "icon",
+                    x: 1,
+                    y: 2,
+                    id: "id",
+                },
+            ],
+            image: "",
+            id: "groupID",
+        },
+    ];
+    const result = GameMapUtility.findIndex(gameMapGroups, "groupID", "id");
     expect(result).toBe(0);
+});
+
+test("findIndex2", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "",
+            gameMaps: [
+                {
+                    name: "name",
+                    items: [],
+                    monsters: [],
+                    memo: "memo",
+                    icon: "icon",
+                    x: 1,
+                    y: 2,
+                    id: "id",
+                },
+            ],
+            image: "",
+            id: "groupID",
+        },
+    ];
+    const result = GameMapUtility.findIndex(gameMapGroups, "groupID", "id1");
+    expect(result).toBeNull();
 });
 
 test("added", () => {
@@ -83,14 +160,14 @@ test("added", () => {
                 name: "",
                 gameMaps: [],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapUtility.added(strategyMemo, 0, {
+    const result = GameMapUtility.added(strategyMemo, "gameMapID", {
         name: "",
         items: [],
         monsters: [],
@@ -118,14 +195,14 @@ test("added", () => {
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("changed", () => {
@@ -143,18 +220,18 @@ test("changed", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapUtility.changed(strategyMemo, 0, 0, {
+    const result = GameMapUtility.changed(strategyMemo, "gameMapID", "id", {
         name: "name",
         items: ["item"],
         monsters: ["monster"],
@@ -162,7 +239,6 @@ test("changed", () => {
         icon: "icon",
         x: 1,
         y: 2,
-        id: "",
     });
     const expected: StrategyMemoWithID = {
         gameName: "",
@@ -178,18 +254,18 @@ test("changed", () => {
                         icon: "icon",
                         x: 1,
                         y: 2,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("removed", () => {
@@ -207,18 +283,18 @@ test("removed", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapUtility.removed(strategyMemo, 0, 0);
+    const result = GameMapUtility.removed(strategyMemo, "gameMapID", "id");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
@@ -226,14 +302,14 @@ test("removed", () => {
                 name: "",
                 gameMaps: [],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("movedUp", () => {
@@ -251,7 +327,7 @@ test("movedUp", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id1",
                     },
                     {
                         name: "2",
@@ -261,18 +337,18 @@ test("movedUp", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id2",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapUtility.movedUp(strategyMemo, 0, 1);
+    const result = GameMapUtility.movedUp(strategyMemo, "gameMapID", "id2");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
@@ -287,7 +363,7 @@ test("movedUp", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id2",
                     },
                     {
                         name: "1",
@@ -297,21 +373,21 @@ test("movedUp", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id1",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
-test("moved", () => {
+test("movedDown", () => {
     const strategyMemo: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
@@ -319,16 +395,6 @@ test("moved", () => {
                 name: "",
                 gameMaps: [
                     {
-                        name: "1",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                    {
                         name: "2",
                         items: [],
                         monsters: [],
@@ -336,18 +402,28 @@ test("moved", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id2",
+                    },
+                    {
+                        name: "1",
+                        items: [],
+                        monsters: [],
+                        memo: "",
+                        icon: "",
+                        x: 0,
+                        y: 0,
+                        id: "id1",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapUtility.movedDown(strategyMemo, 0, 0);
+    const result = GameMapUtility.movedDown(strategyMemo, "gameMapID", "id2");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
@@ -355,16 +431,6 @@ test("moved", () => {
                 name: "",
                 gameMaps: [
                     {
-                        name: "2",
-                        items: [],
-                        monsters: [],
-                        memo: "",
-                        icon: "",
-                        x: 0,
-                        y: 0,
-                        id: "",
-                    },
-                    {
                         name: "1",
                         items: [],
                         monsters: [],
@@ -372,18 +438,28 @@ test("moved", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id1",
+                    },
+                    {
+                        name: "2",
+                        items: [],
+                        monsters: [],
+                        memo: "",
+                        icon: "",
+                        x: 0,
+                        y: 0,
+                        id: "id2",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("additionXY1", () => {
@@ -401,18 +477,21 @@ test("additionXY1", () => {
                         icon: "",
                         x: 50,
                         y: 50,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapUtility.additionXY(strategyMemo, 0, 0, 5, -5);
+    const result = GameMapUtility.additionXY(strategyMemo, "gameMapID", "id", {
+        x: 5,
+        y: -5,
+    });
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
@@ -427,11 +506,11 @@ test("additionXY1", () => {
                         icon: "",
                         x: 55,
                         y: 45,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
@@ -456,18 +535,21 @@ test("additionXY2", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapUtility.additionXY(strategyMemo, 0, 0, -1, -1);
+    const result = GameMapUtility.additionXY(strategyMemo, "gameMapID", "id", {
+        x: -1,
+        y: -1,
+    });
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
@@ -482,11 +564,11 @@ test("additionXY2", () => {
                         icon: "",
                         x: 0,
                         y: 0,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
@@ -511,18 +593,21 @@ test("additionXY3", () => {
                         icon: "",
                         x: 100,
                         y: 100,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapUtility.additionXY(strategyMemo, 0, 0, 1, 1);
+    const result = GameMapUtility.additionXY(strategyMemo, "gameMapID", "id", {
+        x: 1,
+        y: 1,
+    });
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
@@ -537,11 +622,11 @@ test("additionXY3", () => {
                         icon: "",
                         x: 100,
                         y: 100,
-                        id: "",
+                        id: "id",
                     },
                 ],
                 image: "",
-                id: "",
+                id: "gameMapID",
             },
         ],
         preparations: [],

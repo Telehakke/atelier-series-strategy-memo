@@ -19,30 +19,60 @@ test("isPreparations", () => {
 
 test("create", () => {
     const preparation = PreparationUtility.create(
-        "失敗作の灰",
-        "",
-        "（エリキシル）、（魔法の道具）",
-        "0",
+        "name",
+        "material1、material2",
+        "category1、category2",
+        "id",
     );
     const expected: PreparationWithID = {
-        name: "失敗作の灰",
-        materials: [],
-        categories: ["（エリキシル）", "（魔法の道具）"],
-        id: "0",
+        name: "name",
+        materials: ["material1", "material2"],
+        categories: ["category1", "category2"],
+        id: "id",
     };
     expect(preparation).toEqual(expected);
 });
 
-test("findIndex", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [{ name: "", materials: [], categories: [], id: "id" }],
-        memos: [],
-        id: "",
+test("find1", () => {
+    const preparations: PreparationWithID[] = [
+        { name: "name1", materials: [], categories: [], id: "id1" },
+        { name: "name2", materials: [], categories: [], id: "id2" },
+    ];
+    const result = PreparationUtility.find(preparations, "id1");
+    const expected: PreparationWithID = {
+        name: "name1",
+        materials: [],
+        categories: [],
+        id: "id1",
     };
-    const result = PreparationUtility.findIndex(strategyMemo, "id");
+    expect(result).toEqual(expected);
+});
+
+test("find2", () => {
+    const preparations: PreparationWithID[] = [
+        { name: "name1", materials: [], categories: [], id: "id1" },
+        { name: "name2", materials: [], categories: [], id: "id2" },
+    ];
+    const result = PreparationUtility.find(preparations, "id3");
+    expect(result).toBeNull();
+});
+
+test("findIndex1", () => {
+    const preparations: PreparationWithID[] = [
+        { name: "name1", materials: [], categories: [], id: "id1" },
+        { name: "name2", materials: [], categories: [], id: "id2" },
+    ];
+    const result = PreparationUtility.findIndex(preparations, "id1");
     expect(result).toBe(0);
+});
+
+test("findIndex2", () => {
+    const preparations: PreparationWithID[] = [
+        { name: "name1", materials: [], categories: [], id: "id1" },
+        { name: "name2", materials: [], categories: [], id: "id2" },
+    ];
+    const result = PreparationUtility.findIndex(preparations, "id3");
+    expect(result).toBeNull();
 });
 
 test("added", () => {
@@ -73,7 +103,7 @@ test("added", () => {
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toEqual(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("changed", () => {
@@ -85,17 +115,16 @@ test("changed", () => {
                 name: "",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id",
             },
         ],
         memos: [],
         id: "",
     };
-    const result = PreparationUtility.changed(strategyMemo, 0, {
+    const result = PreparationUtility.changed(strategyMemo, "id", {
         name: "name",
         materials: ["material"],
         categories: ["category"],
-        id: "",
     });
     const expected: StrategyMemoWithID = {
         gameName: "",
@@ -105,13 +134,13 @@ test("changed", () => {
                 name: "name",
                 materials: ["material"],
                 categories: ["category"],
-                id: "",
+                id: "id",
             },
         ],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("removed", () => {
@@ -123,13 +152,13 @@ test("removed", () => {
                 name: "",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id",
             },
         ],
         memos: [],
         id: "",
     };
-    const result = PreparationUtility.removed(strategyMemo, 0);
+    const result = PreparationUtility.removed(strategyMemo, "id");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [],
@@ -137,7 +166,7 @@ test("removed", () => {
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("movedUp", () => {
@@ -146,43 +175,43 @@ test("movedUp", () => {
         gameMapGroups: [],
         preparations: [
             {
-                name: "1",
+                name: "name1",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id1",
             },
             {
-                name: "2",
+                name: "name2",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id2",
             },
         ],
         memos: [],
         id: "",
     };
-    const result = PreparationUtility.movedUp(strategyMemo, 1);
+    const result = PreparationUtility.movedUp(strategyMemo, "id2");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
             {
-                name: "2",
+                name: "name2",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id2",
             },
             {
-                name: "1",
+                name: "name1",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id1",
             },
         ],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("movedDown", () => {
@@ -191,41 +220,41 @@ test("movedDown", () => {
         gameMapGroups: [],
         preparations: [
             {
-                name: "1",
+                name: "name2",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id2",
             },
             {
-                name: "2",
+                name: "name1",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id1",
             },
         ],
         memos: [],
         id: "",
     };
-    const result = PreparationUtility.movedDown(strategyMemo, 0);
+    const result = PreparationUtility.movedDown(strategyMemo, "id2");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
             {
-                name: "2",
+                name: "name1",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id1",
             },
             {
-                name: "1",
+                name: "name2",
                 materials: [],
                 categories: [],
-                id: "",
+                id: "id2",
             },
         ],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });

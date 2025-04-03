@@ -1,3 +1,4 @@
+import { GameMapGroupUtility, GameMapGroupWithID } from "./gameMapGroup";
 import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull, isNumber, isString, isStrings } from "./typeGuards";
 
@@ -73,63 +74,134 @@ export class GameMapUtility {
         };
     };
 
+    static find = (
+        gameMapGroups: GameMapGroupWithID[],
+        gameMapGroupsID: string,
+        id: string,
+    ): GameMapWithID | null => {
+        const gameMapGroup = GameMapGroupUtility.find(
+            gameMapGroups,
+            gameMapGroupsID,
+        );
+        if (gameMapGroup == null) return null;
+
+        return gameMapGroup.gameMaps.find((v) => v.id === id) ?? null;
+    };
+
     static findIndex = (
-        strategyMemo: StrategyMemoWithID,
-        gameMapGroupsIndex: number,
+        gameMapGroups: GameMapGroupWithID[],
+        gameMapGroupsID: string,
         id: string,
     ): number | null => {
-        const index = strategyMemo.gameMapGroups[
-            gameMapGroupsIndex
-        ].gameMaps.findIndex((v) => v.id === id);
+        const gameMapGroup = GameMapGroupUtility.find(
+            gameMapGroups,
+            gameMapGroupsID,
+        );
+        if (gameMapGroup == null) return null;
+
+        const index = gameMapGroup.gameMaps.findIndex((v) => v.id === id);
         return index < 0 ? null : index;
     };
 
     static added = (
         strategyMemo: StrategyMemoWithID,
-        gameMapGroupsIndex: number,
+        gameMapGroupsID: string,
         gameMap: GameMapWithID,
     ): StrategyMemoWithID => {
+        const index = GameMapGroupUtility.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+        );
+        if (index == null) return strategyMemo;
+
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        copied.gameMapGroups[gameMapGroupsIndex].gameMaps.push(gameMap);
+        copied.gameMapGroups[index].gameMaps.push(gameMap);
         return copied;
     };
 
     static changed = (
         strategyMemo: StrategyMemoWithID,
-        gameMapGroupsIndex: number,
-        gameMapsIndex: number,
-        gameMap: GameMapWithID,
+        gameMapGroupsID: string,
+        id: string,
+        input: {
+            name: string;
+            items: string[];
+            monsters: string[];
+            memo: string;
+            icon: string;
+            x: number;
+            y: number;
+        },
     ): StrategyMemoWithID => {
+        const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+        );
+        if (gameMapGroupsIndex == null) return strategyMemo;
+
+        const index = this.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+            id,
+        );
+        if (index == null) return strategyMemo;
+
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        copied.gameMapGroups[gameMapGroupsIndex].gameMaps[gameMapsIndex] =
-            gameMap;
+        const gameMap: GameMapWithID = {
+            ...input,
+            id: copied.gameMapGroups[gameMapGroupsIndex].gameMaps[index].id,
+        };
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps[index] = gameMap;
         return copied;
     };
 
     static removed = (
         strategyMemo: StrategyMemoWithID,
-        gameMapGroupsIndex: number,
-        gameMapsIndex: number,
+        gameMapGroupsID: string,
+        id: string,
     ): StrategyMemoWithID => {
-        const copied = StrategyMemoUtility.copied(strategyMemo);
-        copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
-            gameMapsIndex,
-            1,
+        const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
         );
+        if (gameMapGroupsIndex == null) return strategyMemo;
+
+        const index = this.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+            id,
+        );
+        if (index == null) return strategyMemo;
+
+        const copied = StrategyMemoUtility.copied(strategyMemo);
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(index, 1);
         return copied;
     };
 
     static movedUp = (
         strategyMemo: StrategyMemoWithID,
-        gameMapGroupsIndex: number,
-        gameMapsIndex: number,
+        gameMapGroupsID: string,
+        id: string,
     ): StrategyMemoWithID => {
-        const newIndex = gameMapsIndex - 1;
+        const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+        );
+        if (gameMapGroupsIndex == null) return strategyMemo;
+
+        const index = this.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+            id,
+        );
+        if (index == null) return strategyMemo;
+
+        const newIndex = index - 1;
         if (newIndex < 0) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
         const [item] = copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
-            gameMapsIndex,
+            index,
             1,
         );
         copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
@@ -142,10 +214,23 @@ export class GameMapUtility {
 
     static movedDown = (
         strategyMemo: StrategyMemoWithID,
-        gameMapGroupsIndex: number,
-        gameMapsIndex: number,
+        gameMapGroupsID: string,
+        id: string,
     ): StrategyMemoWithID => {
-        const newIndex = gameMapsIndex + 1;
+        const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+        );
+        if (gameMapGroupsIndex == null) return strategyMemo;
+
+        const index = this.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+            id,
+        );
+        if (index == null) return strategyMemo;
+
+        const newIndex = index + 1;
         if (
             newIndex >=
             strategyMemo.gameMapGroups[gameMapGroupsIndex].gameMaps.length
@@ -154,7 +239,7 @@ export class GameMapUtility {
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
         const [item] = copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
-            gameMapsIndex,
+            index,
             1,
         );
         copied.gameMapGroups[gameMapGroupsIndex].gameMaps.splice(
@@ -167,19 +252,34 @@ export class GameMapUtility {
 
     static additionXY = (
         strategyMemo: StrategyMemoWithID,
-        gameMapGroupsIndex: number,
-        gameMapsIndex: number,
-        x: number,
-        y: number,
+        gameMapGroupsID: string,
+        id: string,
+        input: {
+            x: number;
+            y: number;
+        },
     ): StrategyMemoWithID => {
+        const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+        );
+        if (gameMapGroupsIndex == null) return strategyMemo;
+
+        const index = this.findIndex(
+            strategyMemo.gameMapGroups,
+            gameMapGroupsID,
+            id,
+        );
+        if (index == null) return strategyMemo;
+
         const copied = StrategyMemoUtility.copied(strategyMemo);
         const gameMap =
-            copied.gameMapGroups[gameMapGroupsIndex].gameMaps[gameMapsIndex];
+            copied.gameMapGroups[gameMapGroupsIndex].gameMaps[index];
 
-        let validX = gameMap.x + x;
+        let validX = gameMap.x + input.x;
         if (validX < 0) validX = 0;
         if (validX > 100) validX = 100;
-        let validY = gameMap.y + y;
+        let validY = gameMap.y + input.y;
         if (validY < 0) validY = 0;
         if (validY > 100) validY = 100;
 
@@ -188,8 +288,7 @@ export class GameMapUtility {
             x: validX,
             y: validY,
         };
-        copied.gameMapGroups[gameMapGroupsIndex].gameMaps[gameMapsIndex] =
-            newGameMap;
+        copied.gameMapGroups[gameMapGroupsIndex].gameMaps[index] = newGameMap;
         return copied;
     };
 }

@@ -1,9 +1,12 @@
 import { Button } from "@headlessui/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef } from "react";
+import { strategyMemoRepositoryAtom } from "../../../atoms";
 import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
-import { GameMapGroupWithID } from "../../../models/gameMapGroup";
-import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
+import {
+    GameMapGroupUtility,
+    GameMapGroupWithID,
+} from "../../../models/gameMapGroup";
 import { Bg, Border, Shadow } from "../../commons/classNames";
 import {
     SquareChevronDownIconButton,
@@ -13,14 +16,14 @@ import {
 } from "../../commons/iconButtons";
 
 const GameMapCanvas = ({
-    filteredGameMapGroup,
-    gameMapGroupsIndex,
+    gameMapGroups,
+    selectedIDInGameMapGroups,
     selectedID,
     setSelectedID,
     className,
 }: {
-    filteredGameMapGroup?: GameMapGroupWithID;
-    gameMapGroupsIndex?: number;
+    gameMapGroups: GameMapGroupWithID[];
+    selectedIDInGameMapGroups: string | null;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;
@@ -48,80 +51,78 @@ const GameMapCanvas = ({
             ctx.stroke();
             ctx.closePath();
         }
-    }, [filteredGameMapGroup]);
+    }, [canvas]);
 
-    if (filteredGameMapGroup == null || gameMapGroupsIndex == null)
-        return <></>;
+    if (selectedIDInGameMapGroups == null) return <></>;
 
-    const gameMapGroup = strategyMemo.gameMapGroups[gameMapGroupsIndex];
+    const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
+        gameMapGroups,
+        selectedIDInGameMapGroups,
+    );
+    if (gameMapGroupsIndex == null) return <></>;
+
+    const gameMapGroup = gameMapGroups[gameMapGroupsIndex];
+
+    const hasImage = (): boolean => {
+        return gameMapGroup.image.length > 0;
+    };
+
+    const filteredGameMaps = (): GameMapWithID[] => {
+        if (selectedID == null) {
+            return gameMapGroups[gameMapGroupsIndex].gameMaps;
+        }
+
+        return strategyMemo.gameMapGroups[gameMapGroupsIndex].gameMaps;
+    };
 
     return (
-        <>
-            <div
-                className={`relative mx-auto aspect-square max-w-150 overflow-clip border-1 ${Bg.neutral50} ${Border.neutral950} ${className}`}
-            >
-                <canvas
-                    className="size-full opacity-20"
-                    ref={canvas}
-                    width="200px"
-                    height="200px"
+        <div
+            className={`relative mx-auto aspect-square max-w-150 overflow-clip border-1 ${Bg.neutral50} ${Border.neutral950} ${className}`}
+        >
+            <canvas
+                className="size-full opacity-20"
+                ref={canvas}
+                width="200px"
+                height="200px"
+                style={{ imageRendering: "pixelated" }}
+            />
+            {hasImage() && (
+                <img
+                    className="absolute inset-0 size-full object-contain"
                     style={{ imageRendering: "pixelated" }}
+                    src={gameMapGroup.image}
                 />
-                {gameMapGroup.image.length > 0 && (
-                    <img
-                        className="absolute inset-0 size-full object-contain"
-                        style={{ imageRendering: "pixelated" }}
-                        src={gameMapGroup.image}
-                    />
-                )}
-                {gameMapGroup.gameMaps
-                    .filter((gameMap) => {
-                        if (selectedID != null) return true;
-                        return filteredGameMapGroup.gameMaps.some(
-                            (filteredGameMap) =>
-                                gameMap.id === filteredGameMap.id,
-                        );
-                    })
-                    .map((v) => (
-                        <Card
-                            className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50} ${selectedID == null || v.id === selectedID ? "" : "opacity-50"}`}
-                            key={v.id}
-                            gameMap={v}
-                            selectedID={selectedID}
-                            setSelectedID={setSelectedID}
-                        />
-                    ))}
-                {selectedID != null &&
-                filteredGameMapGroup.gameMaps.some(
-                    (v) => v.id === selectedID,
-                ) ? (
-                    <>
-                        <MoveUpButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            selectedID={selectedID}
-                            className={`absolute top-0 left-1/2 -translate-x-1/2 ${Bg.neutral50}`}
-                        />
-                        <MoveLeftButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            selectedID={selectedID}
-                            className={`absolute top-1/2 left-0 -translate-y-1/2 ${Bg.neutral50}`}
-                        />
-                        <MoveRightButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            selectedID={selectedID}
-                            className={`absolute top-1/2 right-0 -translate-y-1/2 ${Bg.neutral50}`}
-                        />
-                        <MoveDownButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            selectedID={selectedID}
-                            className={`absolute bottom-0 left-1/2 -translate-x-1/2 ${Bg.neutral50}`}
-                        />
-                    </>
-                ) : (
-                    <></>
-                )}
-            </div>
-        </>
+            )}
+            {filteredGameMaps().map((v) => (
+                <Card
+                    className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50} ${selectedID == null || v.id === selectedID ? "" : "opacity-50"}`}
+                    key={v.id}
+                    gameMap={v}
+                    selectedID={selectedID}
+                    setSelectedID={setSelectedID}
+                />
+            ))}
+            <MoveUpButton
+                selectedIDInGameMapGroup={selectedIDInGameMapGroups}
+                selectedID={selectedID}
+                className={`absolute top-0 left-1/2 -translate-x-1/2 ${Bg.neutral50}`}
+            />
+            <MoveLeftButton
+                selectedIDInGameMapGroup={selectedIDInGameMapGroups}
+                selectedID={selectedID}
+                className={`absolute top-1/2 left-0 -translate-y-1/2 ${Bg.neutral50}`}
+            />
+            <MoveRightButton
+                selectedIDInGameMapGroup={selectedIDInGameMapGroups}
+                selectedID={selectedID}
+                className={`absolute top-1/2 right-0 -translate-y-1/2 ${Bg.neutral50}`}
+            />
+            <MoveDownButton
+                selectedIDInGameMapGroup={selectedIDInGameMapGroups}
+                selectedID={selectedID}
+                className={`absolute bottom-0 left-1/2 -translate-x-1/2 ${Bg.neutral50}`}
+            />
+        </div>
     );
 };
 
@@ -155,34 +156,29 @@ const Card = ({
     );
 };
 
+/* -------------------------------------------------------------------------- */
+
 const MoveUpButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroup,
     selectedID,
     className,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string;
+    selectedIDInGameMapGroup: string | null;
+    selectedID: string | null;
     className?: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = () => {
-        setStrategyMemo((v) => {
-            const index = GameMapUtility.findIndex(
-                v,
-                gameMapGroupsIndex,
-                selectedID,
-            );
-            if (index == null) return v;
+    if (selectedIDInGameMapGroup == null) return <></>;
+    if (selectedID == null) return <></>;
 
-            return GameMapUtility.additionXY(
-                v,
-                gameMapGroupsIndex,
-                index,
-                0,
-                -5,
-            );
-        });
+    const handleButtonClick = () => {
+        setStrategyMemo((v) =>
+            GameMapUtility.additionXY(v, selectedIDInGameMapGroup, selectedID, {
+                x: 0,
+                y: -5,
+            }),
+        );
     };
 
     return (
@@ -194,33 +190,26 @@ const MoveUpButton = ({
 };
 
 const MoveLeftButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroup,
     selectedID,
     className,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string;
+    selectedIDInGameMapGroup: string | null;
+    selectedID: string | null;
     className?: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = () => {
-        setStrategyMemo((v) => {
-            const index = GameMapUtility.findIndex(
-                v,
-                gameMapGroupsIndex,
-                selectedID,
-            );
-            if (index == null) return v;
+    if (selectedIDInGameMapGroup == null) return <></>;
+    if (selectedID == null) return <></>;
 
-            return GameMapUtility.additionXY(
-                v,
-                gameMapGroupsIndex,
-                index,
-                -5,
-                0,
-            );
-        });
+    const handleButtonClick = () => {
+        setStrategyMemo((v) =>
+            GameMapUtility.additionXY(v, selectedIDInGameMapGroup, selectedID, {
+                x: -5,
+                y: 0,
+            }),
+        );
     };
 
     return (
@@ -232,33 +221,26 @@ const MoveLeftButton = ({
 };
 
 const MoveRightButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroup,
     selectedID,
     className,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string;
+    selectedIDInGameMapGroup: string | null;
+    selectedID: string | null;
     className?: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = () => {
-        setStrategyMemo((v) => {
-            const index = GameMapUtility.findIndex(
-                v,
-                gameMapGroupsIndex,
-                selectedID,
-            );
-            if (index == null) return v;
+    if (selectedIDInGameMapGroup == null) return <></>;
+    if (selectedID == null) return <></>;
 
-            return GameMapUtility.additionXY(
-                v,
-                gameMapGroupsIndex,
-                index,
-                5,
-                0,
-            );
-        });
+    const handleButtonClick = () => {
+        setStrategyMemo((v) =>
+            GameMapUtility.additionXY(v, selectedIDInGameMapGroup, selectedID, {
+                x: 5,
+                y: 0,
+            }),
+        );
     };
 
     return (
@@ -270,33 +252,26 @@ const MoveRightButton = ({
 };
 
 const MoveDownButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroup,
     selectedID,
     className,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string;
+    selectedIDInGameMapGroup: string | null;
+    selectedID: string | null;
     className?: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    const handleButtonClick = () => {
-        setStrategyMemo((v) => {
-            const index = GameMapUtility.findIndex(
-                v,
-                gameMapGroupsIndex,
-                selectedID,
-            );
-            if (index == null) return v;
+    if (selectedIDInGameMapGroup == null) return <></>;
+    if (selectedID == null) return <></>;
 
-            return GameMapUtility.additionXY(
-                v,
-                gameMapGroupsIndex,
-                index,
-                0,
-                5,
-            );
-        });
+    const handleButtonClick = () => {
+        setStrategyMemo((v) =>
+            GameMapUtility.additionXY(v, selectedIDInGameMapGroup, selectedID, {
+                x: 0,
+                y: 5,
+            }),
+        );
     };
 
     return (

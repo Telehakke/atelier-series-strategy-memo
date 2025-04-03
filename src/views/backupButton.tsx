@@ -1,8 +1,8 @@
 import { Button } from "@headlessui/react";
 import { useAtom } from "jotai";
 import { useState } from "react";
+import { strategyMemoRepositoryAtom } from "../atoms";
 import { StrategyMemoUtility } from "../models/strategyMemo";
-import { strategyMemoRepositoryAtom } from "../strategyMemoAtom";
 import { Bg, Border } from "./commons/classNames";
 import DialogView from "./commons/dialogView";
 import { DatabaseIconButton } from "./commons/iconButtons";

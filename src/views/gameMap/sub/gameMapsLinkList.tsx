@@ -1,16 +1,28 @@
-import { GameMapGroupWithID } from "../../../models/gameMapGroup";
+import {
+    GameMapGroupUtility,
+    GameMapGroupWithID,
+} from "../../../models/gameMapGroup";
 import { Text } from "../../commons/classNames";
 
 const GameMapsLinkList = ({
-    gameMapGroup,
+    gameMapGroups,
+    selectedID,
     className,
 }: {
-    gameMapGroup?: GameMapGroupWithID;
+    gameMapGroups: GameMapGroupWithID[];
+    selectedID: string | null;
     className?: string;
 }) => {
+    if (selectedID == null) return <></>;
+
+    const index = GameMapGroupUtility.findIndex(gameMapGroups, selectedID);
+    if (index == null) return <></>;
+
+    const gameMapGroup = gameMapGroups[index];
+
     return (
         <div className={`w-45 ${className}`}>
-            {gameMapGroup?.gameMaps.map((v) => (
+            {gameMapGroup.gameMaps.map((v) => (
                 <a
                     className={`block truncate leading-8 ${Text.hoverBlue500}`}
                     key={v.id}

@@ -2,7 +2,7 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { useAtomValue } from "jotai";
 import { Map, NotebookPen, Wand } from "lucide-react";
 import { useState } from "react";
-import { strategyMemoRepositoryAtom } from "./strategyMemoAtom";
+import { strategyMemoRepositoryAtom } from "./atoms";
 import BackupButton from "./views/backupButton";
 import { Bg, Border, Text } from "./views/commons/classNames";
 import GameMapView from "./views/gameMap/gameMapView";

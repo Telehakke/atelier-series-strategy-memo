@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { GameMapGroupWithID } from "../../models/gameMapGroup";
+import {
+    GameMapGroupUtility,
+    GameMapGroupWithID,
+} from "../../models/gameMapGroup";
 import GameMapGroupsFiltering from "../../models/gameMapGroupsFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
@@ -19,11 +22,12 @@ const GameMapView = ({
     isPanelOpen: boolean;
     setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-    const [gameMapGroupsIndex, setGameMapGroupsIndex] = useState(0);
-    const [filteringValue, setFilteringValue] = useState("");
+    const [selectedIndexInGameMapGroups, setSelectedIndexInGameMapGroups] =
+        useState(0);
     const [selectedIDInCanvas, setSelectedIDInCanvas] = useState<string | null>(
         null,
     );
+    const [filteringValue, setFilteringValue] = useState("");
     const gameMapGroupsFiltering = new GameMapGroupsFiltering(gameMapGroups);
     const filteredGameMapGroups =
         selectedIDInCanvas != null
@@ -31,6 +35,10 @@ const GameMapView = ({
             : gameMapGroupsFiltering.filtered(
                   splitByWhiteSpace(filteringValue),
               );
+    const selectedIDInGameMapGroups = GameMapGroupUtility.findID(
+        gameMapGroups,
+        selectedIndexInGameMapGroups,
+    );
 
     return (
         <>
@@ -44,8 +52,12 @@ const GameMapView = ({
                         <GameMapGroupsList
                             className="pb-2"
                             gameMapGroups={filteredGameMapGroups}
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            setGameMapGroupsIndex={setGameMapGroupsIndex}
+                            selectedIDInGameMapGroups={
+                                selectedIDInGameMapGroups
+                            }
+                            setSelectedIndexInGameMapGroups={
+                                setSelectedIndexInGameMapGroups
+                            }
                             setSelectedIDInCanvas={setSelectedIDInCanvas}
                         />
                         <FilteringTextField
@@ -55,9 +67,8 @@ const GameMapView = ({
                         />
                         <GameMapsLinkList
                             className="py-2"
-                            gameMapGroup={
-                                filteredGameMapGroups[gameMapGroupsIndex]
-                            }
+                            gameMapGroups={filteredGameMapGroups}
+                            selectedID={selectedIDInGameMapGroups}
                         />
                     </div>
                 )}
@@ -70,17 +81,15 @@ const GameMapView = ({
             <div className="ml-13">
                 <GameMapCanvas
                     className="mb-2"
-                    key={gameMapGroupsIndex}
-                    filteredGameMapGroup={
-                        filteredGameMapGroups[gameMapGroupsIndex]
-                    }
-                    gameMapGroupsIndex={gameMapGroupsIndex}
+                    key={selectedIDInGameMapGroups}
+                    gameMapGroups={filteredGameMapGroups}
+                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
                     selectedID={selectedIDInCanvas}
                     setSelectedID={setSelectedIDInCanvas}
                 />
                 <GameMapsList
-                    gameMapGroup={filteredGameMapGroups[gameMapGroupsIndex]}
-                    gameMapGroupsIndex={gameMapGroupsIndex}
+                    gameMapGroups={filteredGameMapGroups}
+                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
                     setSelectedIDInCanvas={setSelectedIDInCanvas}
                 />
             </div>

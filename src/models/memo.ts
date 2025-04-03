@@ -35,11 +35,12 @@ export class MemoUtility {
         };
     };
 
-    static findIndex = (
-        strategyMemo: StrategyMemoWithID,
-        id: string,
-    ): number | null => {
-        const index = strategyMemo.memos.findIndex((v) => v.id === id);
+    static find = (memos: MemoWithID[], id: string): MemoWithID | null => {
+        return memos.find((v) => v.id === id) ?? null;
+    };
+
+    static findIndex = (memos: MemoWithID[], id: string): number | null => {
+        const index = memos.findIndex((v) => v.id === id);
         return index < 0 ? null : index;
     };
 
@@ -54,45 +55,61 @@ export class MemoUtility {
 
     static changed = (
         strategyMemo: StrategyMemoWithID,
-        memosIndex: number,
-        memo: MemoWithID,
+        id: string,
+        input: { title: string; text: string },
     ): StrategyMemoWithID => {
+        const index = this.findIndex(strategyMemo.memos, id);
+        if (index == null) return strategyMemo;
+
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        copied.memos[memosIndex] = memo;
+        const memo: MemoWithID = {
+            ...input,
+            id: copied.memos[index].id,
+        };
+        copied.memos[index] = memo;
         return copied;
     };
 
     static removed = (
         strategyMemo: StrategyMemoWithID,
-        memosIndex: number,
+        id: string,
     ): StrategyMemoWithID => {
+        const index = this.findIndex(strategyMemo.memos, id);
+        if (index == null) return strategyMemo;
+
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        copied.memos.splice(memosIndex, 1);
+        copied.memos.splice(index, 1);
         return copied;
     };
 
     static movedUp = (
         strategyMemo: StrategyMemoWithID,
-        memosIndex: number,
+        id: string,
     ): StrategyMemoWithID => {
-        const newIndex = memosIndex - 1;
+        const index = this.findIndex(strategyMemo.memos, id);
+        if (index == null) return strategyMemo;
+
+        const newIndex = index - 1;
         if (newIndex < 0) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const [item] = copied.memos.splice(memosIndex, 1);
+        const [item] = copied.memos.splice(index, 1);
         copied.memos.splice(newIndex, 0, item);
         return copied;
     };
 
     static movedDown = (
         strategyMemo: StrategyMemoWithID,
-        memosIndex: number,
+        id: string,
     ): StrategyMemoWithID => {
-        const newIndex = memosIndex + 1;
+        const index = this.findIndex(strategyMemo.memos, id);
+        if (index == null) return strategyMemo;
+
+        const newIndex = index + 1;
         if (newIndex >= strategyMemo.memos.length) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const [item] = copied.memos.splice(memosIndex, 1);
+        const [item] = copied.memos.splice(index, 1);
         copied.memos.splice(newIndex, 0, item);
         return copied;
     };

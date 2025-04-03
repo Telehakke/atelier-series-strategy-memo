@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { GameMapGroupUtility } from "../gameMapGroup";
+import { GameMapGroupUtility, GameMapGroupWithID } from "../gameMapGroup";
 import { StrategyMemoWithID } from "../strategyMemo";
 
 test("isGameMapGroup", () => {
@@ -10,6 +10,132 @@ test("isGameMapGroup", () => {
 test("isGameMapGroups", () => {
     const gameMapGroups: GameMapGroupUtility[] = [];
     expect(GameMapGroupUtility.isGameMapGroups(gameMapGroups)).toBeTruthy();
+});
+
+test("find1", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "name1",
+            gameMaps: [],
+            image: "image1",
+            id: "id1",
+        },
+        {
+            name: "name2",
+            gameMaps: [],
+            image: "image2",
+            id: "id2",
+        },
+    ];
+    const result = GameMapGroupUtility.find(gameMapGroups, "id1");
+    const expected: GameMapGroupWithID = {
+        name: "name1",
+        gameMaps: [],
+        image: "image1",
+        id: "id1",
+    };
+    expect(result).toEqual(expected);
+});
+
+test("find2", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "name1",
+            gameMaps: [],
+            image: "image1",
+            id: "id1",
+        },
+        {
+            name: "name2",
+            gameMaps: [],
+            image: "image2",
+            id: "id2",
+        },
+    ];
+    const result = GameMapGroupUtility.find(gameMapGroups, "id3");
+    expect(result).toBeNull();
+});
+
+test("findIndex1", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "name1",
+            gameMaps: [],
+            image: "image1",
+            id: "id1",
+        },
+        {
+            name: "name2",
+            gameMaps: [],
+            image: "image2",
+            id: "id2",
+        },
+    ];
+    const result = GameMapGroupUtility.findIndex(gameMapGroups, "id1");
+    expect(result).toBe(0);
+});
+
+test("findIndex2", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "name1",
+            gameMaps: [],
+            image: "image1",
+            id: "id1",
+        },
+        {
+            name: "name2",
+            gameMaps: [],
+            image: "image2",
+            id: "id2",
+        },
+    ];
+    const result = GameMapGroupUtility.findIndex(gameMapGroups, "id3");
+    expect(result).toBeNull();
+});
+
+test("findID1", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "name1",
+            gameMaps: [],
+            image: "image1",
+            id: "id1",
+        },
+        {
+            name: "name2",
+            gameMaps: [],
+            image: "image2",
+            id: "id2",
+        },
+    ];
+    const result = GameMapGroupUtility.findID(gameMapGroups, 0);
+    expect(result).toBe("id1");
+});
+
+test("findID2", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [
+        {
+            name: "name1",
+            gameMaps: [],
+            image: "image1",
+            id: "id1",
+        },
+        {
+            name: "name2",
+            gameMaps: [],
+            image: "image2",
+            id: "id2",
+        },
+    ];
+    const result = GameMapGroupUtility.findID(gameMapGroups, 2);
+    expect(result).toBeNull();
+});
+
+test("findID3", () => {
+    const gameMapGroups: GameMapGroupWithID[] = [];
+    const result = GameMapGroupUtility.findID(gameMapGroups, 0);
+    expect(result).toBeNull();
 });
 
 test("added", () => {
@@ -40,7 +166,7 @@ test("added", () => {
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("changedName", () => {
@@ -51,14 +177,14 @@ test("changedName", () => {
                 name: "",
                 gameMaps: [],
                 image: "",
-                id: "",
+                id: "id",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapGroupUtility.changedName(strategyMemo, 0, "name");
+    const result = GameMapGroupUtility.changedName(strategyMemo, "id", "name");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
@@ -66,14 +192,14 @@ test("changedName", () => {
                 name: "name",
                 gameMaps: [],
                 image: "",
-                id: "",
+                id: "id",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("changedImage", () => {
@@ -84,7 +210,7 @@ test("changedImage", () => {
                 name: "",
                 gameMaps: [],
                 image: "",
-                id: "",
+                id: "id",
             },
         ],
         preparations: [],
@@ -93,7 +219,7 @@ test("changedImage", () => {
     };
     const result = GameMapGroupUtility.changedImage(
         strategyMemo,
-        0,
+        "id",
         "data:image/png;base64,...",
     );
     const expected: StrategyMemoWithID = {
@@ -103,14 +229,14 @@ test("changedImage", () => {
                 name: "",
                 gameMaps: [],
                 image: "data:image/png;base64,...",
-                id: "",
+                id: "id",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("removed", () => {
@@ -121,14 +247,14 @@ test("removed", () => {
                 name: "",
                 gameMaps: [],
                 image: "",
-                id: "",
+                id: "id",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapGroupUtility.removed(strategyMemo, 0);
+    const result = GameMapGroupUtility.removed(strategyMemo, "id");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [],
@@ -136,7 +262,7 @@ test("removed", () => {
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("movedUp", () => {
@@ -144,44 +270,44 @@ test("movedUp", () => {
         gameName: "",
         gameMapGroups: [
             {
-                name: "1",
+                name: "name1",
                 gameMaps: [],
-                image: "",
-                id: "",
+                image: "image1",
+                id: "id1",
             },
             {
-                name: "2",
+                name: "name2",
                 gameMaps: [],
-                image: "",
-                id: "",
+                image: "image2",
+                id: "id2",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapGroupUtility.movedUp(strategyMemo, 1);
+    const result = GameMapGroupUtility.movedUp(strategyMemo, "id2");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
             {
-                name: "2",
+                name: "name2",
                 gameMaps: [],
-                image: "",
-                id: "",
+                image: "image2",
+                id: "id2",
             },
             {
-                name: "1",
+                name: "name1",
                 gameMaps: [],
-                image: "",
-                id: "",
+                image: "image1",
+                id: "id1",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("movedDown", () => {
@@ -189,42 +315,42 @@ test("movedDown", () => {
         gameName: "",
         gameMapGroups: [
             {
-                name: "1",
+                name: "name2",
                 gameMaps: [],
-                image: "",
-                id: "",
+                image: "image2",
+                id: "id2",
             },
             {
-                name: "2",
+                name: "name1",
                 gameMaps: [],
-                image: "",
-                id: "",
+                image: "image1",
+                id: "id1",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    const result = GameMapGroupUtility.movedDown(strategyMemo, 0);
+    const result = GameMapGroupUtility.movedDown(strategyMemo, "id2");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [
             {
-                name: "2",
+                name: "name1",
                 gameMaps: [],
-                image: "",
-                id: "",
+                image: "image1",
+                id: "id1",
             },
             {
-                name: "1",
+                name: "name2",
                 gameMaps: [],
-                image: "",
-                id: "",
+                image: "image2",
+                id: "id2",
             },
         ],
         preparations: [],
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });

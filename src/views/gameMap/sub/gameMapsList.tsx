@@ -1,9 +1,12 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { ReactNode, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { strategyMemoRepositoryAtom } from "../../../atoms";
 import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
-import { GameMapGroupWithID } from "../../../models/gameMapGroup";
-import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
+import {
+    GameMapGroupUtility,
+    GameMapGroupWithID,
+} from "../../../models/gameMapGroup";
 import CardBase from "../../commons/cardBase";
 import { Bg, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
@@ -18,18 +21,26 @@ import TextEditor from "../../commons/textEditor";
 import TextField from "../../commons/textField";
 
 const GameMapsList = ({
-    gameMapGroup,
-    gameMapGroupsIndex,
+    gameMapGroups,
+    selectedIDInGameMapGroups,
     setSelectedIDInCanvas,
 }: {
-    gameMapGroup?: GameMapGroupWithID;
-    gameMapGroupsIndex: number;
+    gameMapGroups: GameMapGroupWithID[];
+    selectedIDInGameMapGroups: string | null;
     setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
     const [isEditItemDialogOpen, setIsEditDialogOpen] = useState(false);
 
-    if (gameMapGroup == null) return;
+    if (selectedIDInGameMapGroups == null) return <></>;
+
+    const index = GameMapGroupUtility.findIndex(
+        gameMapGroups,
+        selectedIDInGameMapGroups,
+    );
+    if (index == null) return <></>;
+
+    const gameMapGroup = gameMapGroups[index];
 
     return (
         <>
@@ -45,33 +56,31 @@ const GameMapsList = ({
                 ))}
             </div>
             <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
-                {selectedID != null &&
-                    gameMapGroup.gameMaps.some((v) => v.id === selectedID) && (
-                        <>
-                            <MoveItemUpButton
-                                gameMapGroupsIndex={gameMapGroupsIndex}
-                                selectedID={selectedID}
-                            />
-                            <MoveItemDownButton
-                                gameMapGroupsIndex={gameMapGroupsIndex}
-                                selectedID={selectedID}
-                            />
-                            <EditItemButton
-                                gameMapGroupsIndex={gameMapGroupsIndex}
-                                selectedID={selectedID}
-                                isEditItemDialogOpen={isEditItemDialogOpen}
-                                setIsEditItemDialogOpen={setIsEditDialogOpen}
-                            />
-                            <RemoveItemButton
-                                gameMapGroupsIndex={gameMapGroupsIndex}
-                                selectedID={selectedID}
-                                setSelectedIDInCanvas={setSelectedIDInCanvas}
-                            />
-                        </>
-                    )}
+                <MoveItemUpButton
+                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                    selectedID={selectedID}
+                />
+                <MoveItemDownButton
+                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                    selectedID={selectedID}
+                />
+                <EditItemButton
+                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                    selectedID={selectedID}
+                    setSelectedID={setSelectedID}
+                    isEditItemDialogOpen={isEditItemDialogOpen}
+                    setIsEditItemDialogOpen={setIsEditDialogOpen}
+                />
+                <RemoveItemButton
+                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                    selectedID={selectedID}
+                    setSelectedID={setSelectedID}
+                    setSelectedIDInCanvas={setSelectedIDInCanvas}
+                />
                 <AddItemButton
                     className="grid justify-items-center"
-                    gameMapGroupsIndex={gameMapGroupsIndex}
+                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                    setSelectedID={setSelectedID}
                 />
             </div>
         </>
@@ -148,42 +157,49 @@ const TextWithLabel = ({
 /* -------------------------------------------------------------------------- */
 
 const AddItemButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroups,
+    setSelectedID,
     className,
 }: {
-    gameMapGroupsIndex: number;
+    selectedIDInGameMapGroups: string | null;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;
 }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    if (selectedIDInGameMapGroups == null) return <></>;
 
     return (
         <div className={className}>
             <PlusIconLargeButton onClick={() => setIsOpen(true)} />
             <AddItemDialog
                 key={`${isOpen}`}
+                selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                setSelectedID={setSelectedID}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                gameMapGroupsIndex={gameMapGroupsIndex}
             />
         </div>
     );
 };
 
 const AddItemDialog = ({
+    selectedIDInGameMapGroups,
+    setSelectedID,
     isOpen,
     setIsOpen,
-    gameMapGroupsIndex,
 }: {
+    selectedIDInGameMapGroups: string;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    gameMapGroupsIndex: number;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
     const [name, setName] = useState("");
     const [items, setItems] = useState("");
     const [monsters, setMonsters] = useState("");
     const [memo, setMemo] = useState("");
-    const [icon, setIcon] = useState("🔴");
+    const [icon, setIcon] = useState("");
     const [x, setX] = useState("50");
     const [y, setY] = useState("50");
     const [message, setMessage] = useState("");
@@ -202,8 +218,9 @@ const AddItemDialog = ({
 
         try {
             setStrategyMemo((v) =>
-                GameMapUtility.added(v, gameMapGroupsIndex, gameMap),
+                GameMapUtility.added(v, selectedIDInGameMapGroups, gameMap),
             );
+            setSelectedID(null);
             setIsOpen(false);
         } catch (error) {
             if (String(error).includes("QuotaExceededError")) {
@@ -250,65 +267,71 @@ const AddItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const EditItemButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroups,
     selectedID,
+    setSelectedID,
     isEditItemDialogOpen,
     setIsEditItemDialogOpen,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string;
+    selectedIDInGameMapGroups: string | null;
+    selectedID: string | null;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     isEditItemDialogOpen: boolean;
     setIsEditItemDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
-    const index = GameMapUtility.findIndex(
-        strategyMemo,
-        gameMapGroupsIndex,
-        selectedID,
-    );
+    if (selectedIDInGameMapGroups == null) return <></>;
+    if (selectedID == null) return <></>;
 
     return (
         <>
             <PencilIconLargeButton
                 onClick={() => setIsEditItemDialogOpen(true)}
             />
-            {index != null && (
-                <EditItemDialog
-                    key={`${isEditItemDialogOpen}`}
-                    isOpen={isEditItemDialogOpen}
-                    setIsOpen={setIsEditItemDialogOpen}
-                    gameMapGroupsIndex={gameMapGroupsIndex}
-                    index={index}
-                />
-            )}
+            <EditItemDialog
+                key={`${isEditItemDialogOpen}`}
+                selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                selectedID={selectedID}
+                setSelectedID={setSelectedID}
+                isOpen={isEditItemDialogOpen}
+                setIsOpen={setIsEditItemDialogOpen}
+            />
         </>
     );
 };
 
 const EditItemDialog = ({
+    selectedIDInGameMapGroups,
+    selectedID,
+    setSelectedID,
     isOpen,
     setIsOpen,
-    gameMapGroupsIndex,
-    index,
 }: {
+    selectedIDInGameMapGroups: string;
+    selectedID: string;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    gameMapGroupsIndex: number;
-    index: number;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const gameMap =
-        strategyMemo.gameMapGroups[gameMapGroupsIndex].gameMaps[index];
-    const [name, setName] = useState(gameMap.name);
-    const [items, setItems] = useState(gameMap.items.join("、"));
-    const [monsters, setMonsters] = useState(gameMap.monsters.join("、"));
-    const [memo, setMemo] = useState(gameMap.memo);
-    const [icon, setIcon] = useState(gameMap.icon);
-    const [x, setX] = useState(gameMap.x.toString());
-    const [y, setY] = useState(gameMap.y.toString());
+    const gameMap = GameMapUtility.find(
+        strategyMemo.gameMapGroups,
+        selectedIDInGameMapGroups,
+        selectedID,
+    );
+    const [name, setName] = useState(gameMap?.name ?? "");
+    const [items, setItems] = useState(gameMap?.items.join("、") ?? "");
+    const [monsters, setMonsters] = useState(
+        gameMap?.monsters.join("、") ?? "",
+    );
+    const [memo, setMemo] = useState(gameMap?.memo ?? "");
+    const [icon, setIcon] = useState(gameMap?.icon ?? "");
+    const [x, setX] = useState(gameMap?.x.toString() ?? "");
+    const [y, setY] = useState(gameMap?.y.toString() ?? "");
     const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
+        if (gameMap == null) return;
+
         const newGameMap = GameMapUtility.create(
             name,
             items,
@@ -324,11 +347,12 @@ const EditItemDialog = ({
             setStrategyMemo((v) =>
                 GameMapUtility.changed(
                     v,
-                    gameMapGroupsIndex,
-                    index,
+                    selectedIDInGameMapGroups,
+                    selectedID,
                     newGameMap,
                 ),
             );
+            setSelectedID(null);
             setIsOpen(false);
         } catch (error) {
             if (String(error).includes("QuotaExceededError")) {
@@ -375,59 +399,60 @@ const EditItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const RemoveItemButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroups,
     selectedID,
+    setSelectedID,
     setSelectedIDInCanvas,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string;
+    selectedIDInGameMapGroups: string | null;
+    selectedID: string | null;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
-    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
-    const index = GameMapUtility.findIndex(
-        strategyMemo,
-        gameMapGroupsIndex,
-        selectedID,
-    );
     const [isOpen, setIsOpen] = useState(false);
+
+    if (selectedIDInGameMapGroups == null) return <></>;
+    if (selectedID == null) return <></>;
 
     return (
         <>
             <TrashIconLargeButton onClick={() => setIsOpen(true)} />
-            {index != null && (
-                <RemoveItemDialog
-                    isOpen={isOpen}
-                    setIsOpen={setIsOpen}
-                    gameMapGroupsIndex={gameMapGroupsIndex}
-                    index={index}
-                    setSelectedIDInCanvas={setSelectedIDInCanvas}
-                />
-            )}
+            <RemoveItemDialog
+                selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                selectedID={selectedID}
+                setSelectedID={setSelectedID}
+                setSelectedIDInCanvas={setSelectedIDInCanvas}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+            />
         </>
     );
 };
 
 const RemoveItemDialog = ({
+    selectedIDInGameMapGroups,
+    selectedID,
+    setSelectedID,
+    setSelectedIDInCanvas,
     isOpen,
     setIsOpen,
-    gameMapGroupsIndex,
-    index,
-    setSelectedIDInCanvas,
 }: {
+    selectedIDInGameMapGroups: string;
+    selectedID: string;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    gameMapGroupsIndex: number;
-    index: number;
-    setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
     const handleButtonClick = () => {
         setStrategyMemo((v) =>
-            GameMapUtility.removed(v, gameMapGroupsIndex, index),
+            GameMapUtility.removed(v, selectedIDInGameMapGroups, selectedID),
         );
-        setIsOpen(false);
+        setSelectedID(null);
         setSelectedIDInCanvas(null);
+        setIsOpen(false);
     };
 
     return (
@@ -522,24 +547,20 @@ const GameMapInput = ({
 /* -------------------------------------------------------------------------- */
 
 const MoveItemUpButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroups,
     selectedID,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string;
+    selectedIDInGameMapGroups: string | null;
+    selectedID: string | null;
 }) => {
-    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const index = GameMapUtility.findIndex(
-        strategyMemo,
-        gameMapGroupsIndex,
-        selectedID,
-    );
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    if (index == null) return <></>;
+    if (selectedIDInGameMapGroups == null) return <></>;
+    if (selectedID == null) return <></>;
 
     const handleButtonClick = () => {
         setStrategyMemo((v) =>
-            GameMapUtility.movedUp(v, gameMapGroupsIndex, index),
+            GameMapUtility.movedUp(v, selectedIDInGameMapGroups, selectedID),
         );
     };
 
@@ -547,24 +568,20 @@ const MoveItemUpButton = ({
 };
 
 const MoveItemDownButton = ({
-    gameMapGroupsIndex,
+    selectedIDInGameMapGroups,
     selectedID,
 }: {
-    gameMapGroupsIndex: number;
-    selectedID: string;
+    selectedIDInGameMapGroups: string | null;
+    selectedID: string | null;
 }) => {
-    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const index = GameMapUtility.findIndex(
-        strategyMemo,
-        gameMapGroupsIndex,
-        selectedID,
-    );
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    if (index == null) return <></>;
+    if (selectedIDInGameMapGroups == null) return <></>;
+    if (selectedID == null) return <></>;
 
     const handleButtonClick = () => {
         setStrategyMemo((v) =>
-            GameMapUtility.movedDown(v, gameMapGroupsIndex, index),
+            GameMapUtility.movedDown(v, selectedIDInGameMapGroups, selectedID),
         );
     };
 

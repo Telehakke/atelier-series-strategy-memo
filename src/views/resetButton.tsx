@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { useState } from "react";
-import { strategyMemoRepositoryAtom } from "../strategyMemoAtom";
+import { strategyMemoRepositoryAtom } from "../atoms";
 import DialogView from "./commons/dialogView";
 import { RotateCCWIconButton } from "./commons/iconButtons";
 

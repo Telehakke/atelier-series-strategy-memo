@@ -1,4 +1,6 @@
+import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { ClipMode, ClipModeEnum, JpegQuality } from "./models/imageFile";
 import { StrategyMemoUtility, StrategyMemoWithID } from "./models/strategyMemo";
 
 export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemoWithID>(
@@ -90,3 +92,6 @@ export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemoWithID>(
         },
     },
 );
+
+export const jpegQualityAtom = atom<number>(JpegQuality.middle);
+export const clipModeAtom = atom<ClipMode>(ClipModeEnum.all);

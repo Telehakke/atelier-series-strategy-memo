@@ -48,11 +48,18 @@ export class PreparationUtility {
         };
     };
 
+    static find = (
+        preparations: PreparationWithID[],
+        id: string,
+    ): PreparationWithID | null => {
+        return preparations.find((v) => v.id === id) ?? null;
+    };
+
     static findIndex = (
-        strategyMemo: StrategyMemoWithID,
+        preparations: PreparationWithID[],
         id: string,
     ): number | null => {
-        const index = strategyMemo.preparations.findIndex((v) => v.id === id);
+        const index = preparations.findIndex((v) => v.id === id);
         return index < 0 ? null : index;
     };
 
@@ -67,45 +74,65 @@ export class PreparationUtility {
 
     static changed = (
         strategyMemo: StrategyMemoWithID,
-        preparationsIndex: number,
-        preparation: PreparationWithID,
+        id: string,
+        input: {
+            name: string;
+            materials: string[];
+            categories: string[];
+        },
     ): StrategyMemoWithID => {
+        const index = this.findIndex(strategyMemo.preparations, id);
+        if (index == null) return strategyMemo;
+
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        copied.preparations[preparationsIndex] = preparation;
+        const preparation: PreparationWithID = {
+            ...input,
+            id: copied.preparations[index].id,
+        };
+        copied.preparations[index] = preparation;
         return copied;
     };
 
     static removed = (
         strategyMemo: StrategyMemoWithID,
-        preparationsIndex: number,
+        id: string,
     ): StrategyMemoWithID => {
+        const index = this.findIndex(strategyMemo.preparations, id);
+        if (index == null) return strategyMemo;
+
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        copied.preparations.splice(preparationsIndex, 1);
+        copied.preparations.splice(index, 1);
         return copied;
     };
 
     static movedUp = (
         strategyMemo: StrategyMemoWithID,
-        preparationsIndex: number,
+        id: string,
     ): StrategyMemoWithID => {
-        const newIndex = preparationsIndex - 1;
+        const index = this.findIndex(strategyMemo.preparations, id);
+        if (index == null) return strategyMemo;
+
+        const newIndex = index - 1;
         if (newIndex < 0) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const [item] = copied.preparations.splice(preparationsIndex, 1);
+        const [item] = copied.preparations.splice(index, 1);
         copied.preparations.splice(newIndex, 0, item);
         return copied;
     };
 
     static movedDown = (
         strategyMemo: StrategyMemoWithID,
-        preparationsIndex: number,
+        id: string,
     ): StrategyMemoWithID => {
-        const newIndex = preparationsIndex + 1;
+        const index = this.findIndex(strategyMemo.preparations, id);
+        if (index == null) return strategyMemo;
+
+        const newIndex = index + 1;
         if (newIndex >= strategyMemo.preparations.length) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const [item] = copied.preparations.splice(preparationsIndex, 1);
+        const [item] = copied.preparations.splice(index, 1);
         copied.preparations.splice(newIndex, 0, item);
         return copied;
     };

@@ -1,8 +1,8 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { strategyMemoRepositoryAtom } from "../../../atoms";
 import { MemoUtility, MemoWithID } from "../../../models/memo";
-import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
 import CardBase from "../../commons/cardBase";
 import DialogView from "../../commons/dialogView";
 import {
@@ -33,20 +33,22 @@ const MemosList = ({ memos }: { memos: MemoWithID[] }) => {
                 ))}
             </div>
             <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
-                {selectedID != null &&
-                    memos.some((v) => v.id === selectedID) && (
-                        <>
-                            <MoveItemUpButton selectedID={selectedID} />
-                            <MoveItemDownButton selectedID={selectedID} />
-                            <EditItemButton
-                                selectedID={selectedID}
-                                isEditDialogOpen={isEditDialogOpen}
-                                setIsEditDialogOpen={setIsEditDialogOpen}
-                            />
-                            <RemoveItemButton selectedID={selectedID} />
-                        </>
-                    )}
-                <AddItemButton className="grid justify-items-center" />
+                <MoveItemUpButton selectedID={selectedID} />
+                <MoveItemDownButton selectedID={selectedID} />
+                <EditItemButton
+                    setSelectedID={setSelectedID}
+                    selectedID={selectedID}
+                    isEditDialogOpen={isEditDialogOpen}
+                    setIsEditDialogOpen={setIsEditDialogOpen}
+                />
+                <RemoveItemButton
+                    selectedID={selectedID}
+                    setSelectedID={setSelectedID}
+                />
+                <AddItemButton
+                    setSelectedID={setSelectedID}
+                    className="grid justify-items-center"
+                />
             </div>
         </>
     );
@@ -87,7 +89,13 @@ const Card = ({
 
 /* -------------------------------------------------------------------------- */
 
-const AddItemButton = ({ className }: { className?: string }) => {
+const AddItemButton = ({
+    setSelectedID,
+    className,
+}: {
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    className?: string;
+}) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -95,6 +103,7 @@ const AddItemButton = ({ className }: { className?: string }) => {
             <PlusIconLargeButton onClick={() => setIsOpen(true)} />
             <AddItemDialog
                 key={`${isOpen}`}
+                setSelectedID={setSelectedID}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
             />
@@ -103,9 +112,11 @@ const AddItemButton = ({ className }: { className?: string }) => {
 };
 
 const AddItemDialog = ({
+    setSelectedID,
     isOpen,
     setIsOpen,
 }: {
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
@@ -119,6 +130,7 @@ const AddItemDialog = ({
 
         try {
             setStrategyMemo((v) => MemoUtility.added(v, memo));
+            setSelectedID(null);
             setIsOpen(false);
         } catch (error) {
             if (String(error).includes("QuotaExceededError")) {
@@ -156,51 +168,59 @@ const AddItemDialog = ({
 
 const EditItemButton = ({
     selectedID,
+    setSelectedID,
     isEditDialogOpen,
     setIsEditDialogOpen,
 }: {
-    selectedID: string;
+    selectedID: string | null;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     isEditDialogOpen: boolean;
     setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
-    const index = MemoUtility.findIndex(strategyMemo, selectedID);
+    if (selectedID == null) return <></>;
 
     return (
         <>
             <PencilIconLargeButton onClick={() => setIsEditDialogOpen(true)} />
-            {index != null && (
-                <EditItemDialog
-                    key={`${isEditDialogOpen}`}
-                    isOpen={isEditDialogOpen}
-                    setIsOpen={setIsEditDialogOpen}
-                    index={index}
-                />
-            )}
+            <EditItemDialog
+                key={`${isEditDialogOpen}`}
+                selectedID={selectedID}
+                setSelectedID={setSelectedID}
+                isOpen={isEditDialogOpen}
+                setIsOpen={setIsEditDialogOpen}
+            />
         </>
     );
 };
 
 const EditItemDialog = ({
+    selectedID,
+    setSelectedID,
     isOpen,
     setIsOpen,
-    index,
 }: {
+    selectedID: string;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    index: number;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const memo = strategyMemo.memos[index];
-    const [title, setTitle] = useState(memo.title);
-    const [text, setText] = useState(memo.text);
+    const memo = MemoUtility.find(strategyMemo.memos, selectedID);
+    const [title, setTitle] = useState(memo?.title ?? "");
+    const [text, setText] = useState(memo?.text ?? "");
     const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
-        const newMemo = MemoUtility.create(title, text, memo.id);
+        if (memo == null) return;
 
         try {
-            setStrategyMemo((v) => MemoUtility.changed(v, index, newMemo));
+            setStrategyMemo((v) =>
+                MemoUtility.changed(v, memo.id, {
+                    title: title,
+                    text: text,
+                }),
+            );
+            setSelectedID(null);
             setIsOpen(false);
         } catch (error) {
             if (String(error).includes("QuotaExceededError")) {
@@ -236,38 +256,46 @@ const EditItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const RemoveItemButton = ({ selectedID }: { selectedID: string }) => {
-    const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
-    const index = MemoUtility.findIndex(strategyMemo, selectedID);
+const RemoveItemButton = ({
+    selectedID,
+    setSelectedID,
+}: {
+    selectedID: string | null;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+}) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    if (selectedID == null) return <></>;
 
     return (
         <>
             <TrashIconLargeButton onClick={() => setIsOpen(true)} />
-            {index != null && (
-                <RemoveItemDialog
-                    isOpen={isOpen}
-                    setIsOpen={setIsOpen}
-                    index={index}
-                />
-            )}
+            <RemoveItemDialog
+                selectedID={selectedID}
+                setSelectedID={setSelectedID}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+            />
         </>
     );
 };
 
 const RemoveItemDialog = ({
+    selectedID,
+    setSelectedID,
     isOpen,
     setIsOpen,
-    index,
 }: {
+    selectedID: string;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    index: number;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
     const handleButtonClick = () => {
-        setStrategyMemo((v) => MemoUtility.removed(v, index));
+        setStrategyMemo((v) => MemoUtility.removed(v, selectedID));
+        setSelectedID(null);
         setIsOpen(false);
     };
 
@@ -316,27 +344,25 @@ const MemoInput = ({
 
 /* -------------------------------------------------------------------------- */
 
-const MoveItemUpButton = ({ selectedID }: { selectedID: string }) => {
-    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const index = MemoUtility.findIndex(strategyMemo, selectedID);
+const MoveItemUpButton = ({ selectedID }: { selectedID: string | null }) => {
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    if (index == null) return <></>;
+    if (selectedID == null) return <></>;
 
     const handleButtonClick = () => {
-        setStrategyMemo((v) => MemoUtility.movedUp(v, index));
+        setStrategyMemo((v) => MemoUtility.movedUp(v, selectedID));
     };
 
     return <ChevronUpIconLargeButton onClick={() => handleButtonClick()} />;
 };
 
-const MoveItemDownButton = ({ selectedID }: { selectedID: string }) => {
-    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const index = MemoUtility.findIndex(strategyMemo, selectedID);
+const MoveItemDownButton = ({ selectedID }: { selectedID: string | null }) => {
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    if (index == null) return <></>;
+    if (selectedID == null) return <></>;
 
     const handleButtonClick = () => {
-        setStrategyMemo((v) => MemoUtility.movedDown(v, index));
+        setStrategyMemo((v) => MemoUtility.movedDown(v, selectedID));
     };
 
     return <ChevronDownIconLargeButton onClick={() => handleButtonClick()} />;

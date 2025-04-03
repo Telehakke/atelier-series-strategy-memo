@@ -3,18 +3,21 @@ import { useAtom, useSetAtom } from "jotai";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
+    clipModeAtom,
+    jpegQualityAtom,
+    strategyMemoRepositoryAtom,
+} from "../../../atoms";
+import {
     GameMapGroupUtility,
     GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
 import ImageFile, {
-    ClipMode,
     ClipModeEnum,
     ClipModeJA,
     isClipMode,
     JpegQuality,
 } from "../../../models/imageFile";
 import { StrategyMemoUtility } from "../../../models/strategyMemo";
-import { strategyMemoRepositoryAtom } from "../../../strategyMemoAtom";
 import { Bg, Border, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
 import {
@@ -30,14 +33,16 @@ import TextField from "../../commons/textField";
 
 const GameMapGroupsList = ({
     gameMapGroups,
-    gameMapGroupsIndex,
-    setGameMapGroupsIndex,
+    selectedIDInGameMapGroups,
+    setSelectedIndexInGameMapGroups,
     setSelectedIDInCanvas,
     className,
 }: {
     gameMapGroups: GameMapGroupWithID[];
-    gameMapGroupsIndex: number;
-    setGameMapGroupsIndex: React.Dispatch<React.SetStateAction<number>>;
+    selectedIDInGameMapGroups: string | null;
+    setSelectedIndexInGameMapGroups: React.Dispatch<
+        React.SetStateAction<number>
+    >;
     setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;
 }) => {
@@ -47,27 +52,27 @@ const GameMapGroupsList = ({
                 <>
                     <div className="flex justify-end">
                         <MoveItemUpButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            setGameMapGroupsIndex={setGameMapGroupsIndex}
+                            selectedID={selectedIDInGameMapGroups}
+                            setSelectedIndex={setSelectedIndexInGameMapGroups}
                         />
                         <EditItemButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
+                            selectedID={selectedIDInGameMapGroups}
                         />
                         <RemoveItemButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            setGameMapGroupsIndex={setGameMapGroupsIndex}
+                            selectedID={selectedIDInGameMapGroups}
+                            setSelectedIndex={setSelectedIndexInGameMapGroups}
                         />
                     </div>
                     <div className="flex justify-end">
                         <MoveItemDownButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
-                            setGameMapGroupsIndex={setGameMapGroupsIndex}
+                            selectedID={selectedIDInGameMapGroups}
+                            setSelectedIndex={setSelectedIndexInGameMapGroups}
                         />
                         <AddImageButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
+                            selectedID={selectedIDInGameMapGroups}
                         />
                         <RemoveImageButton
-                            gameMapGroupsIndex={gameMapGroupsIndex}
+                            selectedID={selectedIDInGameMapGroups}
                         />
                     </div>
                     <ul
@@ -76,9 +81,9 @@ const GameMapGroupsList = ({
                         {gameMapGroups.map((v, i) => (
                             <li
                                 key={v.id}
-                                className={`px-2 py-1 ${gameMapGroupsIndex === i ? Bg.blue200 : Bg.hoverNeutral200}`}
+                                className={`px-2 py-1 ${v.id === selectedIDInGameMapGroups ? Bg.blue200 : Bg.hoverNeutral200}`}
                                 onClick={() => {
-                                    setGameMapGroupsIndex(i);
+                                    setSelectedIndexInGameMapGroups(i);
                                     setSelectedIDInCanvas(null);
                                 }}
                             >
@@ -93,7 +98,10 @@ const GameMapGroupsList = ({
                     </ul>
                 </>
             )}
-            <AddItemButton className="mx-auto" />
+            <AddItemButton
+                setSelectedIndex={setSelectedIndexInGameMapGroups}
+                className="mx-auto"
+            />
         </div>
     );
 };
@@ -102,7 +110,13 @@ export default GameMapGroupsList;
 
 /* -------------------------------------------------------------------------- */
 
-const AddItemButton = ({ className }: { className?: string }) => {
+const AddItemButton = ({
+    setSelectedIndex,
+    className,
+}: {
+    setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
+    className?: string;
+}) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -110,6 +124,7 @@ const AddItemButton = ({ className }: { className?: string }) => {
             <PlusIconLargeButton onClick={() => setIsOpen(true)} />
             <AddItemDialog
                 key={`${isOpen}`}
+                setSelectedIndex={setSelectedIndex}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
             />
@@ -118,9 +133,11 @@ const AddItemButton = ({ className }: { className?: string }) => {
 };
 
 const AddItemDialog = ({
+    setSelectedIndex,
     isOpen,
     setIsOpen,
 }: {
+    setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
@@ -129,7 +146,11 @@ const AddItemDialog = ({
 
     const handleButtonClick = () => {
         const gameMapGroup = GameMapGroupUtility.create(name, [], "", uuidv4());
-        setStrategyMemo((v) => GameMapGroupUtility.added(v, gameMapGroup));
+        setStrategyMemo((v) => {
+            const obj = GameMapGroupUtility.added(v, gameMapGroup);
+            setSelectedIndex(obj.gameMapGroups.length - 1);
+            return obj;
+        });
         setIsOpen(false);
     };
 
@@ -153,42 +174,43 @@ const AddItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const EditItemButton = ({
-    gameMapGroupsIndex,
-}: {
-    gameMapGroupsIndex: number;
-}) => {
+const EditItemButton = ({ selectedID }: { selectedID: string | null }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    if (selectedID == null) return <></>;
 
     return (
         <>
             <PencilIconButton onClick={() => setIsOpen(true)} />
             <EditItemDialog
                 key={`${isOpen}`}
+                selectedID={selectedID}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                gameMapGroupsIndex={gameMapGroupsIndex}
             />
         </>
     );
 };
 
 const EditItemDialog = ({
+    selectedID,
     isOpen,
     setIsOpen,
-    gameMapGroupsIndex,
 }: {
+    selectedID: string;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    gameMapGroupsIndex: number;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
-    const gameMapGroup = strategyMemo.gameMapGroups[gameMapGroupsIndex];
-    const [name, setName] = useState(gameMapGroup.name);
+    const gameMapGroup = GameMapGroupUtility.find(
+        strategyMemo.gameMapGroups,
+        selectedID,
+    );
+    const [name, setName] = useState(gameMapGroup?.name ?? "");
 
     const handleButtonClick = () => {
         setStrategyMemo((v) =>
-            GameMapGroupUtility.changedName(v, gameMapGroupsIndex, name),
+            GameMapGroupUtility.changedName(v, selectedID, name),
         );
         setIsOpen(false);
     };
@@ -214,45 +236,45 @@ const EditItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const RemoveItemButton = ({
-    gameMapGroupsIndex,
-    setGameMapGroupsIndex,
+    selectedID,
+    setSelectedIndex,
 }: {
-    gameMapGroupsIndex: number;
-    setGameMapGroupsIndex: React.Dispatch<React.SetStateAction<number>>;
+    selectedID: string | null;
+    setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    if (selectedID == null) return <></>;
 
     return (
         <>
             <TrashIconButton onClick={() => setIsOpen(true)} />
             <RemoveItemDialog
+                selectedID={selectedID}
+                setSelectedIndex={setSelectedIndex}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                gameMapGroupsIndex={gameMapGroupsIndex}
-                setGameMapGroupsIndex={setGameMapGroupsIndex}
             />
         </>
     );
 };
 
 const RemoveItemDialog = ({
+    selectedID,
+    setSelectedIndex,
     isOpen,
     setIsOpen,
-    gameMapGroupsIndex,
-    setGameMapGroupsIndex,
 }: {
+    selectedID: string;
+    setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    gameMapGroupsIndex: number;
-    setGameMapGroupsIndex: React.Dispatch<React.SetStateAction<number>>;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
     const handleButtonClick = () => {
-        setStrategyMemo((v) =>
-            GameMapGroupUtility.removed(v, gameMapGroupsIndex),
-        );
-        setGameMapGroupsIndex(0);
+        setStrategyMemo((v) => GameMapGroupUtility.removed(v, selectedID));
+        setSelectedIndex(0);
         setIsOpen(false);
     };
 
@@ -272,94 +294,90 @@ const RemoveItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const MoveItemUpButton = ({
-    gameMapGroupsIndex,
-    setGameMapGroupsIndex,
+    selectedID,
+    setSelectedIndex,
 }: {
-    gameMapGroupsIndex: number;
-    setGameMapGroupsIndex: React.Dispatch<React.SetStateAction<number>>;
+    selectedID: string | null;
+    setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    return (
-        <ChevronUpIconButton
-            onClick={() => {
-                setStrategyMemo((v) =>
-                    GameMapGroupUtility.movedUp(v, gameMapGroupsIndex),
-                );
-                setGameMapGroupsIndex((v) => {
-                    const index = v - 1;
-                    if (index < 0) return v;
+    if (selectedID == null) return <></>;
 
-                    return index;
-                });
-            }}
-        />
-    );
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => GameMapGroupUtility.movedUp(v, selectedID));
+        setSelectedIndex((v) => {
+            let index = v - 1;
+            if (index < 0) index = 0;
+            return index;
+        });
+    };
+
+    return <ChevronUpIconButton onClick={() => handleButtonClick()} />;
 };
 
 const MoveItemDownButton = ({
-    gameMapGroupsIndex,
-    setGameMapGroupsIndex,
+    selectedID,
+    setSelectedIndex,
 }: {
-    gameMapGroupsIndex: number;
-    setGameMapGroupsIndex: React.Dispatch<React.SetStateAction<number>>;
+    selectedID: string | null;
+    setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
-    return (
-        <ChevronDownIconButton
-            onClick={() => {
-                setStrategyMemo((v) =>
-                    GameMapGroupUtility.movedDown(v, gameMapGroupsIndex),
-                );
-                setGameMapGroupsIndex((v) => {
-                    const index = v + 1;
-                    if (index >= strategyMemo.gameMapGroups.length) return v;
+    if (selectedID == null) return <></>;
 
-                    return index;
-                });
-            }}
-        />
-    );
+    const handleButtonClick = () => {
+        setStrategyMemo((v) => {
+            setSelectedIndex((i) => {
+                let index = i + 1;
+                if (v.gameMapGroups.length <= index) {
+                    index = v.gameMapGroups.length - 1;
+                }
+                return index;
+            });
+            return GameMapGroupUtility.movedDown(v, selectedID);
+        });
+    };
+
+    return <ChevronDownIconButton onClick={() => handleButtonClick()} />;
 };
 
 /* -------------------------------------------------------------------------- */
 
-const AddImageButton = ({
-    gameMapGroupsIndex,
-}: {
-    gameMapGroupsIndex: number;
-}) => {
+const AddImageButton = ({ selectedID }: { selectedID: string | null }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    if (selectedID == null) return <></>;
 
     return (
         <>
             <ImageIconButton onClick={() => setIsOpen(true)} />
             <AddImageDialog
                 key={`${isOpen}`}
+                selectedID={selectedID}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                gameMapGroupsIndex={gameMapGroupsIndex}
             />
         </>
     );
 };
 
 const AddImageDialog = ({
+    selectedID,
     isOpen,
     setIsOpen,
-    gameMapGroupsIndex,
 }: {
+    selectedID: string;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    gameMapGroupsIndex: number;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
     const [message, setMessage] = useState(
         StrategyMemoUtility.dataSize(strategyMemo),
     );
-    const [jpegQuality, setJpegQuality] = useState<number>(JpegQuality.middle);
-    const [clipMode, setClipMode] = useState<ClipMode>(ClipModeEnum.all);
+    const [jpegQuality, setJpegQuality] = useAtom(jpegQualityAtom);
+    const [clipMode, setClipMode] = useAtom(clipModeAtom);
 
     const handleChange: React.ChangeEventHandler<HTMLInputElement> = async (
         event,
@@ -381,7 +399,7 @@ const AddImageDialog = ({
             setStrategyMemo((v) => {
                 const obj = GameMapGroupUtility.changedImage(
                     v,
-                    gameMapGroupsIndex,
+                    selectedID,
                     base64,
                 );
                 setMessage(StrategyMemoUtility.dataSize(obj));
@@ -480,39 +498,37 @@ const AddImageDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const RemoveImageButton = ({
-    gameMapGroupsIndex,
-}: {
-    gameMapGroupsIndex: number;
-}) => {
+const RemoveImageButton = ({ selectedID }: { selectedID: string | null }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    if (selectedID == null) return <></>;
 
     return (
         <>
             <ImageOffIconButton onClick={() => setIsOpen(true)} />
             <RemoveImageDialog
+                selectedID={selectedID}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                gameMapGroupsIndex={gameMapGroupsIndex}
             />
         </>
     );
 };
 
 const RemoveImageDialog = ({
+    selectedID,
     isOpen,
     setIsOpen,
-    gameMapGroupsIndex,
 }: {
+    selectedID: string;
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    gameMapGroupsIndex: number;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
 
     const handleButtonClick = () => {
         setStrategyMemo((v) =>
-            GameMapGroupUtility.changedImage(v, gameMapGroupsIndex, ""),
+            GameMapGroupUtility.changedImage(v, selectedID, ""),
         );
         setIsOpen(false);
     };

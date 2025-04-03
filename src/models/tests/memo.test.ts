@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { MemoUtility } from "../memo";
+import { MemoUtility, MemoWithID } from "../memo";
 import { StrategyMemoWithID } from "../strategyMemo";
 
 test("isMemo", () => {
@@ -12,16 +12,41 @@ test("isMemos", () => {
     expect(MemoUtility.isMemos(memos)).toBeTruthy();
 });
 
-test("findIndex", () => {
-    const strategyMemo: StrategyMemoWithID = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [{ title: "", text: "", id: "id" }],
-        id: "",
-    };
-    const result = MemoUtility.findIndex(strategyMemo, "id");
+test("find1", () => {
+    const memos: MemoWithID[] = [
+        { title: "title1", text: "text1", id: "id1" },
+        { title: "title2", text: "text2", id: "id2" },
+    ];
+    const result = MemoUtility.find(memos, "id1");
+    const expected: MemoWithID = { title: "title1", text: "text1", id: "id1" };
+    expect(result).toEqual(expected);
+});
+
+test("find2", () => {
+    const memos: MemoWithID[] = [
+        { title: "title1", text: "text1", id: "id1" },
+        { title: "title2", text: "text2", id: "id2" },
+    ];
+    const result = MemoUtility.find(memos, "id3");
+    expect(result).toBeNull();
+});
+
+test("findIndex1", () => {
+    const memos: MemoWithID[] = [
+        { title: "title1", text: "text1", id: "id1" },
+        { title: "title2", text: "text2", id: "id2" },
+    ];
+    const result = MemoUtility.findIndex(memos, "id1");
     expect(result).toBe(0);
+});
+
+test("findIndex2", () => {
+    const memos: MemoWithID[] = [
+        { title: "title1", text: "text1", id: "id1" },
+        { title: "title2", text: "text2", id: "id2" },
+    ];
+    const result = MemoUtility.findIndex(memos, "id3");
+    expect(result).toBeNull();
 });
 
 test("added", () => {
@@ -50,7 +75,7 @@ test("added", () => {
         ],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("changed", () => {
@@ -62,15 +87,14 @@ test("changed", () => {
             {
                 title: "",
                 text: "",
-                id: "",
+                id: "id",
             },
         ],
         id: "",
     };
-    const result = MemoUtility.changed(strategyMemo, 0, {
+    const result = MemoUtility.changed(strategyMemo, "id", {
         title: "title",
         text: "text",
-        id: "",
     });
     const expected: StrategyMemoWithID = {
         gameName: "",
@@ -80,12 +104,12 @@ test("changed", () => {
             {
                 title: "title",
                 text: "text",
-                id: "",
+                id: "id",
             },
         ],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("removed", () => {
@@ -95,14 +119,14 @@ test("removed", () => {
         preparations: [],
         memos: [
             {
-                title: "title",
-                text: "text",
-                id: "",
+                title: "",
+                text: "",
+                id: "id",
             },
         ],
         id: "",
     };
-    const result = MemoUtility.removed(strategyMemo, 0);
+    const result = MemoUtility.removed(strategyMemo, "id");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [],
@@ -110,7 +134,7 @@ test("removed", () => {
         memos: [],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("movedUp", () => {
@@ -120,38 +144,38 @@ test("movedUp", () => {
         preparations: [],
         memos: [
             {
-                title: "1",
-                text: "",
-                id: "",
+                title: "title1",
+                text: "text1",
+                id: "id1",
             },
             {
-                title: "2",
-                text: "",
-                id: "",
+                title: "title2",
+                text: "text2",
+                id: "id2",
             },
         ],
         id: "",
     };
-    const result = MemoUtility.movedUp(strategyMemo, 1);
+    const result = MemoUtility.movedUp(strategyMemo, "id2");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
         memos: [
             {
-                title: "2",
-                text: "",
-                id: "",
+                title: "title2",
+                text: "text2",
+                id: "id2",
             },
             {
-                title: "1",
-                text: "",
-                id: "",
+                title: "title1",
+                text: "text1",
+                id: "id1",
             },
         ],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
 
 test("movedDown", () => {
@@ -161,36 +185,36 @@ test("movedDown", () => {
         preparations: [],
         memos: [
             {
-                title: "1",
-                text: "",
-                id: "",
+                title: "title2",
+                text: "text2",
+                id: "id2",
             },
             {
-                title: "2",
-                text: "",
-                id: "",
+                title: "title1",
+                text: "text1",
+                id: "id1",
             },
         ],
         id: "",
     };
-    const result = MemoUtility.movedDown(strategyMemo, 0);
+    const result = MemoUtility.movedDown(strategyMemo, "id2");
     const expected: StrategyMemoWithID = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
         memos: [
             {
-                title: "2",
-                text: "",
-                id: "",
+                title: "title1",
+                text: "text1",
+                id: "id1",
             },
             {
-                title: "1",
-                text: "",
-                id: "",
+                title: "title2",
+                text: "text2",
+                id: "id2",
             },
         ],
         id: "",
     };
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
+    expect(result).toEqual(expected);
 });
