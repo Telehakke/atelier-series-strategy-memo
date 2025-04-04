@@ -13,9 +13,12 @@ import DialogView from "../../commons/dialogView";
 import {
     ChevronDownIconLargeButton,
     ChevronUpIconLargeButton,
+    ClipboardCopyIconLargeButton,
+    ClipboardPasteIconLargeButton,
     PencilIconLargeButton,
     PlusIconLargeButton,
     TrashIconLargeButton,
+    XIconLargeButton,
 } from "../../commons/iconButtons";
 import TextEditor from "../../commons/textEditor";
 import TextField from "../../commons/textField";
@@ -31,6 +34,7 @@ const GameMapsList = ({
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
     const [isEditItemDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [copiedItem, setCopiedItem] = useState<GameMapWithID | null>(null);
 
     if (selectedIDInGameMapGroups == null) return <></>;
 
@@ -55,33 +59,68 @@ const GameMapsList = ({
                     />
                 ))}
             </div>
-            <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
-                <MoveItemUpButton
-                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
-                    selectedID={selectedID}
-                />
-                <MoveItemDownButton
-                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
-                    selectedID={selectedID}
-                />
-                <EditItemButton
-                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
-                    selectedID={selectedID}
-                    setSelectedID={setSelectedID}
-                    isEditItemDialogOpen={isEditItemDialogOpen}
-                    setIsEditItemDialogOpen={setIsEditDialogOpen}
-                />
-                <RemoveItemButton
-                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
-                    selectedID={selectedID}
-                    setSelectedID={setSelectedID}
-                    setSelectedIDInCanvas={setSelectedIDInCanvas}
-                />
-                <AddItemButton
-                    className="grid justify-items-center"
-                    selectedIDInGameMapGroups={selectedIDInGameMapGroups}
-                    setSelectedID={setSelectedID}
-                />
+            <div className="fixed right-4 bottom-4 flex gap-4">
+                {copiedItem == null ? (
+                    <>
+                        <div className="flex flex-col gap-4">
+                            <EditItemButton
+                                selectedIDInGameMapGroups={
+                                    selectedIDInGameMapGroups
+                                }
+                                selectedID={selectedID}
+                                setSelectedID={setSelectedID}
+                                isEditItemDialogOpen={isEditItemDialogOpen}
+                                setIsEditItemDialogOpen={setIsEditDialogOpen}
+                            />
+                            <CopyAndPasteItemButton
+                                selectedIDInGameMapGroups={
+                                    selectedIDInGameMapGroups
+                                }
+                                selectedID={selectedID}
+                                setSelectedID={setSelectedID}
+                                copiedItem={copiedItem}
+                                setCopiedItem={setCopiedItem}
+                            />
+                            <RemoveItemButton
+                                selectedIDInGameMapGroups={
+                                    selectedIDInGameMapGroups
+                                }
+                                selectedID={selectedID}
+                                setSelectedID={setSelectedID}
+                                setSelectedIDInCanvas={setSelectedIDInCanvas}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <MoveItemUpButton
+                                selectedIDInGameMapGroups={
+                                    selectedIDInGameMapGroups
+                                }
+                                selectedID={selectedID}
+                            />
+                            <MoveItemDownButton
+                                selectedIDInGameMapGroups={
+                                    selectedIDInGameMapGroups
+                                }
+                                selectedID={selectedID}
+                            />
+                            <AddItemButton
+                                className="grid justify-items-center"
+                                selectedIDInGameMapGroups={
+                                    selectedIDInGameMapGroups
+                                }
+                                setSelectedID={setSelectedID}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <CopyAndPasteItemButton
+                        selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                        selectedID={selectedID}
+                        setSelectedID={setSelectedID}
+                        copiedItem={copiedItem}
+                        setCopiedItem={setCopiedItem}
+                    />
+                )}
             </div>
         </>
     );
@@ -586,4 +625,65 @@ const MoveItemDownButton = ({
     };
 
     return <ChevronDownIconLargeButton onClick={() => handleButtonClick()} />;
+};
+
+/* -------------------------------------------------------------------------- */
+
+const CopyAndPasteItemButton = ({
+    selectedIDInGameMapGroups,
+    selectedID,
+    setSelectedID,
+    copiedItem,
+    setCopiedItem,
+}: {
+    selectedIDInGameMapGroups: string | null;
+    selectedID: string | null;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    copiedItem: GameMapWithID | null;
+    setCopiedItem: React.Dispatch<React.SetStateAction<GameMapWithID | null>>;
+}) => {
+    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+
+    if (selectedIDInGameMapGroups == null) return <></>;
+
+    if (copiedItem != null)
+        return (
+            <div className="flex gap-4">
+                <ClipboardPasteIconLargeButton
+                    onClick={() => {
+                        const preparation = GameMapUtility.copied(copiedItem);
+                        setStrategyMemo((v) =>
+                            GameMapUtility.added(
+                                v,
+                                selectedIDInGameMapGroups,
+                                preparation,
+                            ),
+                        );
+                    }}
+                />
+                <XIconLargeButton
+                    onClick={() => {
+                        setSelectedID(null);
+                        setCopiedItem(null);
+                    }}
+                />
+            </div>
+        );
+
+    if (selectedID != null)
+        return (
+            <ClipboardCopyIconLargeButton
+                onClick={() => {
+                    setCopiedItem(
+                        GameMapUtility.find(
+                            strategyMemo.gameMapGroups,
+                            selectedIDInGameMapGroups,
+                            selectedID,
+                        ),
+                    );
+                }}
+            />
+        );
+
+    return <></>;
 };

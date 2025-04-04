@@ -6,6 +6,8 @@ import {
     ChevronUp,
     CircleX,
     Clipboard,
+    ClipboardCopy,
+    ClipboardPaste,
     Database,
     Image,
     ImageOff,
@@ -17,6 +19,7 @@ import {
     SquareChevronRight,
     SquareChevronUp,
     Trash,
+    X,
 } from "lucide-react";
 import { Bg, Stroke } from "./classNames";
 
@@ -346,6 +349,51 @@ export const TrashIconLargeButton = ({
             onClick={onClick}
         >
             <Trash className={`size-10 ${Stroke.neutral100}`} />
+        </Button>
+    );
+};
+
+export const ClipboardCopyIconLargeButton = ({
+    onClick,
+}: {
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+}) => {
+    return (
+        <Button
+            className={`rounded-full p-2 ${Bg.green500} ${Bg.hoverGreen400}`}
+            onClick={onClick}
+        >
+            <ClipboardCopy className={`size-10 ${Stroke.neutral100}`} />
+        </Button>
+    );
+};
+
+export const ClipboardPasteIconLargeButton = ({
+    onClick,
+}: {
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+}) => {
+    return (
+        <Button
+            className={`rounded-full p-2 ${Bg.green500} ${Bg.hoverGreen400}`}
+            onClick={onClick}
+        >
+            <ClipboardPaste className={`size-10 ${Stroke.neutral100}`} />
+        </Button>
+    );
+};
+
+export const XIconLargeButton = ({
+    onClick,
+}: {
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+}) => {
+    return (
+        <Button
+            className={`rounded-full p-2 ${Bg.neutral500} ${Bg.hoverNeutral400}`}
+            onClick={onClick}
+        >
+            <X className={`size-10 ${Stroke.neutral100}`} />
         </Button>
     );
 };

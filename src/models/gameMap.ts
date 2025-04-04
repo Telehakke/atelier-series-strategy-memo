@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { GameMapGroupUtility, GameMapGroupWithID } from "./gameMapGroup";
 import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull, isNumber, isString, isStrings } from "./typeGuards";
@@ -71,6 +72,19 @@ export class GameMapUtility {
             x: x,
             y: y,
             id: id,
+        };
+    };
+
+    static copied = (gameMap: GameMapWithID): GameMapWithID => {
+        return {
+            name: gameMap.name,
+            items: [...gameMap.items],
+            monsters: [...gameMap.monsters],
+            memo: gameMap.memo,
+            icon: gameMap.icon,
+            x: gameMap.x,
+            y: gameMap.y,
+            id: uuidv4(),
         };
     };
 

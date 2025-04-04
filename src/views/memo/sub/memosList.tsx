@@ -8,9 +8,12 @@ import DialogView from "../../commons/dialogView";
 import {
     ChevronDownIconLargeButton,
     ChevronUpIconLargeButton,
+    ClipboardCopyIconLargeButton,
+    ClipboardPasteIconLargeButton,
     PencilIconLargeButton,
     PlusIconLargeButton,
     TrashIconLargeButton,
+    XIconLargeButton,
 } from "../../commons/iconButtons";
 import TextEditor from "../../commons/textEditor";
 import TextField from "../../commons/textField";
@@ -18,6 +21,7 @@ import TextField from "../../commons/textField";
 const MemosList = ({ memos }: { memos: MemoWithID[] }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [copiedItem, setCopiedItem] = useState<MemoWithID | null>(null);
 
     return (
         <>
@@ -32,23 +36,45 @@ const MemosList = ({ memos }: { memos: MemoWithID[] }) => {
                     />
                 ))}
             </div>
-            <div className="fixed right-4 bottom-4 flex flex-col space-y-4">
-                <MoveItemUpButton selectedID={selectedID} />
-                <MoveItemDownButton selectedID={selectedID} />
-                <EditItemButton
-                    setSelectedID={setSelectedID}
-                    selectedID={selectedID}
-                    isEditDialogOpen={isEditDialogOpen}
-                    setIsEditDialogOpen={setIsEditDialogOpen}
-                />
-                <RemoveItemButton
-                    selectedID={selectedID}
-                    setSelectedID={setSelectedID}
-                />
-                <AddItemButton
-                    setSelectedID={setSelectedID}
-                    className="grid justify-items-center"
-                />
+            <div className="fixed right-4 bottom-4 flex gap-4">
+                {copiedItem == null ? (
+                    <>
+                        <div className="flex flex-col gap-4">
+                            <EditItemButton
+                                setSelectedID={setSelectedID}
+                                selectedID={selectedID}
+                                isEditDialogOpen={isEditDialogOpen}
+                                setIsEditDialogOpen={setIsEditDialogOpen}
+                            />
+                            <CopyAndPasteItemButton
+                                selectedID={selectedID}
+                                setSelectedID={setSelectedID}
+                                copiedItem={copiedItem}
+                                setCopiedItem={setCopiedItem}
+                            />
+                            <RemoveItemButton
+                                selectedID={selectedID}
+                                setSelectedID={setSelectedID}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <MoveItemUpButton selectedID={selectedID} />
+                            <MoveItemDownButton selectedID={selectedID} />
+
+                            <AddItemButton
+                                setSelectedID={setSelectedID}
+                                className="grid justify-items-center"
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <CopyAndPasteItemButton
+                        selectedID={selectedID}
+                        setSelectedID={setSelectedID}
+                        copiedItem={copiedItem}
+                        setCopiedItem={setCopiedItem}
+                    />
+                )}
             </div>
         </>
     );
@@ -366,4 +392,53 @@ const MoveItemDownButton = ({ selectedID }: { selectedID: string | null }) => {
     };
 
     return <ChevronDownIconLargeButton onClick={() => handleButtonClick()} />;
+};
+
+/* -------------------------------------------------------------------------- */
+
+const CopyAndPasteItemButton = ({
+    selectedID,
+    setSelectedID,
+    copiedItem,
+    setCopiedItem,
+}: {
+    selectedID: string | null;
+    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    copiedItem: MemoWithID | null;
+    setCopiedItem: React.Dispatch<React.SetStateAction<MemoWithID | null>>;
+}) => {
+    const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
+
+    if (copiedItem != null)
+        return (
+            <div className="flex gap-4">
+                <ClipboardPasteIconLargeButton
+                    onClick={() => {
+                        const preparation = MemoUtility.copied(copiedItem);
+                        setStrategyMemo((v) =>
+                            MemoUtility.added(v, preparation),
+                        );
+                    }}
+                />
+                <XIconLargeButton
+                    onClick={() => {
+                        setSelectedID(null);
+                        setCopiedItem(null);
+                    }}
+                />
+            </div>
+        );
+
+    if (selectedID != null)
+        return (
+            <ClipboardCopyIconLargeButton
+                onClick={() =>
+                    setCopiedItem(
+                        MemoUtility.find(strategyMemo.memos, selectedID),
+                    )
+                }
+            />
+        );
+
+    return <></>;
 };

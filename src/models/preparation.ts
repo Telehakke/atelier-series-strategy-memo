@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull, isString, isStrings } from "./typeGuards";
 
@@ -45,6 +46,15 @@ export class PreparationUtility {
             materials: materials,
             categories: categories,
             id: id,
+        };
+    };
+
+    static copied = (preparation: PreparationWithID): PreparationWithID => {
+        return {
+            name: preparation.name,
+            materials: [...preparation.materials],
+            categories: [...preparation.categories],
+            id: uuidv4(),
         };
     };
 

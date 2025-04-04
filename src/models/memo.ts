@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
 import { isNotNull, isString } from "./typeGuards";
 
@@ -32,6 +33,14 @@ export class MemoUtility {
             title: inputTitle.trim(),
             text: inputText.trim(),
             id: id,
+        };
+    };
+
+    static copied = (memo: MemoWithID): MemoWithID => {
+        return {
+            title: memo.title,
+            text: memo.text,
+            id: uuidv4(),
         };
     };
 
