@@ -1,21 +1,6 @@
 import { expect, test } from "vitest";
-import { PreparationUtility, PreparationWithID } from "../preparation";
-import { StrategyMemoWithID } from "../strategyMemo";
-
-test("isPreparation", () => {
-    const preparation = PreparationUtility.create(
-        "name",
-        "material",
-        "category",
-        "0",
-    );
-    expect(PreparationUtility.isPreparation(preparation)).toBeTruthy();
-});
-
-test("isPreparations", () => {
-    const preparations: PreparationUtility[] = [];
-    expect(PreparationUtility.isPreparations(preparations)).toBeTruthy();
-});
+import { Preparation, PreparationUtility } from "../preparation";
+import { StrategyMemo } from "../strategyMemo";
 
 test("create", () => {
     const preparation = PreparationUtility.create(
@@ -24,7 +9,7 @@ test("create", () => {
         "category1、category2",
         "id",
     );
-    const expected: PreparationWithID = {
+    const expected: Preparation = {
         name: "name",
         materials: ["material1", "material2"],
         categories: ["category1", "category2"],
@@ -34,12 +19,12 @@ test("create", () => {
 });
 
 test("find1", () => {
-    const preparations: PreparationWithID[] = [
+    const preparations: Preparation[] = [
         { name: "name1", materials: [], categories: [], id: "id1" },
         { name: "name2", materials: [], categories: [], id: "id2" },
     ];
     const result = PreparationUtility.find(preparations, "id1");
-    const expected: PreparationWithID = {
+    const expected: Preparation = {
         name: "name1",
         materials: [],
         categories: [],
@@ -49,7 +34,7 @@ test("find1", () => {
 });
 
 test("find2", () => {
-    const preparations: PreparationWithID[] = [
+    const preparations: Preparation[] = [
         { name: "name1", materials: [], categories: [], id: "id1" },
         { name: "name2", materials: [], categories: [], id: "id2" },
     ];
@@ -58,7 +43,7 @@ test("find2", () => {
 });
 
 test("findIndex1", () => {
-    const preparations: PreparationWithID[] = [
+    const preparations: Preparation[] = [
         { name: "name1", materials: [], categories: [], id: "id1" },
         { name: "name2", materials: [], categories: [], id: "id2" },
     ];
@@ -67,7 +52,7 @@ test("findIndex1", () => {
 });
 
 test("findIndex2", () => {
-    const preparations: PreparationWithID[] = [
+    const preparations: Preparation[] = [
         { name: "name1", materials: [], categories: [], id: "id1" },
         { name: "name2", materials: [], categories: [], id: "id2" },
     ];
@@ -76,7 +61,7 @@ test("findIndex2", () => {
 });
 
 test("added", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -89,7 +74,7 @@ test("added", () => {
         categories: [],
         id: "",
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
@@ -107,7 +92,7 @@ test("added", () => {
 });
 
 test("changed", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
@@ -126,7 +111,7 @@ test("changed", () => {
         materials: ["material"],
         categories: ["category"],
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
@@ -144,7 +129,7 @@ test("changed", () => {
 });
 
 test("removed", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
@@ -159,7 +144,7 @@ test("removed", () => {
         id: "",
     };
     const result = PreparationUtility.removed(strategyMemo, "id");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -170,7 +155,7 @@ test("removed", () => {
 });
 
 test("movedUp", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
@@ -191,7 +176,7 @@ test("movedUp", () => {
         id: "",
     };
     const result = PreparationUtility.movedUp(strategyMemo, "id2");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
@@ -215,7 +200,7 @@ test("movedUp", () => {
 });
 
 test("movedDown", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [
@@ -236,7 +221,7 @@ test("movedDown", () => {
         id: "",
     };
     const result = PreparationUtility.movedDown(strategyMemo, "id2");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [

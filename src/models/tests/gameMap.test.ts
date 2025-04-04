@@ -1,26 +1,7 @@
 import { expect, test } from "vitest";
-import { GameMapUtility, GameMapWithID } from "../gameMap";
-import { GameMapGroupWithID } from "../gameMapGroup";
-import { StrategyMemoWithID } from "../strategyMemo";
-
-test("isGameMap", () => {
-    const gameMap = GameMapUtility.create(
-        "name",
-        "item",
-        "monster",
-        "memo",
-        "icon",
-        "0",
-        "1",
-        "0",
-    );
-    expect(GameMapUtility.isGameMap(gameMap)).toBeTruthy();
-});
-
-test("isGameMaps", () => {
-    const gameMaps: GameMapUtility[] = [];
-    expect(GameMapUtility.isGameMaps(gameMaps)).toBeTruthy();
-});
+import { GameMap, GameMapUtility } from "../gameMap";
+import { GameMapGroup } from "../gameMapGroup";
+import { StrategyMemo } from "../strategyMemo";
 
 test("create", () => {
     const gameMap = GameMapUtility.create(
@@ -33,7 +14,7 @@ test("create", () => {
         "2",
         "id1",
     );
-    const expected: GameMapWithID = {
+    const expected: GameMap = {
         name: "name",
         items: ["item1", "item2"],
         monsters: ["monster1", "monster2"],
@@ -47,7 +28,7 @@ test("create", () => {
 });
 
 test("find1", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "",
             gameMaps: [
@@ -67,7 +48,7 @@ test("find1", () => {
         },
     ];
     const result = GameMapUtility.find(gameMapGroups, "groupID", "id");
-    const expected: GameMapWithID = {
+    const expected: GameMap = {
         name: "name",
         items: [],
         monsters: [],
@@ -81,7 +62,7 @@ test("find1", () => {
 });
 
 test("find2", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "",
             gameMaps: [
@@ -105,7 +86,7 @@ test("find2", () => {
 });
 
 test("findIndex1", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "",
             gameMaps: [
@@ -129,7 +110,7 @@ test("findIndex1", () => {
 });
 
 test("findIndex2", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "",
             gameMaps: [
@@ -153,7 +134,7 @@ test("findIndex2", () => {
 });
 
 test("added", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -177,7 +158,7 @@ test("added", () => {
         y: 0,
         id: "",
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -206,7 +187,7 @@ test("added", () => {
 });
 
 test("changed", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -240,7 +221,7 @@ test("changed", () => {
         x: 1,
         y: 2,
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -269,7 +250,7 @@ test("changed", () => {
 });
 
 test("removed", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -295,7 +276,7 @@ test("removed", () => {
         id: "",
     };
     const result = GameMapUtility.removed(strategyMemo, "gameMapID", "id");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -313,7 +294,7 @@ test("removed", () => {
 });
 
 test("movedUp", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -349,7 +330,7 @@ test("movedUp", () => {
         id: "",
     };
     const result = GameMapUtility.movedUp(strategyMemo, "gameMapID", "id2");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -388,7 +369,7 @@ test("movedUp", () => {
 });
 
 test("movedDown", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -424,7 +405,7 @@ test("movedDown", () => {
         id: "",
     };
     const result = GameMapUtility.movedDown(strategyMemo, "gameMapID", "id2");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -463,7 +444,7 @@ test("movedDown", () => {
 });
 
 test("additionXY1", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -492,7 +473,7 @@ test("additionXY1", () => {
         x: 5,
         y: -5,
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -521,7 +502,7 @@ test("additionXY1", () => {
 });
 
 test("additionXY2", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -550,7 +531,7 @@ test("additionXY2", () => {
         x: -1,
         y: -1,
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -579,7 +560,7 @@ test("additionXY2", () => {
 });
 
 test("additionXY3", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -608,7 +589,7 @@ test("additionXY3", () => {
         x: 1,
         y: 1,
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {

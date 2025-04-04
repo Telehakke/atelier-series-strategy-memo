@@ -1,16 +1,16 @@
-import { GameMapGroupWithID } from "./gameMapGroup";
+import { GameMapGroup } from "./gameMapGroup";
 
 export default class GameMapGroupsFiltering {
-    private gameMapGroups: GameMapGroupWithID[];
+    private gameMapGroups: GameMapGroup[];
 
-    constructor(gameMapGroups: GameMapGroupWithID[]) {
+    constructor(gameMapGroups: GameMapGroup[]) {
         this.gameMapGroups = gameMapGroups;
     }
 
     /**
      * GameMapGroupsの要素に入力文字列を含むものだけを抽出する
      */
-    filtered = (inputs: string[]): GameMapGroupWithID[] => {
+    filtered = (inputs: string[]): GameMapGroup[] => {
         return this.gameMapGroups.map((gameMapGroup) => {
             const gameMaps = gameMapGroup.gameMaps.filter((gameMap) => {
                 return inputs.some((input) => {
@@ -36,7 +36,7 @@ export default class GameMapGroupsFiltering {
         });
     };
 
-    filteredByGameMapID = (id: string): GameMapGroupWithID[] => {
+    filteredByGameMapID = (id: string): GameMapGroup[] => {
         return this.gameMapGroups.map((gameMapGroup) => {
             const gameMaps = gameMapGroup.gameMaps.filter(
                 (gameMap) => gameMap.id === id,

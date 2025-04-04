@@ -8,8 +8,8 @@ import {
     strategyMemoRepositoryAtom,
 } from "../../../atoms";
 import {
+    GameMapGroup,
     GameMapGroupUtility,
-    GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
 import ImageFile, {
     ClipModeEnum,
@@ -38,7 +38,7 @@ const GameMapGroupsList = ({
     setSelectedIDInCanvas,
     className,
 }: {
-    gameMapGroups: GameMapGroupWithID[];
+    gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string | null;
     setSelectedIndexInGameMapGroups: React.Dispatch<
         React.SetStateAction<number>

@@ -1,37 +1,20 @@
 import { v4 as uuidv4 } from "uuid";
-import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
-import { isNotNull, isString, isStrings } from "./typeGuards";
+import { StrategyMemo, StrategyMemoUtility } from "./strategyMemo";
 
 export type Preparation = {
     readonly name: string;
     readonly materials: string[];
     readonly categories: string[];
-};
-
-export type PreparationWithID = Preparation & {
     readonly id: string;
 };
 
 export class PreparationUtility {
-    static isPreparation = (value: unknown): value is Preparation => {
-        if (!isNotNull(value)) return false;
-        if (!isString(value.name)) return false;
-        if (!isStrings(value.materials)) return false;
-        if (!isStrings(value.categories)) return false;
-        return true;
-    };
-
-    static isPreparations = (value: unknown): value is Preparation[] => {
-        if (!Array.isArray(value)) return false;
-        return value.every((v) => this.isPreparation(v));
-    };
-
     static create = (
         inputName: string,
         inputMaterials: string,
         inputCategories: string,
         id: string,
-    ): PreparationWithID => {
+    ): Preparation => {
         const name = inputName.trim();
         const materials = inputMaterials
             .split(/[,、]/)
@@ -49,7 +32,7 @@ export class PreparationUtility {
         };
     };
 
-    static copied = (preparation: PreparationWithID): PreparationWithID => {
+    static copied = (preparation: Preparation): Preparation => {
         return {
             name: preparation.name,
             materials: [...preparation.materials],
@@ -59,14 +42,14 @@ export class PreparationUtility {
     };
 
     static find = (
-        preparations: PreparationWithID[],
+        preparations: Preparation[],
         id: string,
-    ): PreparationWithID | null => {
+    ): Preparation | null => {
         return preparations.find((v) => v.id === id) ?? null;
     };
 
     static findIndex = (
-        preparations: PreparationWithID[],
+        preparations: Preparation[],
         id: string,
     ): number | null => {
         const index = preparations.findIndex((v) => v.id === id);
@@ -74,28 +57,28 @@ export class PreparationUtility {
     };
 
     static added = (
-        strategyMemo: StrategyMemoWithID,
-        preparation: PreparationWithID,
-    ): StrategyMemoWithID => {
+        strategyMemo: StrategyMemo,
+        preparation: Preparation,
+    ): StrategyMemo => {
         const copied = StrategyMemoUtility.copied(strategyMemo);
         copied.preparations.push(preparation);
         return copied;
     };
 
     static changed = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         id: string,
         input: {
             name: string;
             materials: string[];
             categories: string[];
         },
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const index = this.findIndex(strategyMemo.preparations, id);
         if (index == null) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const preparation: PreparationWithID = {
+        const preparation: Preparation = {
             ...input,
             id: copied.preparations[index].id,
         };
@@ -103,10 +86,7 @@ export class PreparationUtility {
         return copied;
     };
 
-    static removed = (
-        strategyMemo: StrategyMemoWithID,
-        id: string,
-    ): StrategyMemoWithID => {
+    static removed = (strategyMemo: StrategyMemo, id: string): StrategyMemo => {
         const index = this.findIndex(strategyMemo.preparations, id);
         if (index == null) return strategyMemo;
 
@@ -115,10 +95,7 @@ export class PreparationUtility {
         return copied;
     };
 
-    static movedUp = (
-        strategyMemo: StrategyMemoWithID,
-        id: string,
-    ): StrategyMemoWithID => {
+    static movedUp = (strategyMemo: StrategyMemo, id: string): StrategyMemo => {
         const index = this.findIndex(strategyMemo.preparations, id);
         if (index == null) return strategyMemo;
 
@@ -132,9 +109,9 @@ export class PreparationUtility {
     };
 
     static movedDown = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         id: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const index = this.findIndex(strategyMemo.preparations, id);
         if (index == null) return strategyMemo;
 

@@ -41,10 +41,7 @@ const BackupDialog = ({
     );
 
     const handleDownloadButtonClick = () => {
-        const strategyMemo = StrategyMemoUtility.toStrategyMemo(
-            strategyMemoRepository,
-        );
-        StrategyMemoUtility.download(strategyMemo);
+        StrategyMemoUtility.download(strategyMemoRepository);
     };
 
     const handleFileOpen: React.ChangeEventHandler<HTMLInputElement> = (

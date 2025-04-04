@@ -2,7 +2,7 @@ import { useAtom, useSetAtom } from "jotai";
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { strategyMemoRepositoryAtom } from "../../../atoms";
-import { MemoUtility, MemoWithID } from "../../../models/memo";
+import { Memo, MemoUtility } from "../../../models/memo";
 import CardBase from "../../commons/cardBase";
 import DialogView from "../../commons/dialogView";
 import {
@@ -18,10 +18,10 @@ import {
 import TextEditor from "../../commons/textEditor";
 import TextField from "../../commons/textField";
 
-const MemosList = ({ memos }: { memos: MemoWithID[] }) => {
+const MemosList = ({ memos }: { memos: Memo[] }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [copiedItem, setCopiedItem] = useState<MemoWithID | null>(null);
+    const [copiedItem, setCopiedItem] = useState<Memo | null>(null);
 
     return (
         <>
@@ -90,7 +90,7 @@ const Card = ({
     setSelectedID,
     setIsEditDialogOpen,
 }: {
-    memo: MemoWithID;
+    memo: Memo;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -404,8 +404,8 @@ const CopyAndPasteItemButton = ({
 }: {
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
-    copiedItem: MemoWithID | null;
-    setCopiedItem: React.Dispatch<React.SetStateAction<MemoWithID | null>>;
+    copiedItem: Memo | null;
+    setCopiedItem: React.Dispatch<React.SetStateAction<Memo | null>>;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
 

@@ -1,19 +1,9 @@
 import { expect, test } from "vitest";
-import { GameMapGroupUtility, GameMapGroupWithID } from "../gameMapGroup";
-import { StrategyMemoWithID } from "../strategyMemo";
-
-test("isGameMapGroup", () => {
-    const gameMapGroup = GameMapGroupUtility.create("name", [], "", "0");
-    expect(GameMapGroupUtility.isGameMapGroup(gameMapGroup)).toBeTruthy();
-});
-
-test("isGameMapGroups", () => {
-    const gameMapGroups: GameMapGroupUtility[] = [];
-    expect(GameMapGroupUtility.isGameMapGroups(gameMapGroups)).toBeTruthy();
-});
+import { GameMapGroup, GameMapGroupUtility } from "../gameMapGroup";
+import { StrategyMemo } from "../strategyMemo";
 
 test("find1", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "name1",
             gameMaps: [],
@@ -28,7 +18,7 @@ test("find1", () => {
         },
     ];
     const result = GameMapGroupUtility.find(gameMapGroups, "id1");
-    const expected: GameMapGroupWithID = {
+    const expected: GameMapGroup = {
         name: "name1",
         gameMaps: [],
         image: "image1",
@@ -38,7 +28,7 @@ test("find1", () => {
 });
 
 test("find2", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "name1",
             gameMaps: [],
@@ -57,7 +47,7 @@ test("find2", () => {
 });
 
 test("findIndex1", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "name1",
             gameMaps: [],
@@ -76,7 +66,7 @@ test("findIndex1", () => {
 });
 
 test("findIndex2", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "name1",
             gameMaps: [],
@@ -95,7 +85,7 @@ test("findIndex2", () => {
 });
 
 test("findID1", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "name1",
             gameMaps: [],
@@ -114,7 +104,7 @@ test("findID1", () => {
 });
 
 test("findID2", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [
+    const gameMapGroups: GameMapGroup[] = [
         {
             name: "name1",
             gameMaps: [],
@@ -133,13 +123,13 @@ test("findID2", () => {
 });
 
 test("findID3", () => {
-    const gameMapGroups: GameMapGroupWithID[] = [];
+    const gameMapGroups: GameMapGroup[] = [];
     const result = GameMapGroupUtility.findID(gameMapGroups, 0);
     expect(result).toBeNull();
 });
 
 test("added", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -152,7 +142,7 @@ test("added", () => {
         image: "",
         id: "",
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -170,7 +160,7 @@ test("added", () => {
 });
 
 test("changedName", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -185,7 +175,7 @@ test("changedName", () => {
         id: "",
     };
     const result = GameMapGroupUtility.changedName(strategyMemo, "id", "name");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -203,7 +193,7 @@ test("changedName", () => {
 });
 
 test("changedImage", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -222,7 +212,7 @@ test("changedImage", () => {
         "id",
         "data:image/png;base64,...",
     );
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -240,7 +230,7 @@ test("changedImage", () => {
 });
 
 test("removed", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -255,7 +245,7 @@ test("removed", () => {
         id: "",
     };
     const result = GameMapGroupUtility.removed(strategyMemo, "id");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -266,7 +256,7 @@ test("removed", () => {
 });
 
 test("movedUp", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -287,7 +277,7 @@ test("movedUp", () => {
         id: "",
     };
     const result = GameMapGroupUtility.movedUp(strategyMemo, "id2");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -311,7 +301,7 @@ test("movedUp", () => {
 });
 
 test("movedDown", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {
@@ -332,7 +322,7 @@ test("movedDown", () => {
         id: "",
     };
     const result = GameMapGroupUtility.movedDown(strategyMemo, "id2");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [
             {

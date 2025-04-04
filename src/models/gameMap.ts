@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { GameMapGroupUtility, GameMapGroupWithID } from "./gameMapGroup";
-import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
-import { isNotNull, isNumber, isString, isStrings } from "./typeGuards";
+import { GameMapGroup, GameMapGroupUtility } from "./gameMapGroup";
+import { StrategyMemo, StrategyMemoUtility } from "./strategyMemo";
 
 export type GameMap = {
     readonly name: string;
@@ -11,30 +10,10 @@ export type GameMap = {
     readonly icon: string;
     readonly x: number;
     readonly y: number;
-};
-
-export type GameMapWithID = GameMap & {
     readonly id: string;
 };
 
 export class GameMapUtility {
-    static isGameMap = (value: unknown): value is GameMap => {
-        if (!isNotNull(value)) return false;
-        if (!isString(value.name)) return false;
-        if (!isStrings(value.items)) return false;
-        if (!isStrings(value.monsters)) return false;
-        if (!isString(value.memo)) return false;
-        if (!isString(value.icon)) return false;
-        if (!isNumber(value.x)) return false;
-        if (!isNumber(value.y)) return false;
-        return true;
-    };
-
-    static isGameMaps = (value: unknown): value is GameMap[] => {
-        if (!Array.isArray(value)) return false;
-        return value.every((v) => this.isGameMap(v));
-    };
-
     static create = (
         inputName: string,
         inputItems: string,
@@ -44,7 +23,7 @@ export class GameMapUtility {
         inputX: string,
         inputY: string,
         id: string,
-    ): GameMapWithID => {
+    ): GameMap => {
         const name = inputName.trim();
         const items = inputItems
             .split(/[,、]/)
@@ -75,7 +54,7 @@ export class GameMapUtility {
         };
     };
 
-    static copied = (gameMap: GameMapWithID): GameMapWithID => {
+    static copied = (gameMap: GameMap): GameMap => {
         return {
             name: gameMap.name,
             items: [...gameMap.items],
@@ -89,10 +68,10 @@ export class GameMapUtility {
     };
 
     static find = (
-        gameMapGroups: GameMapGroupWithID[],
+        gameMapGroups: GameMapGroup[],
         gameMapGroupsID: string,
         id: string,
-    ): GameMapWithID | null => {
+    ): GameMap | null => {
         const gameMapGroup = GameMapGroupUtility.find(
             gameMapGroups,
             gameMapGroupsID,
@@ -103,7 +82,7 @@ export class GameMapUtility {
     };
 
     static findIndex = (
-        gameMapGroups: GameMapGroupWithID[],
+        gameMapGroups: GameMapGroup[],
         gameMapGroupsID: string,
         id: string,
     ): number | null => {
@@ -118,10 +97,10 @@ export class GameMapUtility {
     };
 
     static added = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         gameMapGroupsID: string,
-        gameMap: GameMapWithID,
-    ): StrategyMemoWithID => {
+        gameMap: GameMap,
+    ): StrategyMemo => {
         const index = GameMapGroupUtility.findIndex(
             strategyMemo.gameMapGroups,
             gameMapGroupsID,
@@ -134,7 +113,7 @@ export class GameMapUtility {
     };
 
     static changed = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         gameMapGroupsID: string,
         id: string,
         input: {
@@ -146,7 +125,7 @@ export class GameMapUtility {
             x: number;
             y: number;
         },
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
             strategyMemo.gameMapGroups,
             gameMapGroupsID,
@@ -161,7 +140,7 @@ export class GameMapUtility {
         if (index == null) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const gameMap: GameMapWithID = {
+        const gameMap: GameMap = {
             ...input,
             id: copied.gameMapGroups[gameMapGroupsIndex].gameMaps[index].id,
         };
@@ -170,10 +149,10 @@ export class GameMapUtility {
     };
 
     static removed = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         gameMapGroupsID: string,
         id: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
             strategyMemo.gameMapGroups,
             gameMapGroupsID,
@@ -193,10 +172,10 @@ export class GameMapUtility {
     };
 
     static movedUp = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         gameMapGroupsID: string,
         id: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
             strategyMemo.gameMapGroups,
             gameMapGroupsID,
@@ -227,10 +206,10 @@ export class GameMapUtility {
     };
 
     static movedDown = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         gameMapGroupsID: string,
         id: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
             strategyMemo.gameMapGroups,
             gameMapGroupsID,
@@ -265,14 +244,14 @@ export class GameMapUtility {
     };
 
     static additionXY = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         gameMapGroupsID: string,
         id: string,
         input: {
             x: number;
             y: number;
         },
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const gameMapGroupsIndex = GameMapGroupUtility.findIndex(
             strategyMemo.gameMapGroups,
             gameMapGroupsID,

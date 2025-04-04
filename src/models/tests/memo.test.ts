@@ -1,29 +1,19 @@
 import { expect, test } from "vitest";
-import { MemoUtility, MemoWithID } from "../memo";
-import { StrategyMemoWithID } from "../strategyMemo";
-
-test("isMemo", () => {
-    const memo = MemoUtility.create("title", "text", "0");
-    expect(MemoUtility.isMemo(memo)).toBeTruthy();
-});
-
-test("isMemos", () => {
-    const memos: MemoUtility[] = [];
-    expect(MemoUtility.isMemos(memos)).toBeTruthy();
-});
+import { Memo, MemoUtility } from "../memo";
+import { StrategyMemo } from "../strategyMemo";
 
 test("find1", () => {
-    const memos: MemoWithID[] = [
+    const memos: Memo[] = [
         { title: "title1", text: "text1", id: "id1" },
         { title: "title2", text: "text2", id: "id2" },
     ];
     const result = MemoUtility.find(memos, "id1");
-    const expected: MemoWithID = { title: "title1", text: "text1", id: "id1" };
+    const expected: Memo = { title: "title1", text: "text1", id: "id1" };
     expect(result).toEqual(expected);
 });
 
 test("find2", () => {
-    const memos: MemoWithID[] = [
+    const memos: Memo[] = [
         { title: "title1", text: "text1", id: "id1" },
         { title: "title2", text: "text2", id: "id2" },
     ];
@@ -32,7 +22,7 @@ test("find2", () => {
 });
 
 test("findIndex1", () => {
-    const memos: MemoWithID[] = [
+    const memos: Memo[] = [
         { title: "title1", text: "text1", id: "id1" },
         { title: "title2", text: "text2", id: "id2" },
     ];
@@ -41,7 +31,7 @@ test("findIndex1", () => {
 });
 
 test("findIndex2", () => {
-    const memos: MemoWithID[] = [
+    const memos: Memo[] = [
         { title: "title1", text: "text1", id: "id1" },
         { title: "title2", text: "text2", id: "id2" },
     ];
@@ -50,7 +40,7 @@ test("findIndex2", () => {
 });
 
 test("added", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -62,7 +52,7 @@ test("added", () => {
         text: "",
         id: "",
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -79,7 +69,7 @@ test("added", () => {
 });
 
 test("changed", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -96,7 +86,7 @@ test("changed", () => {
         title: "title",
         text: "text",
     });
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -113,7 +103,7 @@ test("changed", () => {
 });
 
 test("removed", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -127,7 +117,7 @@ test("removed", () => {
         id: "",
     };
     const result = MemoUtility.removed(strategyMemo, "id");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -138,7 +128,7 @@ test("removed", () => {
 });
 
 test("movedUp", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -157,7 +147,7 @@ test("movedUp", () => {
         id: "",
     };
     const result = MemoUtility.movedUp(strategyMemo, "id2");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -179,7 +169,7 @@ test("movedUp", () => {
 });
 
 test("movedDown", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -198,7 +188,7 @@ test("movedDown", () => {
         id: "",
     };
     const result = MemoUtility.movedDown(strategyMemo, "id2");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],

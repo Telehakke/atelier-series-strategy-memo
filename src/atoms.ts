@@ -1,9 +1,9 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { ClipMode, ClipModeEnum, JpegQuality } from "./models/imageFile";
-import { StrategyMemoUtility, StrategyMemoWithID } from "./models/strategyMemo";
+import { StrategyMemo, StrategyMemoUtility } from "./models/strategyMemo";
 
-export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemoWithID>(
+export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemo>(
     "strategyMemo",
     {
         gameName: "ソフィーのアトリエ",

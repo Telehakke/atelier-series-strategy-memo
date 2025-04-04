@@ -2,10 +2,10 @@ import { useAtom, useSetAtom } from "jotai";
 import { ReactNode, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { strategyMemoRepositoryAtom } from "../../../atoms";
-import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
+import { GameMap, GameMapUtility } from "../../../models/gameMap";
 import {
+    GameMapGroup,
     GameMapGroupUtility,
-    GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
 import CardBase from "../../commons/cardBase";
 import { Bg, Text } from "../../commons/classNames";
@@ -28,13 +28,13 @@ const GameMapsList = ({
     selectedIDInGameMapGroups,
     setSelectedIDInCanvas,
 }: {
-    gameMapGroups: GameMapGroupWithID[];
+    gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string | null;
     setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
     const [isEditItemDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [copiedItem, setCopiedItem] = useState<GameMapWithID | null>(null);
+    const [copiedItem, setCopiedItem] = useState<GameMap | null>(null);
 
     if (selectedIDInGameMapGroups == null) return <></>;
 
@@ -136,7 +136,7 @@ const Card = ({
     setSelectedID,
     setIsEditDialogOpen,
 }: {
-    gameMap: GameMapWithID;
+    gameMap: GameMap;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -639,8 +639,8 @@ const CopyAndPasteItemButton = ({
     selectedIDInGameMapGroups: string | null;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
-    copiedItem: GameMapWithID | null;
-    setCopiedItem: React.Dispatch<React.SetStateAction<GameMapWithID | null>>;
+    copiedItem: GameMap | null;
+    setCopiedItem: React.Dispatch<React.SetStateAction<GameMap | null>>;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
 

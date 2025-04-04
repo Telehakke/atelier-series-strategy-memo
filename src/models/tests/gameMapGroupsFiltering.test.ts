@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
-import { GameMapGroupWithID } from "../gameMapGroup";
+import { GameMapGroup } from "../gameMapGroup";
 import GameMapGroupsFiltering from "../gameMapGroupsFiltering";
 
-const gameMapGroups: GameMapGroupWithID[] = [
+const gameMapGroups: GameMapGroup[] = [
     {
         name: "ワールドマップ",
         gameMaps: [
@@ -48,7 +48,7 @@ test("filtered", () => {
         "キルヘン・ベル",
         "雛鳥の林",
     ]);
-    const expected: GameMapGroupWithID[] = [
+    const expected: GameMapGroup[] = [
         {
             name: "ワールドマップ",
             gameMaps: [
@@ -82,7 +82,7 @@ test("filtered", () => {
 
 test("filteredByGameMapID", () => {
     const result = gameMapGroupsFiltering.filteredByGameMapID("0");
-    const expected: GameMapGroupWithID[] = [
+    const expected: GameMapGroup[] = [
         {
             name: "ワールドマップ",
             gameMaps: [

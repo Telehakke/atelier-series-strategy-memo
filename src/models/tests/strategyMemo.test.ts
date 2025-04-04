@@ -1,23 +1,9 @@
 import { expect, test } from "vitest";
-import {
-    StrategyMemo,
-    StrategyMemoUtility,
-    StrategyMemoWithID,
-} from "../strategyMemo";
-
-test("isStrategyMemo", () => {
-    const strategyMemo: StrategyMemo = {
-        gameName: "",
-        gameMapGroups: [],
-        preparations: [],
-        memos: [],
-    };
-    expect(StrategyMemoUtility.isStrategyMemo(strategyMemo)).toBeTruthy();
-});
+import { StrategyMemo, StrategyMemoUtility } from "../strategyMemo";
 
 test("copied1", () => {
     const result = StrategyMemoUtility.copied(null, "0");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -29,7 +15,7 @@ test("copied1", () => {
 
 test("copied2", () => {
     const result = StrategyMemoUtility.copied({}, "0");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -40,7 +26,7 @@ test("copied2", () => {
 });
 
 test("copied3", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "name",
         gameMapGroups: [
             {
@@ -79,7 +65,7 @@ test("copied3", () => {
         id: "id",
     };
     const result = StrategyMemoUtility.copied(strategyMemo);
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "name",
         gameMapGroups: [
             {
@@ -121,7 +107,7 @@ test("copied3", () => {
 });
 
 test("changedGameName", () => {
-    const strategyMemo: StrategyMemoWithID = {
+    const strategyMemo: StrategyMemo = {
         gameName: "",
         gameMapGroups: [],
         preparations: [],
@@ -129,7 +115,7 @@ test("changedGameName", () => {
         id: "",
     };
     const result = StrategyMemoUtility.changedGameName(strategyMemo, "name");
-    const expected: StrategyMemoWithID = {
+    const expected: StrategyMemo = {
         gameName: "name",
         gameMapGroups: [],
         preparations: [],

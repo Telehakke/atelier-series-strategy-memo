@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MemoWithID } from "../../models/memo";
+import { Memo } from "../../models/memo";
 import MemosFiltering from "../../models/memosFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
@@ -14,7 +14,7 @@ const MemoView = ({
     isPanelOpen,
     setIsPanelOpen,
 }: {
-    memos: MemoWithID[];
+    memos: Memo[];
     isPanelOpen: boolean;
     setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {

@@ -1,16 +1,16 @@
-import { PreparationWithID } from "./preparation";
+import { Preparation } from "./preparation";
 
 export default class PreparationsFiltering {
-    private preparations: PreparationWithID[];
+    private preparations: Preparation[];
 
-    constructor(preparations: PreparationWithID[]) {
+    constructor(preparations: Preparation[]) {
         this.preparations = preparations;
     }
 
     /**
      * preparationsの要素に入力文字列を含むものだけを抽出する
      */
-    filtered = (inputs: string[]): PreparationWithID[] => {
+    filtered = (inputs: string[]): Preparation[] => {
         return this.preparations.filter((v) => {
             return inputs.some((input) => {
                 if (v.name.includes(input)) return true;

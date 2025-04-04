@@ -2,10 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ReactNode, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { strategyMemoRepositoryAtom } from "../../../atoms";
-import {
-    PreparationUtility,
-    PreparationWithID,
-} from "../../../models/preparation";
+import { Preparation, PreparationUtility } from "../../../models/preparation";
 import PreparationsFiltering from "../../../models/preparationsFiltering";
 import CardBase from "../../commons/cardBase";
 import { Bg, Text } from "../../commons/classNames";
@@ -25,13 +22,11 @@ import TextField from "../../commons/textField";
 const PreparationsList = ({
     preparations,
 }: {
-    preparations: PreparationWithID[];
+    preparations: Preparation[];
 }) => {
     const [selectedID, setSelectedID] = useState<string | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [copiedItem, setCopiedItem] = useState<PreparationWithID | null>(
-        null,
-    );
+    const [copiedItem, setCopiedItem] = useState<Preparation | null>(null);
 
     return (
         <>
@@ -99,7 +94,7 @@ const Card = ({
     setSelectedID,
     setIsEditDialogOpen,
 }: {
-    preparation: PreparationWithID;
+    preparation: Preparation;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -125,11 +120,7 @@ const Card = ({
     );
 };
 
-const MaterialsTable = ({
-    preparation,
-}: {
-    preparation: PreparationWithID;
-}) => {
+const MaterialsTable = ({ preparation }: { preparation: Preparation }) => {
     const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
     const preparationsFiltering = new PreparationsFiltering(
         strategyMemo.preparations,
@@ -156,11 +147,7 @@ const MaterialsTable = ({
     );
 };
 
-const CategoriesTable = ({
-    preparation,
-}: {
-    preparation: PreparationWithID;
-}) => {
+const CategoriesTable = ({ preparation }: { preparation: Preparation }) => {
     const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
     const preparationsFiltering = new PreparationsFiltering(
         strategyMemo.preparations,
@@ -530,10 +517,8 @@ const CopyAndPasteItemButton = ({
 }: {
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
-    copiedItem: PreparationWithID | null;
-    setCopiedItem: React.Dispatch<
-        React.SetStateAction<PreparationWithID | null>
-    >;
+    copiedItem: Preparation | null;
+    setCopiedItem: React.Dispatch<React.SetStateAction<Preparation | null>>;
 }) => {
     const [strategyMemo, setStrategyMemo] = useAtom(strategyMemoRepositoryAtom);
 

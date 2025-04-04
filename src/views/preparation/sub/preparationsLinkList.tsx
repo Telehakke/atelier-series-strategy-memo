@@ -1,11 +1,11 @@
-import { PreparationWithID } from "../../../models/preparation";
+import { Preparation } from "../../../models/preparation";
 import { Text } from "../../commons/classNames";
 
 const PreparationsLinkList = ({
     preparations,
     className,
 }: {
-    preparations: PreparationWithID[];
+    preparations: Preparation[];
     className?: string;
 }) => {
     return (

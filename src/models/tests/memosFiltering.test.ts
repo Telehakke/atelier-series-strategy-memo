@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
-import { MemoWithID } from "../memo";
+import { Memo } from "../memo";
 import MemosFiltering from "../memosFiltering";
 
-const memos: MemoWithID[] = [
+const memos: Memo[] = [
     { title: "title1", text: "text1", id: "1" },
     { title: "title2", text: "text2", id: "2" },
 ];
@@ -22,7 +22,7 @@ test("filtered2", () => {
 
 test("filtered3", () => {
     const result = memosFiltering.filtered(["text3"]);
-    const expected: MemoWithID[] = [];
+    const expected: Memo[] = [];
     expect(result).toEqual(expected);
 });
 

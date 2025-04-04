@@ -2,10 +2,10 @@ import { Button } from "@headlessui/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import { strategyMemoRepositoryAtom } from "../../../atoms";
-import { GameMapUtility, GameMapWithID } from "../../../models/gameMap";
+import { GameMap, GameMapUtility } from "../../../models/gameMap";
 import {
+    GameMapGroup,
     GameMapGroupUtility,
-    GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
 import { Bg, Border, Shadow } from "../../commons/classNames";
 import {
@@ -22,7 +22,7 @@ const GameMapCanvas = ({
     setSelectedID,
     className,
 }: {
-    gameMapGroups: GameMapGroupWithID[];
+    gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string | null;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
@@ -67,7 +67,7 @@ const GameMapCanvas = ({
         return gameMapGroup.image.length > 0;
     };
 
-    const filteredGameMaps = (): GameMapWithID[] => {
+    const filteredGameMaps = (): GameMap[] => {
         if (selectedID == null) {
             return gameMapGroups[gameMapGroupsIndex].gameMaps;
         }
@@ -136,7 +136,7 @@ const Card = ({
     setSelectedID,
     className,
 }: {
-    gameMap: GameMapWithID;
+    gameMap: GameMap;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;

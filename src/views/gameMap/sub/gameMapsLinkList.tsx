@@ -1,6 +1,6 @@
 import {
+    GameMapGroup,
     GameMapGroupUtility,
-    GameMapGroupWithID,
 } from "../../../models/gameMapGroup";
 import { Text } from "../../commons/classNames";
 
@@ -9,7 +9,7 @@ const GameMapsLinkList = ({
     selectedID,
     className,
 }: {
-    gameMapGroups: GameMapGroupWithID[];
+    gameMapGroups: GameMapGroup[];
     selectedID: string | null;
     className?: string;
 }) => {

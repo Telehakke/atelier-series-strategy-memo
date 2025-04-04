@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-    GameMapGroupUtility,
-    GameMapGroupWithID,
-} from "../../models/gameMapGroup";
+import { GameMapGroup, GameMapGroupUtility } from "../../models/gameMapGroup";
 import GameMapGroupsFiltering from "../../models/gameMapGroupsFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
@@ -18,7 +15,7 @@ const GameMapView = ({
     isPanelOpen,
     setIsPanelOpen,
 }: {
-    gameMapGroups: GameMapGroupWithID[];
+    gameMapGroups: GameMapGroup[];
     isPanelOpen: boolean;
     setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {

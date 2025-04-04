@@ -1,34 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
-import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
-import { isNotNull, isString } from "./typeGuards";
+import { StrategyMemo, StrategyMemoUtility } from "./strategyMemo";
 
 export type Memo = {
     readonly title: string;
     readonly text: string;
-};
-
-export type MemoWithID = Memo & {
     readonly id: string;
 };
 
 export class MemoUtility {
-    static isMemo = (value: unknown): value is Memo => {
-        if (!isNotNull(value)) return false;
-        if (!isString(value.title)) return false;
-        if (!isString(value.text)) return false;
-        return true;
-    };
-
-    static isMemos = (value: unknown): value is Memo[] => {
-        if (!Array.isArray(value)) return false;
-        return value.every((v) => this.isMemo(v));
-    };
-
     static create = (
         inputTitle: string,
         inputText: string,
         id: string,
-    ): MemoWithID => {
+    ): Memo => {
         return {
             title: inputTitle.trim(),
             text: inputText.trim(),
@@ -36,7 +20,7 @@ export class MemoUtility {
         };
     };
 
-    static copied = (memo: MemoWithID): MemoWithID => {
+    static copied = (memo: Memo): Memo => {
         return {
             title: memo.title,
             text: memo.text,
@@ -44,34 +28,31 @@ export class MemoUtility {
         };
     };
 
-    static find = (memos: MemoWithID[], id: string): MemoWithID | null => {
+    static find = (memos: Memo[], id: string): Memo | null => {
         return memos.find((v) => v.id === id) ?? null;
     };
 
-    static findIndex = (memos: MemoWithID[], id: string): number | null => {
+    static findIndex = (memos: Memo[], id: string): number | null => {
         const index = memos.findIndex((v) => v.id === id);
         return index < 0 ? null : index;
     };
 
-    static added = (
-        strategyMemo: StrategyMemoWithID,
-        memo: MemoWithID,
-    ): StrategyMemoWithID => {
+    static added = (strategyMemo: StrategyMemo, memo: Memo): StrategyMemo => {
         const copied = StrategyMemoUtility.copied(strategyMemo);
         copied.memos.push(memo);
         return copied;
     };
 
     static changed = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         id: string,
         input: { title: string; text: string },
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const index = this.findIndex(strategyMemo.memos, id);
         if (index == null) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const memo: MemoWithID = {
+        const memo: Memo = {
             ...input,
             id: copied.memos[index].id,
         };
@@ -79,10 +60,7 @@ export class MemoUtility {
         return copied;
     };
 
-    static removed = (
-        strategyMemo: StrategyMemoWithID,
-        id: string,
-    ): StrategyMemoWithID => {
+    static removed = (strategyMemo: StrategyMemo, id: string): StrategyMemo => {
         const index = this.findIndex(strategyMemo.memos, id);
         if (index == null) return strategyMemo;
 
@@ -91,10 +69,7 @@ export class MemoUtility {
         return copied;
     };
 
-    static movedUp = (
-        strategyMemo: StrategyMemoWithID,
-        id: string,
-    ): StrategyMemoWithID => {
+    static movedUp = (strategyMemo: StrategyMemo, id: string): StrategyMemo => {
         const index = this.findIndex(strategyMemo.memos, id);
         if (index == null) return strategyMemo;
 
@@ -108,9 +83,9 @@ export class MemoUtility {
     };
 
     static movedDown = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         id: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const index = this.findIndex(strategyMemo.memos, id);
         if (index == null) return strategyMemo;
 

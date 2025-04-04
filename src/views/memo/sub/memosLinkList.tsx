@@ -1,11 +1,11 @@
-import { MemoWithID } from "../../../models/memo";
+import { Memo } from "../../../models/memo";
 import { Text } from "../../commons/classNames";
 
 const MemosLinkList = ({
     memos,
     className,
 }: {
-    memos: MemoWithID[];
+    memos: Memo[];
     className?: string;
 }) => {
     return (

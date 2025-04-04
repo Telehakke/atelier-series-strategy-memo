@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PreparationWithID } from "../../models/preparation";
+import { Preparation } from "../../models/preparation";
 import PreparationsFiltering from "../../models/preparationsFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
 import { Bg, Divide } from "../commons/classNames";
@@ -13,7 +13,7 @@ const PreparationView = ({
     isPanelOpen,
     setIsPanelOpen,
 }: {
-    preparations: PreparationWithID[];
+    preparations: Preparation[];
     isPanelOpen: boolean;
     setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {

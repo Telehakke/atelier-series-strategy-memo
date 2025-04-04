@@ -1,17 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 import dateNow from "./dateNow";
-import { GameMap, GameMapWithID } from "./gameMap";
-import {
-    GameMapGroup,
-    GameMapGroupUtility,
-    GameMapGroupWithID,
-} from "./gameMapGroup";
-import { Memo, MemoUtility, MemoWithID } from "./memo";
-import {
-    Preparation,
-    PreparationUtility,
-    PreparationWithID,
-} from "./preparation";
+import { GameMap } from "./gameMap";
+import { GameMapGroup } from "./gameMapGroup";
+import { Memo } from "./memo";
+import { Preparation } from "./preparation";
 import {
     isArray,
     isNotNull,
@@ -25,69 +17,11 @@ export type StrategyMemo = {
     readonly gameMapGroups: GameMapGroup[];
     readonly preparations: Preparation[];
     readonly memos: Memo[];
-};
-
-export type StrategyMemoWithID = {
-    readonly gameName: string;
-    readonly gameMapGroups: GameMapGroupWithID[];
-    readonly preparations: PreparationWithID[];
-    readonly memos: MemoWithID[];
     readonly id: string;
 };
 
 export class StrategyMemoUtility {
-    static isStrategyMemo = (value: unknown): value is StrategyMemo => {
-        if (!isNotNull(value)) return false;
-        if (!isString(value.gameName)) return false;
-        if (!GameMapGroupUtility.isGameMapGroups(value.gameMapGroups))
-            return false;
-        if (!PreparationUtility.isPreparations(value.preparations))
-            return false;
-        if (!MemoUtility.isMemos(value.memos)) return false;
-        return true;
-    };
-
-    static toStrategyMemo = (value: StrategyMemoWithID): StrategyMemo => {
-        return {
-            gameName: value.gameName,
-            gameMapGroups: value.gameMapGroups.map((v) => {
-                const gameMapGroup: GameMapGroup = {
-                    name: v.name,
-                    gameMaps: v.gameMaps.map((v) => {
-                        const gameMap: GameMap = {
-                            name: v.name,
-                            items: [...v.items],
-                            monsters: [...v.monsters],
-                            memo: v.memo,
-                            icon: v.icon,
-                            x: v.x,
-                            y: v.y,
-                        };
-                        return gameMap;
-                    }),
-                    image: v.image,
-                };
-                return gameMapGroup;
-            }),
-            preparations: value.preparations.map((v) => {
-                const preparation: Preparation = {
-                    name: v.name,
-                    materials: [...v.materials],
-                    categories: [...v.categories],
-                };
-                return preparation;
-            }),
-            memos: value.memos.map((v) => {
-                const memo: Memo = {
-                    title: v.title,
-                    text: v.text,
-                };
-                return memo;
-            }),
-        };
-    };
-
-    static copied = (value?: unknown, id?: string): StrategyMemoWithID => {
+    static copied = (value?: unknown, id?: string): StrategyMemo => {
         if (!isNotNull(value))
             return {
                 gameName: "",
@@ -102,7 +36,7 @@ export class StrategyMemoUtility {
             gameMapGroups: isArray(value.gameMapGroups)
                 ? value.gameMapGroups.map((v) => {
                       if (!isNotNull(v)) {
-                          const gameMapGroup: GameMapGroupWithID = {
+                          const gameMapGroup: GameMapGroup = {
                               name: "",
                               gameMaps: [],
                               image: "",
@@ -111,12 +45,12 @@ export class StrategyMemoUtility {
                           return gameMapGroup;
                       }
 
-                      const gameMapGroup: GameMapGroupWithID = {
+                      const gameMapGroup: GameMapGroup = {
                           name: isString(v.name) ? v.name : "",
                           gameMaps: isArray(v.gameMaps)
                               ? v.gameMaps.map((v) => {
                                     if (!isNotNull(v)) {
-                                        const gameMap: GameMapWithID = {
+                                        const gameMap: GameMap = {
                                             name: "",
                                             items: [],
                                             monsters: [],
@@ -129,7 +63,7 @@ export class StrategyMemoUtility {
                                         return gameMap;
                                     }
 
-                                    const gameMap: GameMapWithID = {
+                                    const gameMap: GameMap = {
                                         name: isString(v.name) ? v.name : "",
                                         items: isStrings(v.items)
                                             ? v.items
@@ -157,7 +91,7 @@ export class StrategyMemoUtility {
             preparations: isArray(value.preparations)
                 ? value.preparations.map((v) => {
                       if (!isNotNull(v)) {
-                          const preparation: PreparationWithID = {
+                          const preparation: Preparation = {
                               name: "",
                               materials: [],
                               categories: [],
@@ -166,7 +100,7 @@ export class StrategyMemoUtility {
                           return preparation;
                       }
 
-                      const preparation: PreparationWithID = {
+                      const preparation: Preparation = {
                           name: isString(v.name) ? v.name : "",
                           materials: isStrings(v.materials) ? v.materials : [],
                           categories: isStrings(v.categories)
@@ -180,7 +114,7 @@ export class StrategyMemoUtility {
             memos: isArray(value.memos)
                 ? value.memos.map((v) => {
                       if (!isNotNull(v)) {
-                          const memo: MemoWithID = {
+                          const memo: Memo = {
                               title: "",
                               text: "",
                               id: id ?? uuidv4(),
@@ -188,7 +122,7 @@ export class StrategyMemoUtility {
                           return memo;
                       }
 
-                      const memo: MemoWithID = {
+                      const memo: Memo = {
                           title: isString(v.title) ? v.title : "",
                           text: isString(v.text) ? v.text : "",
                           id: isString(v.id) ? v.id : (id ?? uuidv4()),
@@ -201,9 +135,9 @@ export class StrategyMemoUtility {
     };
 
     static changedGameName = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         name: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const copied = this.copied(strategyMemo);
         return {
             ...copied,
@@ -220,7 +154,7 @@ export class StrategyMemoUtility {
         anchor.click();
     };
 
-    static dataSize = (strategyMemo: StrategyMemoWithID): string => {
+    static dataSize = (strategyMemo: StrategyMemo): string => {
         const size = new Blob([JSON.stringify(strategyMemo)]).size;
         return `データサイズ：${Math.trunc((size * 1000) / 1000000) / 1000} MB`;
     };

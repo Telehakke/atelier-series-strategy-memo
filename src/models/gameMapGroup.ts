@@ -1,40 +1,20 @@
-import { GameMap, GameMapUtility, GameMapWithID } from "./gameMap";
-import { StrategyMemoUtility, StrategyMemoWithID } from "./strategyMemo";
-import { isNotNull, isString } from "./typeGuards";
+import { GameMap } from "./gameMap";
+import { StrategyMemo, StrategyMemoUtility } from "./strategyMemo";
 
 export type GameMapGroup = {
     readonly name: string;
     readonly gameMaps: GameMap[];
     readonly image: string;
-};
-
-export type GameMapGroupWithID = {
-    readonly name: string;
-    readonly gameMaps: GameMapWithID[];
-    readonly image: string;
     readonly id: string;
 };
 
 export class GameMapGroupUtility {
-    static isGameMapGroup = (value: unknown): value is GameMapGroup => {
-        if (!isNotNull(value)) return false;
-        if (!isString(value.name)) return false;
-        if (!GameMapUtility.isGameMaps(value.gameMaps)) return false;
-        if (!isString(value.image)) return false;
-        return true;
-    };
-
-    static isGameMapGroups = (value: unknown): value is GameMapGroup[] => {
-        if (!Array.isArray(value)) return false;
-        return value.every((v) => this.isGameMapGroup(v));
-    };
-
     static create = (
         inputName: string,
-        gameMaps: GameMapWithID[],
+        gameMaps: GameMap[],
         image: string,
         id: string,
-    ): GameMapGroupWithID => {
+    ): GameMapGroup => {
         return {
             name: inputName.trim(),
             gameMaps: gameMaps,
@@ -44,14 +24,14 @@ export class GameMapGroupUtility {
     };
 
     static find = (
-        gameMapGroups: GameMapGroupWithID[],
+        gameMapGroups: GameMapGroup[],
         id: string,
-    ): GameMapGroupWithID | null => {
+    ): GameMapGroup | null => {
         return gameMapGroups.find((v) => v.id === id) ?? null;
     };
 
     static findIndex = (
-        gameMapGroups: GameMapGroupWithID[],
+        gameMapGroups: GameMapGroup[],
         id: string,
     ): number | null => {
         const index = gameMapGroups.findIndex((v) => v.id === id);
@@ -59,7 +39,7 @@ export class GameMapGroupUtility {
     };
 
     static findID = (
-        gameMapGroups: GameMapGroupWithID[],
+        gameMapGroups: GameMapGroup[],
         index: number,
     ): string | null => {
         if (gameMapGroups.length === 0) return null;
@@ -69,24 +49,24 @@ export class GameMapGroupUtility {
     };
 
     static added = (
-        strategyMemo: StrategyMemoWithID,
-        gameMapGroup: GameMapGroupWithID,
-    ): StrategyMemoWithID => {
+        strategyMemo: StrategyMemo,
+        gameMapGroup: GameMapGroup,
+    ): StrategyMemo => {
         const copied = StrategyMemoUtility.copied(strategyMemo);
         copied.gameMapGroups.push(gameMapGroup);
         return copied;
     };
 
     static changedName = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         id: string,
         name: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const index = this.findIndex(strategyMemo.gameMapGroups, id);
         if (index == null) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const gameMapGroup: GameMapGroupWithID = {
+        const gameMapGroup: GameMapGroup = {
             ...copied.gameMapGroups[index],
             name: name,
         };
@@ -95,15 +75,15 @@ export class GameMapGroupUtility {
     };
 
     static changedImage = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         id: string,
         image: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const index = this.findIndex(strategyMemo.gameMapGroups, id);
         if (index == null) return strategyMemo;
 
         const copied = StrategyMemoUtility.copied(strategyMemo);
-        const gameMapGroup: GameMapGroupWithID = {
+        const gameMapGroup: GameMapGroup = {
             ...copied.gameMapGroups[index],
             image: image,
         };
@@ -111,10 +91,7 @@ export class GameMapGroupUtility {
         return copied;
     };
 
-    static removed = (
-        strategyMemo: StrategyMemoWithID,
-        id: string,
-    ): StrategyMemoWithID => {
+    static removed = (strategyMemo: StrategyMemo, id: string): StrategyMemo => {
         const index = this.findIndex(strategyMemo.gameMapGroups, id);
         if (index == null) return strategyMemo;
 
@@ -123,10 +100,7 @@ export class GameMapGroupUtility {
         return copied;
     };
 
-    static movedUp = (
-        strategyMemo: StrategyMemoWithID,
-        id: string,
-    ): StrategyMemoWithID => {
+    static movedUp = (strategyMemo: StrategyMemo, id: string): StrategyMemo => {
         const index = this.findIndex(strategyMemo.gameMapGroups, id);
         if (index == null) return strategyMemo;
 
@@ -140,9 +114,9 @@ export class GameMapGroupUtility {
     };
 
     static movedDown = (
-        strategyMemo: StrategyMemoWithID,
+        strategyMemo: StrategyMemo,
         id: string,
-    ): StrategyMemoWithID => {
+    ): StrategyMemo => {
         const index = this.findIndex(strategyMemo.gameMapGroups, id);
         if (index == null) return strategyMemo;
 

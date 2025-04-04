@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
-import { PreparationWithID } from "../preparation";
+import { Preparation } from "../preparation";
 import PreparationsFiltering from "../preparationsFiltering";
 
-const preparations: PreparationWithID[] = [
+const preparations: Preparation[] = [
     {
         name: "失敗作の灰",
         materials: [],
@@ -26,7 +26,7 @@ const preparationsFiltering = new PreparationsFiltering(preparations);
 
 test("filtered1", () => {
     const result = preparationsFiltering.filtered(["失敗作の灰"]);
-    const expected: PreparationWithID[] = [
+    const expected: Preparation[] = [
         {
             name: "失敗作の灰",
             materials: [],
@@ -42,7 +42,7 @@ test("filtered2", () => {
         "（エリキシル）",
         "（中和剤）",
     ]);
-    const expected: PreparationWithID[] = [
+    const expected: Preparation[] = [
         {
             name: "失敗作の灰",
             materials: [],
