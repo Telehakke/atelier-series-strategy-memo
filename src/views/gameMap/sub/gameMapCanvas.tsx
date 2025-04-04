@@ -18,12 +18,16 @@ import {
 const GameMapCanvas = ({
     gameMapGroups,
     selectedIDInGameMapGroups,
+    setSelectedIndexInGameMapGroups,
     selectedID,
     setSelectedID,
     className,
 }: {
     gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string | null;
+    setSelectedIndexInGameMapGroups: React.Dispatch<
+        React.SetStateAction<number>
+    >;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;
@@ -97,9 +101,13 @@ const GameMapCanvas = ({
                 <Card
                     className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50} ${selectedID == null || v.id === selectedID ? "" : "opacity-50"}`}
                     key={v.id}
+                    gameMapGroups={gameMapGroups}
                     gameMap={v}
                     selectedID={selectedID}
                     setSelectedID={setSelectedID}
+                    setSelectedIndexInGameMapGroups={
+                        setSelectedIndexInGameMapGroups
+                    }
                 />
             ))}
             <MoveUpButton
@@ -131,14 +139,20 @@ export default GameMapCanvas;
 /* -------------------------------------------------------------------------- */
 
 const Card = ({
+    gameMapGroups,
     gameMap,
     selectedID,
     setSelectedID,
+    setSelectedIndexInGameMapGroups,
     className,
 }: {
+    gameMapGroups: GameMapGroup[];
     gameMap: GameMap;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    setSelectedIndexInGameMapGroups: React.Dispatch<
+        React.SetStateAction<number>
+    >;
     className?: string;
 }) => {
     return (
@@ -147,6 +161,15 @@ const Card = ({
             key={gameMap.id}
             style={{ left: `${gameMap.x}%`, top: `${gameMap.y}%` }}
             onClick={() => {
+                const gotoIndex = GameMapGroupUtility.findIndex(
+                    gameMapGroups,
+                    gameMap.goto,
+                );
+                if (gotoIndex != null) {
+                    setSelectedIndexInGameMapGroups(gotoIndex);
+                    return;
+                }
+
                 setSelectedID(gameMap.id === selectedID ? null : gameMap.id);
             }}
         >

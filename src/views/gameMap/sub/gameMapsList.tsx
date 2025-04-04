@@ -1,3 +1,4 @@
+import { Field, Label, Select } from "@headlessui/react";
 import { useAtom, useSetAtom } from "jotai";
 import { ReactNode, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -8,7 +9,7 @@ import {
     GameMapGroupUtility,
 } from "../../../models/gameMapGroup";
 import CardBase from "../../commons/cardBase";
-import { Bg, Text } from "../../commons/classNames";
+import { Bg, Border, Text } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
 import {
     ChevronDownIconLargeButton,
@@ -52,6 +53,7 @@ const GameMapsList = ({
                 {gameMapGroup.gameMaps.map((v) => (
                     <Card
                         key={v.id}
+                        gameMapGroups={gameMapGroups}
                         gameMap={v}
                         selectedID={selectedID}
                         setSelectedID={setSelectedID}
@@ -64,6 +66,7 @@ const GameMapsList = ({
                     <>
                         <div className="flex flex-col gap-4">
                             <EditItemButton
+                                gameMapGroups={gameMapGroups}
                                 selectedIDInGameMapGroups={
                                     selectedIDInGameMapGroups
                                 }
@@ -105,6 +108,7 @@ const GameMapsList = ({
                             />
                             <AddItemButton
                                 className="grid justify-items-center"
+                                gameMapGroups={gameMapGroups}
                                 selectedIDInGameMapGroups={
                                     selectedIDInGameMapGroups
                                 }
@@ -131,11 +135,13 @@ export default GameMapsList;
 /* -------------------------------------------------------------------------- */
 
 const Card = ({
+    gameMapGroups,
     gameMap,
     selectedID,
     setSelectedID,
     setIsEditDialogOpen,
 }: {
+    gameMapGroups: GameMapGroup[];
     gameMap: GameMap;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
@@ -173,6 +179,12 @@ const Card = ({
                 <TextWithLabel label="アイコン">{gameMap.icon}</TextWithLabel>
                 <TextWithLabel label="座標x">{gameMap.x}</TextWithLabel>
                 <TextWithLabel label="座標y">{gameMap.y}</TextWithLabel>
+                <TextWithLabel label="移動先">
+                    {
+                        GameMapGroupUtility.find(gameMapGroups, gameMap.goto)
+                            ?.name
+                    }
+                </TextWithLabel>
             </div>
         </CardBase>
     );
@@ -196,10 +208,12 @@ const TextWithLabel = ({
 /* -------------------------------------------------------------------------- */
 
 const AddItemButton = ({
+    gameMapGroups,
     selectedIDInGameMapGroups,
     setSelectedID,
     className,
 }: {
+    gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;
@@ -213,6 +227,7 @@ const AddItemButton = ({
             <PlusIconLargeButton onClick={() => setIsOpen(true)} />
             <AddItemDialog
                 key={`${isOpen}`}
+                gameMapGroups={gameMapGroups}
                 selectedIDInGameMapGroups={selectedIDInGameMapGroups}
                 setSelectedID={setSelectedID}
                 isOpen={isOpen}
@@ -223,11 +238,13 @@ const AddItemButton = ({
 };
 
 const AddItemDialog = ({
+    gameMapGroups,
     selectedIDInGameMapGroups,
     setSelectedID,
     isOpen,
     setIsOpen,
 }: {
+    gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     isOpen: boolean;
@@ -241,6 +258,7 @@ const AddItemDialog = ({
     const [icon, setIcon] = useState("");
     const [x, setX] = useState("50");
     const [y, setY] = useState("50");
+    const [goto, setGoto] = useState("");
     const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
@@ -252,6 +270,7 @@ const AddItemDialog = ({
             icon,
             x,
             y,
+            goto,
             uuidv4(),
         );
 
@@ -283,6 +302,7 @@ const AddItemDialog = ({
             <div className="space-y-2">
                 <p>{message}</p>
                 <GameMapInput
+                    gameMapGroups={gameMapGroups}
                     name={name}
                     setName={setName}
                     items={items}
@@ -297,6 +317,8 @@ const AddItemDialog = ({
                     setX={setX}
                     y={y}
                     setY={setY}
+                    goto={goto}
+                    setGoto={setGoto}
                 />
             </div>
         </DialogView>
@@ -306,12 +328,14 @@ const AddItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const EditItemButton = ({
+    gameMapGroups,
     selectedIDInGameMapGroups,
     selectedID,
     setSelectedID,
     isEditItemDialogOpen,
     setIsEditItemDialogOpen,
 }: {
+    gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string | null;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
@@ -328,6 +352,7 @@ const EditItemButton = ({
             />
             <EditItemDialog
                 key={`${isEditItemDialogOpen}`}
+                gameMapGroups={gameMapGroups}
                 selectedIDInGameMapGroups={selectedIDInGameMapGroups}
                 selectedID={selectedID}
                 setSelectedID={setSelectedID}
@@ -339,12 +364,14 @@ const EditItemButton = ({
 };
 
 const EditItemDialog = ({
+    gameMapGroups,
     selectedIDInGameMapGroups,
     selectedID,
     setSelectedID,
     isOpen,
     setIsOpen,
 }: {
+    gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string;
     selectedID: string;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
@@ -366,6 +393,7 @@ const EditItemDialog = ({
     const [icon, setIcon] = useState(gameMap?.icon ?? "");
     const [x, setX] = useState(gameMap?.x.toString() ?? "");
     const [y, setY] = useState(gameMap?.y.toString() ?? "");
+    const [goto, setGoto] = useState(gameMap?.goto ?? "");
     const [message, setMessage] = useState("");
 
     const handleButtonClick = () => {
@@ -379,6 +407,7 @@ const EditItemDialog = ({
             icon,
             x,
             y,
+            goto,
             gameMap.id,
         );
 
@@ -415,6 +444,7 @@ const EditItemDialog = ({
             <div className="space-y-2">
                 <p>{message}</p>
                 <GameMapInput
+                    gameMapGroups={gameMapGroups}
                     name={name}
                     setName={setName}
                     items={items}
@@ -429,6 +459,8 @@ const EditItemDialog = ({
                     setX={setX}
                     y={y}
                     setY={setY}
+                    goto={goto}
+                    setGoto={setGoto}
                 />
             </div>
         </DialogView>
@@ -510,6 +542,7 @@ const RemoveItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const GameMapInput = ({
+    gameMapGroups,
     name,
     setName,
     items,
@@ -524,7 +557,10 @@ const GameMapInput = ({
     setX,
     y,
     setY,
+    goto,
+    setGoto,
 }: {
+    gameMapGroups: GameMapGroup[];
     name: string;
     setName: React.Dispatch<React.SetStateAction<string>>;
     items: string;
@@ -539,6 +575,8 @@ const GameMapInput = ({
     setX: React.Dispatch<React.SetStateAction<string>>;
     y: string;
     setY: React.Dispatch<React.SetStateAction<string>>;
+    goto: string;
+    setGoto: React.Dispatch<React.SetStateAction<string>>;
 }) => {
     return (
         <div className="space-y-2">
@@ -563,21 +601,40 @@ const GameMapInput = ({
                 onChange={(e) => setMemo(e.target.value)}
             />
             <div className="flex gap-2">
-                <TextField
-                    label="アイコン"
-                    value={icon}
-                    onChange={(e) => setIcon(e.target.value)}
-                />
-                <TextField
-                    label="座標x"
-                    value={x}
-                    onChange={(e) => setX(e.target.value)}
-                />
-                <TextField
-                    label="座標y"
-                    value={y}
-                    onChange={(e) => setY(e.target.value)}
-                />
+                <div className="grid w-2/3 grid-cols-3 gap-2">
+                    <TextField
+                        label="アイコン"
+                        value={icon}
+                        onChange={(e) => setIcon(e.target.value)}
+                    />
+                    <TextField
+                        label="座標x"
+                        value={x}
+                        onChange={(e) => setX(e.target.value)}
+                    />
+                    <TextField
+                        label="座標y"
+                        value={y}
+                        onChange={(e) => setY(e.target.value)}
+                    />
+                </div>
+                <Field className="w-1/3">
+                    <Label className={`text-sm ${Text.neutral500}`}>
+                        移動先
+                    </Label>
+                    <Select
+                        className={`w-full rounded-md border-2 px-1 py-1 ${Border.neutral500}`}
+                        value={goto}
+                        onChange={(event) => setGoto(event.target.value)}
+                    >
+                        <option value="">-</option>
+                        {gameMapGroups.map((v) => (
+                            <option key={v.id} value={v.id}>
+                                {v.name}
+                            </option>
+                        ))}
+                    </Select>
+                </Field>
             </div>
         </div>
     );

@@ -81,6 +81,9 @@ const GameMapView = ({
                     key={selectedIDInGameMapGroups}
                     gameMapGroups={filteredGameMapGroups}
                     selectedIDInGameMapGroups={selectedIDInGameMapGroups}
+                    setSelectedIndexInGameMapGroups={
+                        setSelectedIndexInGameMapGroups
+                    }
                     selectedID={selectedIDInCanvas}
                     setSelectedID={setSelectedIDInCanvas}
                 />

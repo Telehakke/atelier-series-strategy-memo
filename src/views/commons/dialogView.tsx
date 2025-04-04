@@ -29,35 +29,39 @@ const DialogView = ({
             onClose={() => setIsOpen(false)}
         >
             <div
-                className={`fixed inset-0 flex w-screen items-center justify-center ${Bg.black_25}`}
+                className={`fixed inset-0 grid items-center justify-center overflow-scroll ${Bg.black_25}`}
             >
-                <DialogPanel
-                    className={`m-4 w-full max-w-100 space-y-4 rounded-xl p-4 ${Bg.neutral50}`}
-                >
-                    <DialogTitle
-                        className={`text-center font-bold ${Text.neutral950}`}
+                <div className="w-screen max-w-100">
+                    <DialogPanel
+                        className={`m-4 space-y-4 rounded-xl p-4 ${Bg.neutral50}`}
                     >
-                        {title}
-                    </DialogTitle>
-                    <div>{children}</div>
-                    <div className="flex justify-center gap-4">
-                        <RoundedButton
-                            label={secondaryButtonLabel}
-                            onClick={() => setIsOpen(false)}
-                        />
-                        {primaryButtonLabel != null && (
+                        <DialogTitle
+                            className={`text-center font-bold ${Text.neutral950}`}
+                        >
+                            {title}
+                        </DialogTitle>
+                        <div>{children}</div>
+                        <div className="flex justify-center gap-4">
                             <RoundedButton
-                                label={primaryButtonLabel}
-                                shouldUseWarningColor={shouldUseWarningColor}
-                                onClick={() =>
-                                    onPrimaryButtonClick != null
-                                        ? onPrimaryButtonClick()
-                                        : () => {}
-                                }
+                                label={secondaryButtonLabel}
+                                onClick={() => setIsOpen(false)}
                             />
-                        )}
-                    </div>
-                </DialogPanel>
+                            {primaryButtonLabel != null && (
+                                <RoundedButton
+                                    label={primaryButtonLabel}
+                                    shouldUseWarningColor={
+                                        shouldUseWarningColor
+                                    }
+                                    onClick={() =>
+                                        onPrimaryButtonClick != null
+                                            ? onPrimaryButtonClick()
+                                            : () => {}
+                                    }
+                                />
+                            )}
+                        </div>
+                    </DialogPanel>
+                </div>
             </div>
         </Dialog>
     );

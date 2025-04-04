@@ -14,6 +14,7 @@ const gameMapGroups: GameMapGroup[] = [
                 icon: "🔴",
                 x: 50,
                 y: 50,
+                goto: "",
                 id: "0",
             },
             {
@@ -24,6 +25,7 @@ const gameMapGroups: GameMapGroup[] = [
                 icon: "🔴",
                 x: 40,
                 y: 50,
+                goto: "",
                 id: "1",
             },
             {
@@ -34,6 +36,7 @@ const gameMapGroups: GameMapGroup[] = [
                 icon: "🔴",
                 x: 50,
                 y: 60,
+                goto: "",
                 id: "2",
             },
         ],
@@ -60,6 +63,7 @@ test("filtered", () => {
                     icon: "🔴",
                     x: 50,
                     y: 50,
+                    goto: "",
                     id: "0",
                 },
                 {
@@ -70,6 +74,7 @@ test("filtered", () => {
                     icon: "🔴",
                     x: 40,
                     y: 50,
+                    goto: "",
                     id: "1",
                 },
             ],
@@ -94,6 +99,7 @@ test("filteredByGameMapID", () => {
                     icon: "🔴",
                     x: 50,
                     y: 50,
+                    goto: "",
                     id: "0",
                 },
             ],

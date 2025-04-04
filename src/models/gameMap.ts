@@ -10,6 +10,7 @@ export type GameMap = {
     readonly icon: string;
     readonly x: number;
     readonly y: number;
+    readonly goto: string;
     readonly id: string;
 };
 
@@ -22,6 +23,7 @@ export class GameMapUtility {
         inputIcon: string,
         inputX: string,
         inputY: string,
+        goto: string,
         id: string,
     ): GameMap => {
         const name = inputName.trim();
@@ -50,6 +52,7 @@ export class GameMapUtility {
             icon: icon,
             x: x,
             y: y,
+            goto: goto,
             id: id,
         };
     };
@@ -63,6 +66,7 @@ export class GameMapUtility {
             icon: gameMap.icon,
             x: gameMap.x,
             y: gameMap.y,
+            goto: gameMap.goto,
             id: uuidv4(),
         };
     };
@@ -124,6 +128,7 @@ export class GameMapUtility {
             icon: string;
             x: number;
             y: number;
+            goto: string;
         },
     ): StrategyMemo => {
         const gameMapGroupsIndex = GameMapGroupUtility.findIndex(

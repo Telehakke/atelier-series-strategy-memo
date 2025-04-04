@@ -58,6 +58,7 @@ export class StrategyMemoUtility {
                                             icon: "",
                                             x: 0,
                                             y: 0,
+                                            goto: "",
                                             id: id ?? uuidv4(),
                                         };
                                         return gameMap;
@@ -75,6 +76,7 @@ export class StrategyMemoUtility {
                                         icon: isString(v.icon) ? v.icon : "",
                                         x: isNumber(v.x) ? v.x : 0,
                                         y: isNumber(v.y) ? v.y : 0,
+                                        goto: isString(v.goto) ? v.goto : "",
                                         id: isString(v.id)
                                             ? v.id
                                             : (id ?? uuidv4()),

@@ -12,9 +12,7 @@ const TextField = ({
 }) => {
     return (
         <Field>
-            <Label className={`block text-sm ${Text.neutral500}`}>
-                {label}
-            </Label>
+            <Label className={`text-sm ${Text.neutral500}`}>{label}</Label>
             <Input
                 className={`w-full rounded-md border-2 p-1 ${Border.neutral500}`}
                 type="text"
