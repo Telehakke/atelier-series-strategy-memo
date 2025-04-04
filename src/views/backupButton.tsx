@@ -36,7 +36,9 @@ const BackupDialog = ({
     const [strategyMemoRepository, setStrategyMemoRepository] = useAtom(
         strategyMemoRepositoryAtom,
     );
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState(
+        StrategyMemoUtility.dataSize(strategyMemoRepository),
+    );
 
     const handleDownloadButtonClick = () => {
         const strategyMemo = StrategyMemoUtility.toStrategyMemo(
@@ -53,7 +55,7 @@ const BackupDialog = ({
 
         const file = files[0];
         if (file.type !== "application/json") {
-            setMessage("⚠️.jsonファイルを選択してください");
+            setMessage("⚠️JSONファイルを選択してください");
             return;
         }
 
@@ -94,27 +96,31 @@ const BackupDialog = ({
             title="データのバックアップ"
             secondaryButtonLabel="閉じる"
         >
-            <div className="space-y-2">
-                <Button
-                    className={`rounded-md border-2 px-2 py-1 ${Border.neutral400} ${Bg.hoverNeutral200}`}
-                    onClick={() => handleDownloadButtonClick()}
-                >
-                    ファイルをダウンロード
-                </Button>
+            <div className="flex flex-col gap-4">
                 <p>{message}</p>
-                <label
-                    className={`rounded-md border-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
-                    htmlFor="json-file-open"
-                >
-                    ファイルを開く
-                </label>
-                <input
-                    className="hidden"
-                    id="json-file-open"
-                    type="file"
-                    accept=".json"
-                    onChange={handleFileOpen}
-                />
+                <div>
+                    <Button
+                        className={`rounded-md border-2 px-2 py-1 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                        onClick={() => handleDownloadButtonClick()}
+                    >
+                        ファイルをダウンロード
+                    </Button>
+                </div>
+                <div>
+                    <label
+                        className={`rounded-md border-2 px-2 py-1.5 ${Border.neutral400} ${Bg.hoverNeutral200}`}
+                        htmlFor="json-file-open"
+                    >
+                        ファイルを開く
+                    </label>
+                    <input
+                        className="hidden"
+                        id="json-file-open"
+                        type="file"
+                        accept=".json"
+                        onChange={handleFileOpen}
+                    />
+                </div>
             </div>
         </DialogView>
     );
