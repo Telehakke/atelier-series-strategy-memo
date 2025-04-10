@@ -99,7 +99,7 @@ const GameMapCanvas = ({
             )}
             {filteredGameMaps().map((v) => (
                 <Card
-                    className={`absolute -translate-1/2 p-1 text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50} ${selectedID == null || v.id === selectedID ? "" : "opacity-50"}`}
+                    className={`absolute -translate-1/2 p-px text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50_70} ${selectedID == null || v.id === selectedID ? "" : "opacity-70"}`}
                     key={v.id}
                     gameMapGroups={gameMapGroups}
                     gameMap={v}

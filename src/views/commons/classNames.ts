@@ -9,6 +9,7 @@ export const Bg = {
     hoverNeutral400: "hover:bg-neutral-400",
     hoverRed400: "hover:bg-red-400",
     neutral50: "bg-neutral-50 dark:bg-neutral-950",
+    neutral50_70: "bg-neutral-50/70 dark:bg-neutral-950/70",
     neutral100: "bg-neutral-100 dark:bg-neutral-900",
     neutral500: "bg-neutral-500",
     neutral950: "bg-neutral-950 dark:bg-neutral-400",
