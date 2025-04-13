@@ -1,6 +1,6 @@
 import { Button } from "@headlessui/react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { strategyMemoRepositoryAtom } from "../../../atoms";
 import { GameMap, GameMapUtility } from "../../../models/gameMap";
 import {
@@ -33,6 +33,8 @@ const GameMapCanvas = ({
     className?: string;
 }) => {
     const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
+    const [fontSize, setFontSize] = useState("8px");
+    const [stepValueOfMove, setStepValueOfMove] = useState(5);
     const canvas = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -97,9 +99,13 @@ const GameMapCanvas = ({
                     src={gameMapGroup.image}
                 />
             )}
+            <div
+                className="absolute inset-0 size-full"
+                onClick={() => setFontSize(fontSize === "8px" ? "16px" : "8px")}
+            ></div>
             {filteredGameMaps().map((v) => (
                 <Card
-                    className={`absolute -translate-1/2 p-px text-center text-[8px] text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50_70} ${selectedID == null || v.id === selectedID ? "" : "opacity-70"}`}
+                    className={`absolute -translate-1/2 p-px text-center text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50_70} ${selectedID == null || v.id === selectedID ? "" : "opacity-70"}`}
                     key={v.id}
                     gameMapGroups={gameMapGroups}
                     gameMap={v}
@@ -108,27 +114,37 @@ const GameMapCanvas = ({
                     setSelectedIndexInGameMapGroups={
                         setSelectedIndexInGameMapGroups
                     }
+                    fontSize={fontSize}
                 />
             ))}
             <MoveUpButton
                 selectedIDInGameMapGroup={selectedIDInGameMapGroups}
                 selectedID={selectedID}
-                className={`absolute top-0 left-1/2 -translate-x-1/2 ${Bg.neutral50}`}
+                stepValueOfMove={stepValueOfMove}
+                className={`absolute top-0 left-1/2 -translate-x-1/2 ${Bg.neutral200}`}
             />
             <MoveLeftButton
                 selectedIDInGameMapGroup={selectedIDInGameMapGroups}
                 selectedID={selectedID}
-                className={`absolute top-1/2 left-0 -translate-y-1/2 ${Bg.neutral50}`}
+                stepValueOfMove={stepValueOfMove}
+                className={`absolute top-1/2 left-0 -translate-y-1/2 ${Bg.neutral200}`}
             />
             <MoveRightButton
                 selectedIDInGameMapGroup={selectedIDInGameMapGroups}
                 selectedID={selectedID}
-                className={`absolute top-1/2 right-0 -translate-y-1/2 ${Bg.neutral50}`}
+                stepValueOfMove={stepValueOfMove}
+                className={`absolute top-1/2 right-0 -translate-y-1/2 ${Bg.neutral200}`}
             />
             <MoveDownButton
                 selectedIDInGameMapGroup={selectedIDInGameMapGroups}
                 selectedID={selectedID}
-                className={`absolute bottom-0 left-1/2 -translate-x-1/2 ${Bg.neutral50}`}
+                stepValueOfMove={stepValueOfMove}
+                className={`absolute bottom-0 left-1/2 -translate-x-1/2 ${Bg.neutral200}`}
+            />
+            <SwitchStepButton
+                selectedID={selectedID}
+                stepValueOfMove={stepValueOfMove}
+                setStepValueOfMove={setStepValueOfMove}
             />
         </div>
     );
@@ -144,6 +160,7 @@ const Card = ({
     selectedID,
     setSelectedID,
     setSelectedIndexInGameMapGroups,
+    fontSize,
     className,
 }: {
     gameMapGroups: GameMapGroup[];
@@ -153,6 +170,7 @@ const Card = ({
     setSelectedIndexInGameMapGroups: React.Dispatch<
         React.SetStateAction<number>
     >;
+    fontSize: string;
     className?: string;
 }) => {
     return (
@@ -173,8 +191,8 @@ const Card = ({
                 setSelectedID(gameMap.id === selectedID ? null : gameMap.id);
             }}
         >
-            <p>{gameMap.icon}</p>
-            <p>{gameMap.name}</p>
+            <p style={{ fontSize: fontSize }}>{gameMap.icon}</p>
+            <p style={{ fontSize: fontSize }}>{gameMap.name}</p>
         </Button>
     );
 };
@@ -184,10 +202,12 @@ const Card = ({
 const MoveUpButton = ({
     selectedIDInGameMapGroup,
     selectedID,
+    stepValueOfMove,
     className,
 }: {
     selectedIDInGameMapGroup: string | null;
     selectedID: string | null;
+    stepValueOfMove: number;
     className?: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
@@ -199,7 +219,7 @@ const MoveUpButton = ({
         setStrategyMemo((v) =>
             GameMapUtility.additionXY(v, selectedIDInGameMapGroup, selectedID, {
                 x: 0,
-                y: -5,
+                y: -stepValueOfMove,
             }),
         );
     };
@@ -215,10 +235,12 @@ const MoveUpButton = ({
 const MoveLeftButton = ({
     selectedIDInGameMapGroup,
     selectedID,
+    stepValueOfMove,
     className,
 }: {
     selectedIDInGameMapGroup: string | null;
     selectedID: string | null;
+    stepValueOfMove: number;
     className?: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
@@ -229,7 +251,7 @@ const MoveLeftButton = ({
     const handleButtonClick = () => {
         setStrategyMemo((v) =>
             GameMapUtility.additionXY(v, selectedIDInGameMapGroup, selectedID, {
-                x: -5,
+                x: -stepValueOfMove,
                 y: 0,
             }),
         );
@@ -246,10 +268,12 @@ const MoveLeftButton = ({
 const MoveRightButton = ({
     selectedIDInGameMapGroup,
     selectedID,
+    stepValueOfMove,
     className,
 }: {
     selectedIDInGameMapGroup: string | null;
     selectedID: string | null;
+    stepValueOfMove: number;
     className?: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
@@ -260,7 +284,7 @@ const MoveRightButton = ({
     const handleButtonClick = () => {
         setStrategyMemo((v) =>
             GameMapUtility.additionXY(v, selectedIDInGameMapGroup, selectedID, {
-                x: 5,
+                x: stepValueOfMove,
                 y: 0,
             }),
         );
@@ -277,10 +301,12 @@ const MoveRightButton = ({
 const MoveDownButton = ({
     selectedIDInGameMapGroup,
     selectedID,
+    stepValueOfMove,
     className,
 }: {
     selectedIDInGameMapGroup: string | null;
     selectedID: string | null;
+    stepValueOfMove: number;
     className?: string;
 }) => {
     const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
@@ -292,7 +318,7 @@ const MoveDownButton = ({
         setStrategyMemo((v) =>
             GameMapUtility.additionXY(v, selectedIDInGameMapGroup, selectedID, {
                 x: 0,
-                y: 5,
+                y: stepValueOfMove,
             }),
         );
     };
@@ -302,5 +328,26 @@ const MoveDownButton = ({
             className={className}
             onClick={() => handleButtonClick()}
         />
+    );
+};
+
+const SwitchStepButton = ({
+    selectedID,
+    stepValueOfMove,
+    setStepValueOfMove,
+}: {
+    selectedID: string | null;
+    stepValueOfMove: number;
+    setStepValueOfMove: React.Dispatch<React.SetStateAction<number>>;
+}) => {
+    if (selectedID == null) return <></>;
+
+    return (
+        <Button
+            className={`absolute right-0 bottom-0 size-10 rounded-full ${Bg.neutral200} ${Bg.hoverNeutral300}`}
+            onClick={() => setStepValueOfMove(stepValueOfMove === 1 ? 5 : 1)}
+        >
+            {stepValueOfMove}x
+        </Button>
     );
 };

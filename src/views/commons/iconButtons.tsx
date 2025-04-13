@@ -185,7 +185,7 @@ export const SquareChevronLeftIconButton = ({
 }) => {
     return (
         <Button
-            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral300} ${className}`}
             onClick={onClick}
         >
             <SquareChevronLeft className={`${Stroke.neutral700}`} />
@@ -202,7 +202,7 @@ export const SquareChevronRightIconButton = ({
 }) => {
     return (
         <Button
-            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral300} ${className}`}
             onClick={onClick}
         >
             <SquareChevronRight className={`${Stroke.neutral700}`} />
@@ -219,7 +219,7 @@ export const SquareChevronUpIconButton = ({
 }) => {
     return (
         <Button
-            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral300} ${className}`}
             onClick={onClick}
         >
             <SquareChevronUp className={`${Stroke.neutral700}`} />
@@ -236,7 +236,7 @@ export const SquareChevronDownIconButton = ({
 }) => {
     return (
         <Button
-            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
+            className={`rounded-full p-2 ${Bg.hoverNeutral300} ${className}`}
             onClick={onClick}
         >
             <SquareChevronDown className={`${Stroke.neutral700}`} />
