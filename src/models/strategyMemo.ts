@@ -149,10 +149,10 @@ export class StrategyMemoUtility {
 
     static download = (strategyMemo: StrategyMemo): void => {
         const jsonStr = JSON.stringify(strategyMemo);
-        const dataURL = `data:,${encodeURIComponent(jsonStr)}`;
+        const dataURL = `data:application/json,${encodeURIComponent(jsonStr)}`;
         const anchor = document.createElement("a");
         anchor.href = dataURL;
-        anchor.download = `${strategyMemo.gameName}_${dateNow()}.json`;
+        anchor.download = `${strategyMemo.gameName}_${dateNow()}`;
         anchor.click();
     };
 
