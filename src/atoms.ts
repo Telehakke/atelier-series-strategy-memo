@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import delayAction from "./models/delayAction";
 import { ClipMode, ClipModeEnum, JpegQuality } from "./models/imageFile";
 import { StrategyMemo, StrategyMemoUtility } from "./models/strategyMemo";
 
@@ -88,7 +89,9 @@ export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemo>(
             }
         },
         setItem(key, newValue) {
-            localStorage.setItem(key, JSON.stringify(newValue));
+            delayAction(() => {
+                localStorage.setItem(key, JSON.stringify(newValue));
+            });
         },
         removeItem(key) {
             localStorage.removeItem(key);
