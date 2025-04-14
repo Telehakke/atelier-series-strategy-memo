@@ -3,14 +3,17 @@ import { useAtomValue } from "jotai";
 import { Map, NotebookPen, Wand } from "lucide-react";
 import { useState } from "react";
 import { strategyMemoRepositoryAtom } from "./atoms";
-import BackupButton from "./views/backupButton";
 import { Bg, Border, Text } from "./views/commons/classNames";
+import {
+    PanelLeftCloseIconButton,
+    PanelLeftOpenIconButton,
+} from "./views/commons/iconButtons";
 import GameMapView from "./views/gameMap/gameMapView";
 import GameNameView from "./views/gameNameView";
 import MemoView from "./views/memo/memoView";
 import MoveToRepositoryButton from "./views/moveToRepositoryButton";
 import PreparationView from "./views/preparation/preparationView";
-import ResetButton from "./views/resetButton";
+import ToolsButton from "./views/toolsButton";
 
 const App = () => {
     const strategyMemoRepository = useAtomValue(strategyMemoRepositoryAtom);
@@ -19,12 +22,15 @@ const App = () => {
     return (
         <div className={`${Bg.neutral50} ${Text.neutral950}`}>
             <div
-                className={`fixed top-0 right-0 left-0 z-10 h-12 shadow-md ${Bg.neutral50}`}
+                className={`fixed top-0 right-0 left-0 z-10 h-13 border-b-2 ${Bg.neutral50} ${Border.neutral300}`}
             />
             <TabGroup>
                 <div className="fixed top-2 right-0 left-0 z-20">
                     <div className="flex items-center justify-between gap-2 px-2">
-                        <BackupButton />
+                        <LeftPanelOpenCloseButton
+                            isPanelOpen={isPanelOpen}
+                            setIsPanelOpen={setIsPanelOpen}
+                        />
                         <GameNameView title={strategyMemoRepository.gameName} />
                         <TabList className="grid shrink-0 grid-cols-3 text-nowrap">
                             <Tab
@@ -53,7 +59,7 @@ const App = () => {
                             </Tab>
                         </TabList>
                         <div className="flex shrink-0 items-center gap-2">
-                            <ResetButton />
+                            <ToolsButton />
                             <MoveToRepositoryButton />
                         </div>
                     </div>
@@ -63,21 +69,18 @@ const App = () => {
                         <GameMapView
                             gameMapGroups={strategyMemoRepository.gameMapGroups}
                             isPanelOpen={isPanelOpen}
-                            setIsPanelOpen={setIsPanelOpen}
                         />
                     </TabPanel>
                     <TabPanel className="p-2 pt-14">
                         <PreparationView
                             preparations={strategyMemoRepository.preparations}
                             isPanelOpen={isPanelOpen}
-                            setIsPanelOpen={setIsPanelOpen}
                         />
                     </TabPanel>
                     <TabPanel className="p-2 pt-14">
                         <MemoView
                             memos={strategyMemoRepository.memos}
                             isPanelOpen={isPanelOpen}
-                            setIsPanelOpen={setIsPanelOpen}
                         />
                     </TabPanel>
                 </TabPanels>
@@ -87,3 +90,20 @@ const App = () => {
 };
 
 export default App;
+
+/* -------------------------------------------------------------------------- */
+
+const LeftPanelOpenCloseButton = ({
+    isPanelOpen,
+    setIsPanelOpen,
+}: {
+    isPanelOpen: boolean;
+    setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+    if (isPanelOpen)
+        return (
+            <PanelLeftCloseIconButton onClick={() => setIsPanelOpen(false)} />
+        );
+
+    return <PanelLeftOpenIconButton onClick={() => setIsPanelOpen(true)} />;
+};

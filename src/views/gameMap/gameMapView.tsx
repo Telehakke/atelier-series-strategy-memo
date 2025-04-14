@@ -2,9 +2,8 @@ import { useState } from "react";
 import { GameMapGroup, GameMapGroupUtility } from "../../models/gameMapGroup";
 import GameMapGroupsFiltering from "../../models/gameMapGroupsFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
-import { Bg, Divide } from "../commons/classNames";
+import { Bg, Border, Divide } from "../commons/classNames";
 import FilteringTextField from "../commons/filteringTextField";
-import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
 import GameMapCanvas from "./sub/gameMapCanvas";
 import GameMapGroupsList from "./sub/gameMapGroupsList";
 import GameMapsLinkList from "./sub/gameMapsLinkList";
@@ -13,11 +12,9 @@ import GameMapsList from "./sub/gameMapsList";
 const GameMapView = ({
     gameMapGroups,
     isPanelOpen,
-    setIsPanelOpen,
 }: {
     gameMapGroups: GameMapGroup[];
     isPanelOpen: boolean;
-    setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const [selectedIndexInGameMapGroups, setSelectedIndexInGameMapGroups] =
         useState(0);
@@ -39,10 +36,10 @@ const GameMapView = ({
 
     return (
         <>
-            <div
-                className={`fixed top-0 left-0 z-5 flex h-full gap-2 p-2 pt-14 ${Bg.neutral50}`}
-            >
-                {isPanelOpen && (
+            {isPanelOpen && (
+                <div
+                    className={`fixed top-0 left-0 z-5 flex h-full gap-2 border-r-2 p-2 pt-14 ${Bg.neutral50} ${Border.neutral300}`}
+                >
                     <div
                         className={`divide-y-2 overflow-scroll ${Divide.neutral300}`}
                     >
@@ -68,14 +65,9 @@ const GameMapView = ({
                             selectedID={selectedIDInGameMapGroups}
                         />
                     </div>
-                )}
-                <PanelOpenCloseButton
-                    className="h-full self-center"
-                    isOpen={isPanelOpen}
-                    setIsOpen={setIsPanelOpen}
-                />
-            </div>
-            <div className="ml-13">
+                </div>
+            )}
+            <div>
                 <GameMapCanvas
                     className="mb-2"
                     key={selectedIDInGameMapGroups}

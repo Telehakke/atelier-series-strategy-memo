@@ -23,6 +23,7 @@ export const Bg = {
 
 export const Border = {
     blue200: "border-blue-200 dark:border-blue-800",
+    neutral300: "border-neutral-300 dark:border-neutral-800",
     neutral400: "border-neutral-400 dark:border-neutral-700",
     neutral500: "border-neutral-500",
     neutral950: "border-neutral-950 dark:border-neutral-300",

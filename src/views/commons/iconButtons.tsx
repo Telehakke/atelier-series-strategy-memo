@@ -11,6 +11,8 @@ import {
     Database,
     Image,
     ImageOff,
+    PanelLeftClose,
+    PanelLeftOpen,
     Pencil,
     Plus,
     RotateCcw,
@@ -19,6 +21,7 @@ import {
     SquareChevronRight,
     SquareChevronUp,
     Trash,
+    Wrench,
     X,
 } from "lucide-react";
 import { Bg, Stroke } from "./classNames";
@@ -277,6 +280,59 @@ export const ImageOffIconButton = ({
         </Button>
     );
 };
+
+export const PanelLeftOpenIconButton = ({
+    onClick,
+    className,
+}: {
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    className?: string;
+}) => {
+    return (
+        <Button
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
+            onClick={onClick}
+        >
+            <PanelLeftOpen className={`${Stroke.neutral700}`} />
+        </Button>
+    );
+};
+
+export const PanelLeftCloseIconButton = ({
+    onClick,
+    className,
+}: {
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    className?: string;
+}) => {
+    return (
+        <Button
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
+            onClick={onClick}
+        >
+            <PanelLeftClose className={`${Stroke.neutral700}`} />
+        </Button>
+    );
+};
+
+export const WrenchIconButton = ({
+    onClick,
+    className,
+}: {
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    className?: string;
+}) => {
+    return (
+        <Button
+            className={`rounded-full p-2 ${Bg.hoverNeutral200} ${className}`}
+            onClick={onClick}
+        >
+            <Wrench className={`${Stroke.neutral700}`} />
+        </Button>
+    );
+};
+
+/* -------------------------------------------------------------------------- */
 
 export const PlusIconLargeButton = ({
     onClick,

@@ -2,20 +2,17 @@ import { useState } from "react";
 import { Preparation } from "../../models/preparation";
 import PreparationsFiltering from "../../models/preparationsFiltering";
 import splitByWhiteSpace from "../../models/splitByWhiteSpace";
-import { Bg, Divide } from "../commons/classNames";
+import { Bg, Border, Divide } from "../commons/classNames";
 import FilteringTextField from "../commons/filteringTextField";
-import PanelOpenCloseButton from "../commons/panelOpenCloseButton";
 import PreparationsLinkList from "./sub/preparationsLinkList";
 import PreparationsList from "./sub/preparationsList";
 
 const PreparationView = ({
     preparations,
     isPanelOpen,
-    setIsPanelOpen,
 }: {
     preparations: Preparation[];
     isPanelOpen: boolean;
-    setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const [filteringValue, setFilteringValue] = useState("");
     const preparationsFiltering = new PreparationsFiltering(preparations);
@@ -25,10 +22,10 @@ const PreparationView = ({
 
     return (
         <>
-            <div
-                className={`fixed top-0 left-0 z-5 flex h-full gap-2 p-2 pt-14 ${Bg.neutral50}`}
-            >
-                {isPanelOpen && (
+            {isPanelOpen && (
+                <div
+                    className={`fixed top-0 left-0 z-5 flex h-full gap-2 border-r-2 p-2 pt-14 ${Bg.neutral50} ${Border.neutral300}`}
+                >
                     <div
                         className={`divide-y-2 overflow-scroll ${Divide.neutral300}`}
                     >
@@ -42,16 +39,9 @@ const PreparationView = ({
                             preparations={filteredPreparations}
                         />
                     </div>
-                )}
-                <PanelOpenCloseButton
-                    className="h-full self-center"
-                    isOpen={isPanelOpen}
-                    setIsOpen={setIsPanelOpen}
-                />
-            </div>
-            <div className="ml-13">
-                <PreparationsList preparations={filteredPreparations} />
-            </div>
+                </div>
+            )}
+            <PreparationsList preparations={filteredPreparations} />
         </>
     );
 };
