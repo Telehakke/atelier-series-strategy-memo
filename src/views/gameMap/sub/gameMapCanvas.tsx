@@ -7,7 +7,7 @@ import {
     GameMapGroup,
     GameMapGroupUtility,
 } from "../../../models/gameMapGroup";
-import { Bg, Border, Shadow } from "../../commons/classNames";
+import { Bg, Border } from "../../commons/classNames";
 import {
     SquareChevronDownIconButton,
     SquareChevronLeftIconButton,
@@ -105,7 +105,7 @@ const GameMapCanvas = ({
             ></div>
             {filteredGameMaps().map((v) => (
                 <Card
-                    className={`absolute -translate-1/2 p-px text-center text-nowrap shadow-md data-[hover]:border-1 ${Border.neutral950} ${Shadow.neutral200} ${v.id === selectedID ? Bg.blue200 : Bg.neutral50_70} ${selectedID == null || v.id === selectedID ? "" : "opacity-70"}`}
+                    className={`absolute -translate-1/2 p-px text-center text-nowrap data-[hover]:scale-150 ${v.id === selectedID ? Bg.blue200 : Bg.neutral50_70} ${selectedID == null || v.id === selectedID ? "" : "opacity-70"}`}
                     key={v.id}
                     gameMapGroups={gameMapGroups}
                     gameMap={v}

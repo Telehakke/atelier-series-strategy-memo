@@ -29,10 +29,6 @@ export const Border = {
     neutral950: "border-neutral-950 dark:border-neutral-300",
 } as const;
 
-export const Shadow = {
-    neutral200: "shadow-neutral-200 dark:shadow-neutral-800",
-} as const;
-
 export const Text = {
     hoverBlue500: "hover:text-blue-500",
     neutral50: "text-neutral-50 dark:text-neutral-950",
