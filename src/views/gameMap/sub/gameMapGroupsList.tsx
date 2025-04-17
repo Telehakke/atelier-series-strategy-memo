@@ -36,6 +36,7 @@ const GameMapGroupsList = ({
     selectedIDInGameMapGroups,
     setSelectedIndexInGameMapGroups,
     setSelectedIDInCanvas,
+    setSelectedIDInList,
     className,
 }: {
     gameMapGroups: GameMapGroup[];
@@ -44,6 +45,7 @@ const GameMapGroupsList = ({
         React.SetStateAction<number>
     >;
     setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
+    setSelectedIDInList: React.Dispatch<React.SetStateAction<string | null>>;
     className?: string;
 }) => {
     return (
@@ -85,6 +87,7 @@ const GameMapGroupsList = ({
                                 onClick={() => {
                                     setSelectedIndexInGameMapGroups(i);
                                     setSelectedIDInCanvas(null);
+                                    setSelectedIDInList(null);
                                 }}
                             >
                                 {v.name}

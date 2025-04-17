@@ -28,12 +28,15 @@ const GameMapsList = ({
     gameMapGroups,
     selectedIDInGameMapGroups,
     setSelectedIDInCanvas,
+    selectedIDInList,
+    setSelectedIDInList,
 }: {
     gameMapGroups: GameMapGroup[];
     selectedIDInGameMapGroups: string | null;
     setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
+    selectedIDInList: string | null;
+    setSelectedIDInList: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
-    const [selectedID, setSelectedID] = useState<string | null>(null);
     const [isEditItemDialogOpen, setIsEditDialogOpen] = useState(false);
     const [copiedItem, setCopiedItem] = useState<GameMap | null>(null);
 
@@ -55,8 +58,8 @@ const GameMapsList = ({
                         key={v.id}
                         gameMapGroups={gameMapGroups}
                         gameMap={v}
-                        selectedID={selectedID}
-                        setSelectedID={setSelectedID}
+                        selectedID={selectedIDInList}
+                        setSelectedID={setSelectedIDInList}
                         setIsEditDialogOpen={setIsEditDialogOpen}
                     />
                 ))}
@@ -70,8 +73,8 @@ const GameMapsList = ({
                                 selectedIDInGameMapGroups={
                                     selectedIDInGameMapGroups
                                 }
-                                selectedID={selectedID}
-                                setSelectedID={setSelectedID}
+                                selectedID={selectedIDInList}
+                                setSelectedID={setSelectedIDInList}
                                 isEditItemDialogOpen={isEditItemDialogOpen}
                                 setIsEditItemDialogOpen={setIsEditDialogOpen}
                             />
@@ -79,8 +82,8 @@ const GameMapsList = ({
                                 selectedIDInGameMapGroups={
                                     selectedIDInGameMapGroups
                                 }
-                                selectedID={selectedID}
-                                setSelectedID={setSelectedID}
+                                selectedID={selectedIDInList}
+                                setSelectedID={setSelectedIDInList}
                                 copiedItem={copiedItem}
                                 setCopiedItem={setCopiedItem}
                             />
@@ -88,8 +91,8 @@ const GameMapsList = ({
                                 selectedIDInGameMapGroups={
                                     selectedIDInGameMapGroups
                                 }
-                                selectedID={selectedID}
-                                setSelectedID={setSelectedID}
+                                selectedID={selectedIDInList}
+                                setSelectedID={setSelectedIDInList}
                                 setSelectedIDInCanvas={setSelectedIDInCanvas}
                             />
                         </div>
@@ -98,13 +101,13 @@ const GameMapsList = ({
                                 selectedIDInGameMapGroups={
                                     selectedIDInGameMapGroups
                                 }
-                                selectedID={selectedID}
+                                selectedID={selectedIDInList}
                             />
                             <MoveItemDownButton
                                 selectedIDInGameMapGroups={
                                     selectedIDInGameMapGroups
                                 }
-                                selectedID={selectedID}
+                                selectedID={selectedIDInList}
                             />
                             <AddItemButton
                                 className="grid justify-items-center"
@@ -112,15 +115,15 @@ const GameMapsList = ({
                                 selectedIDInGameMapGroups={
                                     selectedIDInGameMapGroups
                                 }
-                                setSelectedID={setSelectedID}
+                                setSelectedID={setSelectedIDInList}
                             />
                         </div>
                     </>
                 ) : (
                     <CopyAndPasteItemButton
                         selectedIDInGameMapGroups={selectedIDInGameMapGroups}
-                        selectedID={selectedID}
-                        setSelectedID={setSelectedID}
+                        selectedID={selectedIDInList}
+                        setSelectedID={setSelectedIDInList}
                         copiedItem={copiedItem}
                         setCopiedItem={setCopiedItem}
                     />

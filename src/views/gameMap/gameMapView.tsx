@@ -21,6 +21,9 @@ const GameMapView = ({
     const [selectedIDInCanvas, setSelectedIDInCanvas] = useState<string | null>(
         null,
     );
+    const [selectedIDInList, setSelectedIDInList] = useState<string | null>(
+        null,
+    );
     const [filteringValue, setFilteringValue] = useState("");
     const gameMapGroupsFiltering = new GameMapGroupsFiltering(gameMapGroups);
     const filteredGameMapGroups =
@@ -53,6 +56,7 @@ const GameMapView = ({
                                 setSelectedIndexInGameMapGroups
                             }
                             setSelectedIDInCanvas={setSelectedIDInCanvas}
+                            setSelectedIDInList={setSelectedIDInList}
                         />
                         <FilteringTextField
                             className="py-2"
@@ -76,13 +80,16 @@ const GameMapView = ({
                     setSelectedIndexInGameMapGroups={
                         setSelectedIndexInGameMapGroups
                     }
-                    selectedID={selectedIDInCanvas}
-                    setSelectedID={setSelectedIDInCanvas}
+                    selectedIDInCanvas={selectedIDInCanvas}
+                    setSelectedIDInCanvas={setSelectedIDInCanvas}
+                    selectedIDInList={selectedIDInList}
                 />
                 <GameMapsList
                     gameMapGroups={filteredGameMapGroups}
                     selectedIDInGameMapGroups={selectedIDInGameMapGroups}
                     setSelectedIDInCanvas={setSelectedIDInCanvas}
+                    selectedIDInList={selectedIDInList}
+                    setSelectedIDInList={setSelectedIDInList}
                 />
             </div>
         </>

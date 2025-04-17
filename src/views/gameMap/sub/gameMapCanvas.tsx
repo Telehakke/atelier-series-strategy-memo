@@ -19,8 +19,9 @@ const GameMapCanvas = ({
     gameMapGroups,
     selectedIDInGameMapGroups,
     setSelectedIndexInGameMapGroups,
-    selectedID,
-    setSelectedID,
+    selectedIDInCanvas,
+    setSelectedIDInCanvas,
+    selectedIDInList,
     className,
 }: {
     gameMapGroups: GameMapGroup[];
@@ -28,8 +29,9 @@ const GameMapCanvas = ({
     setSelectedIndexInGameMapGroups: React.Dispatch<
         React.SetStateAction<number>
     >;
-    selectedID: string | null;
-    setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
+    selectedIDInCanvas: string | null;
+    setSelectedIDInCanvas: React.Dispatch<React.SetStateAction<string | null>>;
+    selectedIDInList: string | null;
     className?: string;
 }) => {
     const strategyMemo = useAtomValue(strategyMemoRepositoryAtom);
@@ -74,7 +76,7 @@ const GameMapCanvas = ({
     };
 
     const filteredGameMaps = (): GameMap[] => {
-        if (selectedID == null) {
+        if (selectedIDInCanvas == null) {
             return gameMapGroups[gameMapGroupsIndex].gameMaps;
         }
 
@@ -105,12 +107,12 @@ const GameMapCanvas = ({
             ></div>
             {filteredGameMaps().map((v) => (
                 <Card
-                    className={`absolute -translate-1/2 p-px text-center text-nowrap data-[hover]:scale-150 ${v.id === selectedID ? Bg.blue200 : Bg.neutral50_70} ${selectedID == null || v.id === selectedID ? "" : "opacity-70"}`}
+                    className={`absolute -translate-1/2 p-px text-center text-nowrap data-[hover]:scale-150 ${v.id === selectedIDInCanvas ? Bg.blue200 : Bg.neutral50_70} ${selectedIDInCanvas == null || v.id === selectedIDInCanvas ? "" : "opacity-25"} ${selectedIDInList == null || v.id === selectedIDInList ? "" : "opacity-25"}`}
                     key={v.id}
                     gameMapGroups={gameMapGroups}
                     gameMap={v}
-                    selectedID={selectedID}
-                    setSelectedID={setSelectedID}
+                    selectedID={selectedIDInCanvas}
+                    setSelectedID={setSelectedIDInCanvas}
                     setSelectedIndexInGameMapGroups={
                         setSelectedIndexInGameMapGroups
                     }
@@ -119,30 +121,30 @@ const GameMapCanvas = ({
             ))}
             <MoveUpButton
                 selectedIDInGameMapGroup={selectedIDInGameMapGroups}
-                selectedID={selectedID}
+                selectedID={selectedIDInCanvas}
                 stepValueOfMove={stepValueOfMove}
                 className={`absolute top-0 left-1/2 -translate-x-1/2 ${Bg.neutral200}`}
             />
             <MoveLeftButton
                 selectedIDInGameMapGroup={selectedIDInGameMapGroups}
-                selectedID={selectedID}
+                selectedID={selectedIDInCanvas}
                 stepValueOfMove={stepValueOfMove}
                 className={`absolute top-1/2 left-0 -translate-y-1/2 ${Bg.neutral200}`}
             />
             <MoveRightButton
                 selectedIDInGameMapGroup={selectedIDInGameMapGroups}
-                selectedID={selectedID}
+                selectedID={selectedIDInCanvas}
                 stepValueOfMove={stepValueOfMove}
                 className={`absolute top-1/2 right-0 -translate-y-1/2 ${Bg.neutral200}`}
             />
             <MoveDownButton
                 selectedIDInGameMapGroup={selectedIDInGameMapGroups}
-                selectedID={selectedID}
+                selectedID={selectedIDInCanvas}
                 stepValueOfMove={stepValueOfMove}
                 className={`absolute bottom-0 left-1/2 -translate-x-1/2 ${Bg.neutral200}`}
             />
             <SwitchStepButton
-                selectedID={selectedID}
+                selectedID={selectedIDInCanvas}
                 stepValueOfMove={stepValueOfMove}
                 setStepValueOfMove={setStepValueOfMove}
             />
