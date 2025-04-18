@@ -6,6 +6,7 @@ import { Memo } from "./memo";
 import { Preparation } from "./preparation";
 import {
     isArray,
+    isBoolean,
     isNotNull,
     isNumber,
     isString,
@@ -59,6 +60,7 @@ export class StrategyMemoUtility {
                                             x: 0,
                                             y: 0,
                                             goto: "",
+                                            checked: false,
                                             id: id ?? uuidv4(),
                                         };
                                         return gameMap;
@@ -77,6 +79,9 @@ export class StrategyMemoUtility {
                                         x: isNumber(v.x) ? v.x : 0,
                                         y: isNumber(v.y) ? v.y : 0,
                                         goto: isString(v.goto) ? v.goto : "",
+                                        checked: isBoolean(v.checked)
+                                            ? v.checked
+                                            : false,
                                         id: isString(v.id)
                                             ? v.id
                                             : (id ?? uuidv4()),

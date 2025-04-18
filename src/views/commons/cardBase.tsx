@@ -1,3 +1,4 @@
+import { Input } from "@headlessui/react";
 import { ReactNode } from "react";
 import { Bg, Border, Divide, Ring, Text } from "./classNames";
 
@@ -7,6 +8,8 @@ const CardBase = ({
     selected,
     onClick,
     onDoubleClick,
+    checked,
+    handleCheckboxChange,
     children,
 }: {
     title: string;
@@ -14,6 +17,8 @@ const CardBase = ({
     selected: boolean;
     onClick: React.MouseEventHandler<HTMLDivElement>;
     onDoubleClick: React.MouseEventHandler<HTMLDivElement>;
+    checked?: boolean;
+    handleCheckboxChange?: React.ChangeEventHandler<HTMLInputElement>;
     children?: ReactNode;
 }) => {
     return (
@@ -31,6 +36,20 @@ const CardBase = ({
                 >
                     {title}
                 </h2>
+                {checked != null && handleCheckboxChange != null && (
+                    <Input
+                        className="size-6"
+                        type="checkbox"
+                        checked={checked}
+                        onChange={handleCheckboxChange}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}
+                        onDoubleClick={(event) => {
+                            event.stopPropagation();
+                        }}
+                    />
+                )}
             </div>
             <div className={`divide-y-2 text-sm ${Divide.neutral950}`}>
                 {children}

@@ -15,6 +15,7 @@ const gameMapGroups: GameMapGroup[] = [
                 x: 50,
                 y: 50,
                 goto: "",
+                checked: false,
                 id: "0",
             },
             {
@@ -26,6 +27,7 @@ const gameMapGroups: GameMapGroup[] = [
                 x: 40,
                 y: 50,
                 goto: "",
+                checked: false,
                 id: "1",
             },
             {
@@ -37,6 +39,7 @@ const gameMapGroups: GameMapGroup[] = [
                 x: 50,
                 y: 60,
                 goto: "",
+                checked: false,
                 id: "2",
             },
         ],
@@ -64,6 +67,7 @@ test("filtered", () => {
                     x: 50,
                     y: 50,
                     goto: "",
+                    checked: false,
                     id: "0",
                 },
                 {
@@ -75,6 +79,7 @@ test("filtered", () => {
                     x: 40,
                     y: 50,
                     goto: "",
+                    checked: false,
                     id: "1",
                 },
             ],
@@ -100,6 +105,7 @@ test("filteredByGameMapID", () => {
                     x: 50,
                     y: 50,
                     goto: "",
+                    checked: false,
                     id: "0",
                 },
             ],

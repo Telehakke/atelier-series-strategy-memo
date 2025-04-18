@@ -57,6 +57,7 @@ const GameMapsList = ({
                     <Card
                         key={v.id}
                         gameMapGroups={gameMapGroups}
+                        selectedIDInGameMapGroups={selectedIDInGameMapGroups}
                         gameMap={v}
                         selectedID={selectedIDInList}
                         setSelectedID={setSelectedIDInList}
@@ -139,17 +140,23 @@ export default GameMapsList;
 
 const Card = ({
     gameMapGroups,
+    selectedIDInGameMapGroups,
     gameMap,
     selectedID,
     setSelectedID,
     setIsEditDialogOpen,
 }: {
     gameMapGroups: GameMapGroup[];
+    selectedIDInGameMapGroups: string | null;
     gameMap: GameMap;
     selectedID: string | null;
     setSelectedID: React.Dispatch<React.SetStateAction<string | null>>;
     setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const setStrategyMemo = useSetAtom(strategyMemoRepositoryAtom);
+
+    if (selectedIDInGameMapGroups == null) return <></>;
+
     return (
         <CardBase
             title={gameMap.name}
@@ -161,6 +168,21 @@ const Card = ({
             onDoubleClick={() => {
                 setSelectedID(gameMap.id);
                 setIsEditDialogOpen(true);
+            }}
+            checked={gameMap.checked}
+            handleCheckboxChange={(event) => {
+                const newGameMap: GameMap = {
+                    ...gameMap,
+                    checked: event.target.checked,
+                };
+                setStrategyMemo((v) =>
+                    GameMapUtility.changed(
+                        v,
+                        selectedIDInGameMapGroups,
+                        gameMap.id,
+                        newGameMap,
+                    ),
+                );
             }}
         >
             <TextWithLabel label="アイテム">
@@ -274,6 +296,7 @@ const AddItemDialog = ({
             x,
             y,
             goto,
+            false,
             uuidv4(),
         );
 
@@ -411,6 +434,7 @@ const EditItemDialog = ({
             x,
             y,
             goto,
+            gameMap.checked,
             gameMap.id,
         );
 

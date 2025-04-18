@@ -193,8 +193,18 @@ const Card = ({
                 setSelectedID(gameMap.id === selectedID ? null : gameMap.id);
             }}
         >
-            <p style={{ fontSize: fontSize }}>{gameMap.icon}</p>
-            <p style={{ fontSize: fontSize }}>{gameMap.name}</p>
+            <div className="relative">
+                <p style={{ fontSize: fontSize }}>{gameMap.icon}</p>
+                <p style={{ fontSize: fontSize }}>{gameMap.name}</p>
+                {gameMap.checked && (
+                    <p
+                        className="absolute top-1/2 -left-3 -translate-y-1/2"
+                        style={{ fontSize: fontSize }}
+                    >
+                        ✅
+                    </p>
+                )}
+            </div>
         </Button>
     );
 };

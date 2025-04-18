@@ -11,6 +11,7 @@ export type GameMap = {
     readonly x: number;
     readonly y: number;
     readonly goto: string;
+    readonly checked: boolean;
     readonly id: string;
 };
 
@@ -24,6 +25,7 @@ export class GameMapUtility {
         inputX: string,
         inputY: string,
         goto: string,
+        check: boolean,
         id: string,
     ): GameMap => {
         const name = inputName.trim();
@@ -53,6 +55,7 @@ export class GameMapUtility {
             x: x,
             y: y,
             goto: goto,
+            checked: check,
             id: id,
         };
     };
@@ -67,6 +70,7 @@ export class GameMapUtility {
             x: gameMap.x,
             y: gameMap.y,
             goto: gameMap.goto,
+            checked: gameMap.checked,
             id: uuidv4(),
         };
     };
@@ -129,6 +133,7 @@ export class GameMapUtility {
             x: number;
             y: number;
             goto: string;
+            checked: boolean;
         },
     ): StrategyMemo => {
         const gameMapGroupsIndex = GameMapGroupUtility.findIndex(

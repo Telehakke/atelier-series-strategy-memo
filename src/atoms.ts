@@ -21,6 +21,7 @@ export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemo>(
                         x: 50,
                         y: 50,
                         goto: "",
+                        checked: false,
                         id: "ef80217e-57c5-4224-8996-8bf2d39fdd2b",
                     },
                     {
@@ -37,6 +38,7 @@ export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemo>(
                         x: 60,
                         y: 40,
                         goto: "",
+                        checked: false,
                         id: "d3a3fa33-0eb9-412c-850c-c5e5c32cd701",
                     },
                     {
@@ -48,6 +50,7 @@ export const strategyMemoRepositoryAtom = atomWithStorage<StrategyMemo>(
                         x: 55,
                         y: 60,
                         goto: "",
+                        checked: false,
                         id: "a05bfe28-a87a-4a46-8607-5e5c0702d59d",
                     },
                 ],

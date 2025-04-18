@@ -18,3 +18,7 @@ export const isNumber = (value: unknown): value is number => {
 export const isArray = (value: unknown): value is Array<unknown> => {
     return Array.isArray(value);
 };
+
+export const isBoolean = (value: unknown): value is boolean => {
+    return typeof value === "boolean";
+};
