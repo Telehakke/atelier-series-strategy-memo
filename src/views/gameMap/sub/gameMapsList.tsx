@@ -110,14 +110,20 @@ const GameMapsList = ({
                                 }
                                 selectedID={selectedIDInList}
                             />
-                            <AddItemButton
-                                className="grid justify-items-center"
-                                gameMapGroups={gameMapGroups}
-                                selectedIDInGameMapGroups={
-                                    selectedIDInGameMapGroups
-                                }
-                                setSelectedID={setSelectedIDInList}
-                            />
+                            {selectedIDInList ? (
+                                <XIconLargeButton
+                                    onClick={() => setSelectedIDInList(null)}
+                                />
+                            ) : (
+                                <AddItemButton
+                                    className="grid justify-items-center"
+                                    gameMapGroups={gameMapGroups}
+                                    selectedIDInGameMapGroups={
+                                        selectedIDInGameMapGroups
+                                    }
+                                    setSelectedID={setSelectedIDInList}
+                                />
+                            )}
                         </div>
                     </>
                 ) : (

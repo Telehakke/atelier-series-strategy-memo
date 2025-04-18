@@ -65,10 +65,16 @@ const PreparationsList = ({
                         <div className="flex flex-col gap-4">
                             <MoveItemUpButton selectedID={selectedID} />
                             <MoveItemDownButton selectedID={selectedID} />
-                            <AddItemButton
-                                setSelectedID={setSelectedID}
-                                className="grid justify-items-center"
-                            />
+                            {selectedID ? (
+                                <XIconLargeButton
+                                    onClick={() => setSelectedID(null)}
+                                />
+                            ) : (
+                                <AddItemButton
+                                    setSelectedID={setSelectedID}
+                                    className="grid justify-items-center"
+                                />
+                            )}
                         </div>
                     </>
                 ) : (
