@@ -45,8 +45,9 @@ const LeftPanel = () => {
 
     return (
         <div
-            className={`fixed top-0 left-0 z-5 flex h-full border-r-2 p-2 pt-14 ${Bg.neutral50_950} ${Border.neutral300_800} ${isLeftPanelOpened ? "" : "hidden"}`}
+            className={`fixed top-0 left-0 z-5 flex h-full flex-col gap-2 border-r-2 p-2 pt-14 ${Bg.neutral50_950} ${Border.neutral300_800} ${isLeftPanelOpened ? "" : "hidden"}`}
         >
+            {!isReadonly && <GameMapListController />}
             <div
                 className={`divide-y-2 overflow-auto ${Divide.neutral300_800}`}
                 style={{
@@ -54,7 +55,6 @@ const LeftPanel = () => {
                 }}
             >
                 <div className="flex flex-col gap-2 pb-2">
-                    {!isReadonly && <GameMapListController />}
                     <GameMapListView />
                     {!isReadonly && (
                         <AddGameMapButton className="self-center" />

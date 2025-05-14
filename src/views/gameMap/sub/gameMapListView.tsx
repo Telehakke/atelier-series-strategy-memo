@@ -7,7 +7,7 @@ import {
 import { GameMap } from "../../../models/gameMap";
 import GameMapFilter from "../../../models/gameMapFilter";
 import Split from "../../../models/split";
-import { Bg, Border, Text } from "../../commons/classNames";
+import { Bg, Border, Divide, Text } from "../../commons/classNames";
 
 const GameMapListView = ({ className }: { className?: string }) => {
     const gameMaps = useAtomValue(gameMapsAtom);
@@ -22,7 +22,7 @@ const GameMapListView = ({ className }: { className?: string }) => {
     return (
         <div className={`w-45 ${className}`}>
             <ul
-                className={`cursor-default overflow-clip rounded-md border-2 ${Border.neutral950_300}`}
+                className={`cursor-default divide-y-1 overflow-clip rounded-md border-2 ${Border.neutral950_300} ${Divide.neutral300_800}`}
             >
                 {filteredGameMaps.map((v) => (
                     <ListItem key={v.id.value} gameMap={v} />
