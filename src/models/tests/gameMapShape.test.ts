@@ -13,32 +13,32 @@ import {
 
 describe("isShapeName", () => {
     test("1", () => {
-        const result = isShapeName(ShapeNameEnum.square.value);
+        const result = isShapeName(ShapeNameEnum.square.name);
         expect(result).toBeTruthy();
     });
 
     test("2", () => {
-        const result = isShapeName(ShapeNameEnum.circle.value);
+        const result = isShapeName(ShapeNameEnum.circle.name);
         expect(result).toBeTruthy();
     });
 
     test("3", () => {
-        const result = isShapeName(ShapeNameEnum.minus.value);
+        const result = isShapeName(ShapeNameEnum.minus.name);
         expect(result).toBeTruthy();
     });
 
     test("4", () => {
-        const result = isShapeName(ShapeNameEnum.moveRight.value);
+        const result = isShapeName(ShapeNameEnum.moveRight.name);
         expect(result).toBeTruthy();
     });
 
     test("5", () => {
-        const result = isShapeName(ShapeNameEnum.moveHorizontal.value);
+        const result = isShapeName(ShapeNameEnum.moveHorizontal.name);
         expect(result).toBeTruthy();
     });
 
     test("6", () => {
-        const result = isShapeName(ShapeNameEnum.redoDot.value);
+        const result = isShapeName(ShapeNameEnum.redoDot.name);
         expect(result).toBeTruthy();
     });
 
@@ -50,32 +50,32 @@ describe("isShapeName", () => {
 
 describe("isShapeColor", () => {
     test("1", () => {
-        const result = isShapeColor(ShapeColorEnum.currentColor.value);
+        const result = isShapeColor(ShapeColorEnum.currentColor.name);
         expect(result).toBeTruthy();
     });
 
     test("2", () => {
-        const result = isShapeColor(ShapeColorEnum.red.value);
+        const result = isShapeColor(ShapeColorEnum.red.name);
         expect(result).toBeTruthy();
     });
 
     test("3", () => {
-        const result = isShapeColor(ShapeColorEnum.blue.value);
+        const result = isShapeColor(ShapeColorEnum.blue.name);
         expect(result).toBeTruthy();
     });
 
     test("4", () => {
-        const result = isShapeColor(ShapeColorEnum.green.value);
+        const result = isShapeColor(ShapeColorEnum.green.name);
         expect(result).toBeTruthy();
     });
 
     test("5", () => {
-        const result = isShapeColor(ShapeColorEnum.black.value);
+        const result = isShapeColor(ShapeColorEnum.black.name);
         expect(result).toBeTruthy();
     });
 
     test("6", () => {
-        const result = isShapeColor(ShapeColorEnum.white.value);
+        const result = isShapeColor(ShapeColorEnum.white.name);
         expect(result).toBeTruthy();
     });
 
@@ -87,9 +87,9 @@ describe("isShapeColor", () => {
 
 describe("copyWith", () => {
     const item = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(Thickness.min),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(Scale.min, Scale.min),
         new Angle(Angle.min),
@@ -106,9 +106,9 @@ describe("copyWith", () => {
 
     test("2", () => {
         const newItem = new GameMapShape(
-            ShapeNameEnum.minus.value,
+            ShapeNameEnum.minus.name,
             new Thickness(Thickness.min + 1),
-            ShapeColorEnum.blue.value,
+            ShapeColorEnum.blue.name,
             false,
             new Scale(Scale.min + 1, Scale.min + 1),
             new Angle(Angle.min + 1),
@@ -135,9 +135,9 @@ describe("copyWith", () => {
 
 describe("find", () => {
     const item = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(0),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
@@ -161,9 +161,9 @@ describe("find", () => {
 
 describe("findIndex", () => {
     const item = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(0),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
@@ -187,9 +187,9 @@ describe("findIndex", () => {
 
 test("added", () => {
     const item = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(0),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
@@ -206,9 +206,9 @@ test("added", () => {
 
 test("replaced", () => {
     const item1 = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(0),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
@@ -218,9 +218,9 @@ test("replaced", () => {
         new GameMapShapeId("id1"),
     );
     const item2 = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(0),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
@@ -237,9 +237,9 @@ test("replaced", () => {
 
 test("removed", () => {
     const item = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(0),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
@@ -256,9 +256,9 @@ test("removed", () => {
 
 describe("moved", () => {
     const item1 = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(0),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
@@ -268,9 +268,9 @@ describe("moved", () => {
         new GameMapShapeId("id1"),
     );
     const item2 = new GameMapShape(
-        ShapeNameEnum.circle.value,
+        ShapeNameEnum.circle.name,
         new Thickness(0),
-        ShapeColorEnum.black.value,
+        ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
@@ -297,76 +297,70 @@ describe("moved", () => {
 describe("translateShapeName", () => {
     test("1", () => {
         const result = GameMapShapeUtility.translateShapeName(
-            ShapeNameEnum.square.value,
+            ShapeNameEnum.square.name,
         );
         expect(result).toBe(ShapeNameEnum.square.label);
-    });
-
-    test("2", () => {
-        const result = GameMapShapeUtility.translateShapeName("unknown");
-        expect(result).toBe("");
     });
 });
 
 describe("translateShapeColor", () => {
     test("1", () => {
         const result = GameMapShapeUtility.translateShapeColor(
-            ShapeColorEnum.black.value,
+            ShapeColorEnum.black.name,
         );
         expect(result).toBe(ShapeColorEnum.black.label);
-    });
-
-    test("2", () => {
-        const result = GameMapShapeUtility.translateShapeName("unknown");
-        expect(result).toBe("");
     });
 });
 
 describe("nextShapeColor", () => {
     test("1", () => {
         const result = GameMapShapeUtility.nextShapeColor(
-            ShapeColorEnum.currentColor.value,
+            ShapeColorEnum.currentColor.name,
         );
-        expect(result).toBe(ShapeColorEnum.red.value);
+        expect(result).toBe(ShapeColorEnum.red.name);
     });
 
     test("2", () => {
         const result = GameMapShapeUtility.nextShapeColor(
-            ShapeColorEnum.red.value,
+            ShapeColorEnum.red.name,
         );
-        expect(result).toBe(ShapeColorEnum.blue.value);
+        expect(result).toBe(ShapeColorEnum.blue.name);
     });
 
     test("3", () => {
         const result = GameMapShapeUtility.nextShapeColor(
-            ShapeColorEnum.blue.value,
+            ShapeColorEnum.blue.name,
         );
-        expect(result).toBe(ShapeColorEnum.green.value);
+        expect(result).toBe(ShapeColorEnum.green.name);
     });
 
     test("4", () => {
         const result = GameMapShapeUtility.nextShapeColor(
-            ShapeColorEnum.green.value,
+            ShapeColorEnum.green.name,
         );
-        expect(result).toBe(ShapeColorEnum.black.value);
+        expect(result).toBe(ShapeColorEnum.black.name);
     });
 
     test("5", () => {
         const result = GameMapShapeUtility.nextShapeColor(
-            ShapeColorEnum.black.value,
+            ShapeColorEnum.black.name,
         );
-        expect(result).toBe(ShapeColorEnum.white.value);
+        expect(result).toBe(ShapeColorEnum.white.name);
     });
 
     test("6", () => {
         const result = GameMapShapeUtility.nextShapeColor(
-            ShapeColorEnum.white.value,
+            ShapeColorEnum.white.name,
         );
-        expect(result).toBe(ShapeColorEnum.currentColor.value);
+        expect(result).toBe(ShapeColorEnum.currentColor.name);
     });
+});
 
-    test("7", () => {
-        const result = GameMapShapeUtility.nextShapeColor("unknown");
-        expect(result).toBe(ShapeColorEnum.currentColor.value);
+describe("shapeColorValue", () => {
+    test("1", () => {
+        const result = GameMapShapeUtility.shapeColorValue(
+            ShapeColorEnum.black.name,
+        );
+        expect(result).toBe(ShapeColorEnum.black.value);
     });
 });

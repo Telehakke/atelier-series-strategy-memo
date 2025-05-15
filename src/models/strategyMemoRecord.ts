@@ -284,11 +284,11 @@ export class StrategyMemoRecordUtility {
             const gameMapShapes = gameMap.gameMapShapes.map((v) => {
                 const name = isShapeName(v.name)
                     ? v.name
-                    : ShapeNameEnum.square.value;
+                    : ShapeNameEnum.square.name;
                 const thickness = new Thickness(v.thickness);
                 const color = isShapeColor(v.color)
                     ? v.color
-                    : ShapeColorEnum.currentColor.value;
+                    : ShapeColorEnum.currentColor.name;
                 const fill = v.fill;
                 const scale = new Scale(v.scaleX, v.scaleY);
                 const angle = new Angle(v.angle);

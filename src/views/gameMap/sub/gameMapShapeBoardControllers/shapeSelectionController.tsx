@@ -41,7 +41,7 @@ const ShapeSelectionController = ({ gameMapId }: { gameMapId: GameMapId }) => {
                     className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                     gameMapId={gameMapId}
                     gameMapShapeId={gameMapShapeId}
-                    shapeName={ShapeNameEnum.moveRight.value}
+                    shapeName={ShapeNameEnum.moveRight.name}
                 >
                     <MoveRight className={largeIconClassName} />
                 </ChangeShapeButton>
@@ -49,7 +49,7 @@ const ShapeSelectionController = ({ gameMapId }: { gameMapId: GameMapId }) => {
                     className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                     gameMapId={gameMapId}
                     gameMapShapeId={gameMapShapeId}
-                    shapeName={ShapeNameEnum.moveHorizontal.value}
+                    shapeName={ShapeNameEnum.moveHorizontal.name}
                 >
                     <MoveHorizontal className={largeIconClassName} />
                 </ChangeShapeButton>
@@ -57,7 +57,7 @@ const ShapeSelectionController = ({ gameMapId }: { gameMapId: GameMapId }) => {
                     className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                     gameMapId={gameMapId}
                     gameMapShapeId={gameMapShapeId}
-                    shapeName={ShapeNameEnum.redoDot.value}
+                    shapeName={ShapeNameEnum.redoDot.name}
                 >
                     <Redo className={largeIconClassName} />
                 </ChangeShapeButton>
@@ -67,7 +67,7 @@ const ShapeSelectionController = ({ gameMapId }: { gameMapId: GameMapId }) => {
                     className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                     gameMapId={gameMapId}
                     gameMapShapeId={gameMapShapeId}
-                    shapeName={ShapeNameEnum.square.value}
+                    shapeName={ShapeNameEnum.square.name}
                 >
                     <Square className={largeIconClassName} />
                 </ChangeShapeButton>
@@ -75,7 +75,7 @@ const ShapeSelectionController = ({ gameMapId }: { gameMapId: GameMapId }) => {
                     className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                     gameMapId={gameMapId}
                     gameMapShapeId={gameMapShapeId}
-                    shapeName={ShapeNameEnum.circle.value}
+                    shapeName={ShapeNameEnum.circle.name}
                 >
                     <Circle className={largeIconClassName} />
                 </ChangeShapeButton>
@@ -83,7 +83,7 @@ const ShapeSelectionController = ({ gameMapId }: { gameMapId: GameMapId }) => {
                     className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                     gameMapId={gameMapId}
                     gameMapShapeId={gameMapShapeId}
-                    shapeName={ShapeNameEnum.minus.value}
+                    shapeName={ShapeNameEnum.minus.name}
                 >
                     <Minus className={largeIconClassName} />
                 </ChangeShapeButton>

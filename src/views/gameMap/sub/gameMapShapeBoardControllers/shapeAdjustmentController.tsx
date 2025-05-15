@@ -282,9 +282,13 @@ const ChangeColorButton = ({
         >
             <div
                 className="absolute inset-0 m-auto size-10 rounded-full"
-                style={{ backgroundColor: gameMapShape.color }}
+                style={{
+                    backgroundColor: GameMapShapeUtility.shapeColorValue(
+                        gameMapShape.color,
+                    ),
+                }}
             />
-            {gameMapShape.color === ShapeColorEnum.currentColor.value && (
+            {gameMapShape.color === ShapeColorEnum.currentColor.name && (
                 <div className="absolute inset-0 m-auto size-10 rounded-full bg-linear-to-r from-black from-50% to-white to-50%" />
             )}
         </LargeIconButton>

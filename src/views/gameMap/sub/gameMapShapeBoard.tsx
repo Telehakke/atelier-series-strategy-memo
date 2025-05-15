@@ -10,6 +10,7 @@ import { GameMapId } from "../../../models/gameMap";
 import {
     GameMapShape,
     GameMapShapeIdList,
+    GameMapShapeUtility,
     ShapeNameEnum,
 } from "../../../models/gameMapShape";
 import { Bg, Text } from "../../commons/classNames";
@@ -76,7 +77,7 @@ const Card = ({
         ? Text.neutral100
         : Text.neutral950_100;
     const backgroundColor = (): string => {
-        if (isSelectedBoardItem) return Bg.blue500;
+        if (isSelectedBoardItem) return Bg.blue400;
         if (!isGameMapDetailEditMode) return Bg.neutral50_950_70;
         return "";
     };
@@ -121,14 +122,16 @@ const Card = ({
             onClick={handleClick}
         >
             <div
-                className={`${textColor} ${backgroundColor()} ${opacity1} ${opacity2}`}
+                className={` ${textColor} ${backgroundColor()} ${opacity1} ${opacity2}`}
                 style={{ scale: `${scaleX} ${scaleY}` }}
             >
                 <Shape
                     name={gameMapShape.name}
                     style={{
-                        strokeWidth: strokeWidth,
-                        color: gameMapShape.color,
+                        strokeWidth: `${strokeWidth}px`,
+                        color: GameMapShapeUtility.shapeColorValue(
+                            gameMapShape.color,
+                        ),
                         fill: gameMapShape.fill ? "currentcolor" : "none",
                         transform: `rotate(${gameMapShape.angle.value}deg)`,
                         maskImage: maskImage,
@@ -146,16 +149,16 @@ const Shape = ({
     name: string;
     style: React.CSSProperties;
 }) => {
-    if (name === ShapeNameEnum.square.value)
+    if (name === ShapeNameEnum.square.name)
         return <SquareShape style={style} />;
-    if (name === ShapeNameEnum.circle.value)
+    if (name === ShapeNameEnum.circle.name)
         return <CircleShape style={style} />;
-    if (name === ShapeNameEnum.minus.value) return <LineShape style={style} />;
-    if (name === ShapeNameEnum.moveRight.value)
+    if (name === ShapeNameEnum.minus.name) return <LineShape style={style} />;
+    if (name === ShapeNameEnum.moveRight.name)
         return <ArrowShape style={style} />;
-    if (name === ShapeNameEnum.moveHorizontal.value)
+    if (name === ShapeNameEnum.moveHorizontal.name)
         return <TwoWayArrowShape style={style} />;
-    if (name === ShapeNameEnum.redoDot.value)
+    if (name === ShapeNameEnum.redoDot.name)
         return <CurveShape style={style} />;
     return <></>;
 };

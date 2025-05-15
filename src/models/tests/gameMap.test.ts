@@ -46,9 +46,9 @@ describe("copyWith", () => {
             ),
             new GameMapShapeList(
                 new GameMapShape(
-                    ShapeNameEnum.circle.value,
+                    ShapeNameEnum.circle.name,
                     new Thickness(0),
-                    ShapeColorEnum.black.value,
+                    ShapeColorEnum.black.name,
                     false,
                     new Scale(0, 0),
                     new Angle(0),

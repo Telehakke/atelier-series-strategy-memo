@@ -25,7 +25,7 @@ export class GameMapShapeIdList extends IdList<GameMapShapeId> {
 /* -------------------------------------------------------------------------- */
 
 type ShapeNameDetail = {
-    value: ShapeName;
+    name: ShapeName;
     label: string;
 };
 
@@ -37,12 +37,12 @@ export const ShapeNameEnum: {
     readonly moveHorizontal: ShapeNameDetail;
     readonly redoDot: ShapeNameDetail;
 } = {
-    square: { value: "square", label: "四角" },
-    circle: { value: "circle", label: "円" },
-    minus: { value: "minus", label: "直線" },
-    moveRight: { value: "moveRight", label: "矢印" },
-    moveHorizontal: { value: "moveHorizontal", label: "両矢印" },
-    redoDot: { value: "redoDot", label: "カーブ" },
+    square: { name: "square", label: "四角" },
+    circle: { name: "circle", label: "円" },
+    minus: { name: "minus", label: "直線" },
+    moveRight: { name: "moveRight", label: "矢印" },
+    moveHorizontal: { name: "moveHorizontal", label: "両矢印" },
+    redoDot: { name: "redoDot", label: "カーブ" },
 } as const;
 
 export type ShapeName = keyof typeof ShapeNameEnum;
@@ -55,9 +55,10 @@ export const isShapeName = (value: unknown): value is ShapeName => {
 /* -------------------------------------------------------------------------- */
 
 type ShapeColorDetail = {
-    value: ShapeColor;
+    name: ShapeColor;
     label: string;
-    nextValue: ShapeColor;
+    nextName: ShapeColor;
+    value: string;
 };
 
 export const ShapeColorEnum: {
@@ -68,12 +69,37 @@ export const ShapeColorEnum: {
     black: ShapeColorDetail;
     white: ShapeColorDetail;
 } = {
-    currentColor: { value: "currentColor", label: "黒・白", nextValue: "red" },
-    red: { value: "red", label: "赤", nextValue: "blue" },
-    blue: { value: "blue", label: "青", nextValue: "green" },
-    green: { value: "green", label: "緑", nextValue: "black" },
-    black: { value: "black", label: "黒", nextValue: "white" },
-    white: { value: "white", label: "白", nextValue: "currentColor" },
+    currentColor: {
+        name: "currentColor",
+        label: "黒・白",
+        nextName: "red",
+        value: "currentColor",
+    },
+    red: {
+        name: "red",
+        label: "赤",
+        nextName: "blue",
+        value: "oklch(63.7% 0.237 25.331)",
+    },
+    blue: {
+        name: "blue",
+        label: "青",
+        nextName: "green",
+        value: "oklch(62.3% 0.214 259.815)",
+    },
+    green: {
+        name: "green",
+        label: "緑",
+        nextName: "black",
+        value: "oklch(72.3% 0.219 149.579)",
+    },
+    black: { name: "black", label: "黒", nextName: "white", value: "black" },
+    white: {
+        name: "white",
+        label: "白",
+        nextName: "currentColor",
+        value: "white",
+    },
 } as const;
 
 export type ShapeColor = keyof typeof ShapeColorEnum;
@@ -124,9 +150,9 @@ export class GameMapShape implements WithId {
 
     static create = (): GameMapShape =>
         new GameMapShape(
-            ShapeNameEnum.square.value,
+            ShapeNameEnum.square.name,
             new Thickness(2),
-            ShapeColorEnum.currentColor.value,
+            ShapeColorEnum.currentColor.name,
             false,
             new Scale(100, 100),
             new Angle(0),
@@ -198,14 +224,18 @@ export class GameMapShapeList extends ListWithId<GameMapShape, GameMapShapeId> {
 /* -------------------------------------------------------------------------- */
 
 export class GameMapShapeUtility {
-    static translateShapeName = (name: string): string =>
-        Object.values(ShapeNameEnum).find((v) => v.value === name)?.label ?? "";
+    static translateShapeName = (name: ShapeName): string =>
+        Object.values(ShapeNameEnum).find((v) => v.name === name)?.label ?? "";
 
-    static translateShapeColor = (color: string): string =>
-        Object.values(ShapeColorEnum).find((v) => v.value === color)?.label ??
+    static translateShapeColor = (color: ShapeColor): string =>
+        Object.values(ShapeColorEnum).find((v) => v.name === color)?.label ??
         "";
 
-    static nextShapeColor = (currentColor: string): ShapeColor =>
-        Object.values(ShapeColorEnum).find((v) => v.value === currentColor)
-            ?.nextValue ?? "currentColor";
+    static nextShapeColor = (currentColor: ShapeColor): ShapeColor =>
+        Object.values(ShapeColorEnum).find((v) => v.name === currentColor)
+            ?.nextName ?? "currentColor";
+
+    static shapeColorValue = (color: ShapeColor): string =>
+        Object.values(ShapeColorEnum).find((v) => v.name === color)?.value ??
+        "currentColor";
 }

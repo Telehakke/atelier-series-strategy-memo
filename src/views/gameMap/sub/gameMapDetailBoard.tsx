@@ -113,7 +113,7 @@ const Card = ({
         ? Text.neutral100
         : Text.neutral950_100;
     const backgroundColor = isSelectedBoardItem
-        ? Bg.blue500
+        ? Bg.blue400
         : Bg.neutral50_950_70;
 
     // マップ上のアイテムが選択されたら、未選択のアイテムの表示を薄くする

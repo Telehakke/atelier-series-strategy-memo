@@ -1,6 +1,7 @@
 export const Bg = {
     black_white_25: "bg-black/25 dark:bg-white/25",
     blue200_800: "bg-blue-200 dark:bg-blue-800",
+    blue400: "bg-blue-400",
     blue500: "bg-blue-500",
     green500: "bg-green-500",
     hoverBlue400: "hover:bg-blue-400",

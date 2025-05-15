@@ -179,9 +179,9 @@ describe("convert", () => {
                 ),
                 new GameMapShapeList(
                     new GameMapShape(
-                        ShapeNameEnum.circle.value,
+                        ShapeNameEnum.circle.name,
                         new Thickness(1),
-                        ShapeColorEnum.currentColor.value,
+                        ShapeColorEnum.currentColor.name,
                         true,
                         new Scale(100, 100),
                         new Angle(1),

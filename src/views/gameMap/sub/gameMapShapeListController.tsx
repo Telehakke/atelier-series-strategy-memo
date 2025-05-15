@@ -252,7 +252,7 @@ const MoveItemUpButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
         <MoveItemButton
             gameMapId={gameMapId}
             description="上へ移動"
-            action={(gameMapShapes) => gameMapShapes.movedDown(id)}
+            action={(gameMapShapes) => gameMapShapes.movedUp(id)}
         >
             <ChevronUp className={largeIconClassName} />
         </MoveItemButton>
