@@ -38,11 +38,9 @@ import TextField from "../../commons/textField";
 const GameMapListController = () => {
     const isReadonly = useAtomValue(isReadonlyAtom);
     const selectedGameMapId = useAtomValue(selectedGameMapIdAtom);
-    if (isReadonly) return <></>;
-    if (selectedGameMapId == null) return <></>;
 
     const HStack = ({ children }: { children: ReactNode }) => (
-        <div className="flex items-center gap-2">{children}</div>
+        <div className="flex items-center justify-center gap-2">{children}</div>
     );
 
     const VStack = ({ children }: { children: ReactNode }) => (
@@ -52,18 +50,22 @@ const GameMapListController = () => {
     return (
         <HStack>
             <AddGameMapButton />
-            <VStack>
-                <EditItemButton gameMapId={selectedGameMapId} />
-                <RemoveItemButton gameMapId={selectedGameMapId} />
-            </VStack>
-            <VStack>
-                <AddImageButton gameMapId={selectedGameMapId} />
-                <RemoveImageButton gameMapId={selectedGameMapId} />
-            </VStack>
-            <VStack>
-                <MoveItemUpButton gameMapId={selectedGameMapId} />
-                <MoveItemDownButton gameMapId={selectedGameMapId} />
-            </VStack>
+            {!isReadonly && selectedGameMapId != null && (
+                <>
+                    <VStack>
+                        <EditItemButton gameMapId={selectedGameMapId} />
+                        <RemoveItemButton gameMapId={selectedGameMapId} />
+                    </VStack>
+                    <VStack>
+                        <AddImageButton gameMapId={selectedGameMapId} />
+                        <RemoveImageButton gameMapId={selectedGameMapId} />
+                    </VStack>
+                    <VStack>
+                        <MoveItemUpButton gameMapId={selectedGameMapId} />
+                        <MoveItemDownButton gameMapId={selectedGameMapId} />
+                    </VStack>
+                </>
+            )}
         </HStack>
     );
 };

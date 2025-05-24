@@ -124,7 +124,7 @@ export class DrawingRange {
     constructor(value: number) {
         let validValue = value;
         if (value < DrawingRange.min) validValue = DrawingRange.min;
-        if (value > DrawingRange.max) validValue = DrawingRange.max;
+        if (value > DrawingRange.max) validValue = DrawingRange.min;
         this._value = validValue;
     }
 
