@@ -53,19 +53,7 @@ describe("copyWith", () => {
 });
 
 test("create", () => {
-    const item = GameMapDetail.create(
-        "name",
-        "item1、item2",
-        "monster1、monster2",
-        "memo",
-        "icon",
-        "1",
-        "2",
-        new GameMapId("goto"),
-        false,
-        new GameMapDetailId("id"),
-    );
-    const expected = new GameMapDetail(
+    const item = new GameMapDetail(
         "name",
         ["item1", "item2"],
         ["monster1", "monster2"],
@@ -76,7 +64,19 @@ test("create", () => {
         false,
         new GameMapDetailId("id"),
     );
-    expect(JSON.stringify(item)).toEqual(JSON.stringify(expected));
+    const newItem = GameMapDetail.create({
+        name: item.name,
+        items: item.itemsToCommaSeparatedStr,
+        monsters: item.monstersToCommaSeparatedStr,
+        memo: item.memo,
+        icon: item.icon,
+        x: item.point.x.toString(),
+        y: item.point.y.toString(),
+        goto: item.goto,
+        checked: item.checked,
+        id: item.id,
+    });
+    expect(JSON.stringify(newItem)).toEqual(JSON.stringify(item));
 });
 
 describe("find", () => {
@@ -148,7 +148,7 @@ test("added", () => {
 });
 
 test("replaced", () => {
-    const item1 = new GameMapDetail(
+    const item = new GameMapDetail(
         "",
         [],
         [],
@@ -159,8 +159,9 @@ test("replaced", () => {
         false,
         new GameMapDetailId("id1"),
     );
-    const item2 = new GameMapDetail(
-        "",
+    const list = new GameMapDetailList(item);
+    const newItem = new GameMapDetail(
+        "name",
         [],
         [],
         "",
@@ -168,11 +169,10 @@ test("replaced", () => {
         new Point(0, 0),
         new GameMapId("id"),
         false,
-        new GameMapDetailId("id2"),
+        item.id,
     );
-    const list = new GameMapDetailList(item1);
-    const result = list.replaced(item1.id, item2);
-    const expected = new GameMapDetailList(item2);
+    const result = list.replaced(newItem);
+    const expected = new GameMapDetailList(newItem);
     expect(JSON.stringify(result)).toEqual(JSON.stringify(expected));
 });
 

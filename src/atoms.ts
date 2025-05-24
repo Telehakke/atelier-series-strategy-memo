@@ -14,7 +14,7 @@ import { MemoIdList } from "./models/memo";
 import { PreparationIdList } from "./models/preparation";
 import sampleData from "./sampleData";
 import {
-    GameMapShapeEditMode,
+    GameMapShapeEditModeDetail,
     GameMapShapeEditModeEnum,
 } from "./views/gameMap/sub/gameMapShapeBoardControllers/gameMapShapeBoardController";
 
@@ -37,7 +37,7 @@ export const isEditGameMapDialogOpenAtom = atom(false);
 export const gameMapFilteringValueAtom = atom("");
 export const movementStepValueAtom = atom<1 | 5>(1);
 export const isGameMapDetailEditModeAtom = atom(true);
-export const gameMapShapeEditModeAtom = atom<GameMapShapeEditMode>(
+export const gameMapShapeEditModeAtom = atom<GameMapShapeEditModeDetail>(
     GameMapShapeEditModeEnum.select,
 );
 export const canvasScaleAtom = atom(1);

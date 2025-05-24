@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Angle, Point, Progress, Scale, Thickness } from "./dataClasses";
+import { Angle, DrawingRange, Point, Scale, Thickness } from "./dataClasses";
 import { GameMap, GameMapId, GameMapList } from "./gameMap";
 import {
     GameMapDetail,
@@ -65,7 +65,7 @@ type GameMapShapeRecord = {
     readonly scaleY: number;
     readonly angle: number;
     readonly flip: boolean;
-    readonly progress: number;
+    readonly drawingRange: number;
     readonly x: number;
     readonly y: number;
     readonly id: string;
@@ -188,7 +188,7 @@ export class StrategyMemoRecordUtility {
                 scaleY: 0,
                 angle: 0,
                 flip: false,
-                progress: 0,
+                drawingRange: 0,
                 x: 0,
                 y: 0,
                 id: "",
@@ -205,7 +205,7 @@ export class StrategyMemoRecordUtility {
             scaleY: isNumber(value.scaleY) ? value.scaleY : 0,
             angle: isNumber(value.angle) ? value.angle : 0,
             flip: isBoolean(value.flip) ? value.flip : false,
-            progress: isNumber(value.progress) ? value.progress : 0,
+            drawingRange: isNumber(value.drawingRange) ? value.drawingRange : 0,
             x: isNumber(value.x) ? value.x : 0,
             y: isNumber(value.y) ? value.y : 0,
             id: isString(value.id) ? value.id : uuidv4(),
@@ -293,7 +293,7 @@ export class StrategyMemoRecordUtility {
                 const scale = new Scale(v.scaleX, v.scaleY);
                 const angle = new Angle(v.angle);
                 const flip = v.flip;
-                const progress = new Progress(v.progress);
+                const drawingRange = new DrawingRange(v.drawingRange);
                 const point = new Point(v.x, v.y);
                 const id = new GameMapShapeId(v.id);
                 return new GameMapShape(
@@ -304,7 +304,7 @@ export class StrategyMemoRecordUtility {
                     scale,
                     angle,
                     flip,
-                    progress,
+                    drawingRange,
                     point,
                     id,
                 );
@@ -375,7 +375,7 @@ export class StrategyMemoRecordUtility {
                     scaleY: v.scale.y,
                     angle: v.angle.value,
                     flip: v.flip,
-                    progress: v.progress.value,
+                    drawingRange: v.drawingRange.value,
                     x: v.point.x,
                     y: v.point.y,
                     id: v.id.value,

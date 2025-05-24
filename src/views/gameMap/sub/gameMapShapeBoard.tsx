@@ -30,7 +30,7 @@ const GameMapShapeBoard = ({ gameMapId }: { gameMapId: GameMapId }) => {
 
     return (
         <>
-            {gameMap.gameMapShapes.items.map((v) => (
+            {gameMap.gameMapShapes.map((v) => (
                 <Card
                     className={`absolute -translate-1/2 p-px hover:scale-150`}
                     key={v.id.value}
@@ -84,7 +84,7 @@ const Card = ({
 
     // マップ上のアイテムが選択されたら、未選択のアイテムの表示を薄くする
     const opacity1 =
-        selectionManager.boardItems.length > 0 && !isSelectedBoardItem
+        selectionManager.boardItems.isNotEmpty && !isSelectedBoardItem
             ? "opacity-30"
             : "";
 
@@ -93,7 +93,7 @@ const Card = ({
         gameMapShape.id,
     );
     const opacity2 =
-        selectionManager.listItems.length > 0 && !isSelectedListItem
+        selectionManager.listItems.isNotEmpty && !isSelectedListItem
             ? "opacity-30"
             : "";
 
@@ -108,9 +108,9 @@ const Card = ({
         Math.min(gameMapShape.scale.x, gameMapShape.scale.y);
 
     const maskImage =
-        gameMapShape.progress.value === 100
+        gameMapShape.drawingRange.value === 100
             ? "unset"
-            : `conic-gradient(black ${gameMapShape.progress.value}%, transparent ${gameMapShape.progress.value}%)`;
+            : `conic-gradient(black ${gameMapShape.drawingRange.value}%, transparent ${gameMapShape.drawingRange.value}%)`;
 
     return (
         <Button
@@ -158,7 +158,6 @@ const Shape = ({
         return <ArrowShape style={style} />;
     if (name === ShapeNameEnum.moveHorizontal.name)
         return <TwoWayArrowShape style={style} />;
-    if (name === ShapeNameEnum.redoDot.name)
-        return <CurveShape style={style} />;
+    if (name === ShapeNameEnum.redo.name) return <CurveShape style={style} />;
     return <></>;
 };

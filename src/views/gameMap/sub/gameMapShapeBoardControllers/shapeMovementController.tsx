@@ -2,6 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
     gameMapsAtom,
     gameMapShapeSelectionManagerAtom,
+    isReadonlyAtom,
     movementStepValueAtom,
     strategyMemoAtom,
 } from "../../../../atoms";
@@ -25,21 +26,29 @@ import {
 } from "../../../commons/iconButtons";
 
 const ShapeMovementController = ({ gameMapId }: { gameMapId: GameMapId }) => {
+    const HStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex gap-4">{children}</div>
+    );
+
+    const VStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex flex-col items-center gap-4">{children}</div>
+    );
+
     return (
-        <div className="flex gap-4">
-            <div className="flex flex-col gap-4">
+        <HStack>
+            <VStack>
                 <SelectedAllButton gameMapId={gameMapId} />
                 <StepSwitchButton />
-            </div>
-            <div className="flex flex-col items-center gap-4">
+            </VStack>
+            <VStack>
                 <MoveTopButton gameMapId={gameMapId} />
-                <div className="flex gap-4">
+                <HStack>
                     <MoveLeftButton gameMapId={gameMapId} />
                     <MoveBottomButton gameMapId={gameMapId} />
                     <MoveRightButton gameMapId={gameMapId} />
-                </div>
-            </div>
-        </div>
+                </HStack>
+            </VStack>
+        </HStack>
     );
 };
 
@@ -108,6 +117,7 @@ const MoveButton = ({
     action: (point: Point) => Point;
     children: ReactNode;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const selectionManager = useAtomValue(gameMapShapeSelectionManagerAtom);
@@ -117,25 +127,24 @@ const MoveButton = ({
             const gameMap = v.gameMaps.find(gameMapId);
             if (gameMap == null) return v;
 
-            let newGameMapShapes = gameMap.gameMapShapes;
-            selectionManager.boardItems.forEach((id) => {
-                const gameMapShape = gameMap.gameMapShapes.find(id);
-                if (gameMapShape == null) return;
+            const newGameMapShapes = selectionManager.boardItems.reduce(
+                (gameMapShapes, id) => {
+                    const gameMapShape = gameMap.gameMapShapes.find(id);
+                    if (gameMapShape == null) return gameMapShapes;
 
-                const newGameMapShape = gameMapShape.copyWith({
-                    point: action(gameMapShape.point),
-                });
-                newGameMapShapes = newGameMapShapes.replaced(
-                    id,
-                    newGameMapShape,
-                );
-            });
+                    const newGameMapShape = gameMapShape.copyWith({
+                        point: action(gameMapShape.point),
+                    });
+                    return gameMapShapes.replaced(newGameMapShape);
+                },
+                gameMap.gameMapShapes,
+            );
             const newStrategyMemo = v.replacedGameMapShapes(
                 gameMap,
                 newGameMapShapes,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
     };
@@ -171,14 +180,13 @@ const SelectedAllButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
     const setStepValue = useSetAtom(movementStepValueAtom);
     const gameMaps = useAtomValue(gameMapsAtom);
     const gameMap = gameMaps.find(gameMapId);
-
     if (gameMap == null) return <></>;
 
     const handleClick = () => {
         setSelectionManager((v) =>
             v.copyWith({
                 boardItems: new GameMapShapeIdList(
-                    ...gameMap.gameMapShapes.items.map((v) => v.id),
+                    ...gameMap.gameMapShapes.map((v) => v.id),
                 ),
             }),
         );

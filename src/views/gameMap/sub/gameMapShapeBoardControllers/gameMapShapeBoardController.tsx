@@ -1,9 +1,11 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { JSX } from "react";
 import {
     gameMapShapeEditModeAtom,
     gameMapShapeSelectionManagerAtom,
     selectedGameMapIdAtom,
 } from "../../../../atoms";
+import { GameMapId } from "../../../../models/gameMap";
 import { GameMapShapeIdList } from "../../../../models/gameMapShape";
 import { ControllerTypeEnum } from "../../../../models/itemSelectionManager";
 import { Bg, Stroke } from "../../../commons/classNames";
@@ -27,23 +29,13 @@ const GameMapShapeBoardController = ({ className }: { className?: string }) => {
         return <></>;
 
     return (
-        <div className={className}>
-            <div className="flex flex-col items-end gap-4">
-                {editMode === GameMapShapeEditModeEnum.select && (
-                    <ShapeSelectionController gameMapId={selectedGameMapId} />
-                )}
-                {editMode === GameMapShapeEditModeEnum.adjust && (
-                    <ShapeAdjustmentController gameMapId={selectedGameMapId} />
-                )}
-                {editMode === GameMapShapeEditModeEnum.move && (
-                    <ShapeMovementController gameMapId={selectedGameMapId} />
-                )}
-                <div className="flex gap-4">
-                    <SelectModeButton />
-                    <AdjustModeButton />
-                    <MoveModeButton />
-                    <XButton />
-                </div>
+        <div className={`flex flex-col items-end gap-4 ${className}`}>
+            {editMode.component(selectedGameMapId)}
+            <div className="flex gap-4">
+                <SelectModeButton />
+                <AdjustModeButton />
+                <MoveModeButton />
+                <XButton />
             </div>
         </div>
     );
@@ -53,13 +45,33 @@ export default GameMapShapeBoardController;
 
 /* -------------------------------------------------------------------------- */
 
-export const GameMapShapeEditModeEnum = {
-    select: "select",
-    adjust: "adjust",
-    move: "move",
+export type GameMapShapeEditModeDetail = {
+    component: (gameMapId: GameMapId) => JSX.Element;
+};
+
+export const GameMapShapeEditModeEnum: {
+    readonly select: GameMapShapeEditModeDetail;
+    readonly adjust: GameMapShapeEditModeDetail;
+    readonly move: GameMapShapeEditModeDetail;
+} = {
+    select: {
+        component: (gameMapId: GameMapId) => (
+            <ShapeSelectionController gameMapId={gameMapId} />
+        ),
+    },
+    adjust: {
+        component: (gameMapId: GameMapId) => (
+            <ShapeAdjustmentController gameMapId={gameMapId} />
+        ),
+    },
+    move: {
+        component: (gameMapId: GameMapId) => (
+            <ShapeMovementController gameMapId={gameMapId} />
+        ),
+    },
 } as const;
 
-export type GameMapShapeEditMode = keyof typeof GameMapShapeEditModeEnum;
+/* -------------------------------------------------------------------------- */
 
 const SelectModeButton = () => {
     const [editMode, setEditMode] = useAtom(gameMapShapeEditModeAtom);
@@ -68,13 +80,14 @@ const SelectModeButton = () => {
 
     const handleClick = () => setEditMode(GameMapShapeEditModeEnum.select);
 
-    const isSelected = editMode === GameMapShapeEditModeEnum.select;
-    const backgroundColor = isSelected ? Bg.blue500 : Bg.neutral500;
-    const hoverColor = isSelected ? Bg.hoverBlue400 : Bg.hoverNeutral400;
+    const backgroundColor =
+        editMode === GameMapShapeEditModeEnum.select
+            ? `${Bg.blue500} ${Bg.hoverBlue400}`
+            : `${Bg.neutral500} ${Bg.hoverNeutral400}`;
 
     return (
         <ShapesIconLargeButton
-            className={`${backgroundColor} ${hoverColor} ${Stroke.neutral50}`}
+            className={`${backgroundColor} ${Stroke.neutral50}`}
             description="図形選択"
             onClick={handleClick}
         />
@@ -88,13 +101,14 @@ const AdjustModeButton = () => {
 
     const handleClick = () => setEditMode(GameMapShapeEditModeEnum.adjust);
 
-    const isSelected = editMode === GameMapShapeEditModeEnum.adjust;
-    const backgroundColor = isSelected ? Bg.blue500 : Bg.neutral500;
-    const hoverColor = isSelected ? Bg.hoverBlue400 : Bg.hoverNeutral400;
+    const backgroundColor =
+        editMode === GameMapShapeEditModeEnum.adjust
+            ? `${Bg.blue500} ${Bg.hoverBlue400}`
+            : `${Bg.neutral500} ${Bg.hoverNeutral400}`;
 
     return (
         <WrenchIconLargeButton
-            className={`${backgroundColor} ${hoverColor} ${Stroke.neutral50}`}
+            className={`${backgroundColor} ${Stroke.neutral50}`}
             description="調整"
             onClick={handleClick}
         />
@@ -106,13 +120,14 @@ const MoveModeButton = () => {
 
     const handleClick = () => setEditMode(GameMapShapeEditModeEnum.move);
 
-    const isSelected = editMode === GameMapShapeEditModeEnum.move;
-    const backgroundColor = isSelected ? Bg.blue500 : Bg.neutral500;
-    const hoverColor = isSelected ? Bg.hoverBlue400 : Bg.hoverNeutral400;
+    const backgroundColor =
+        editMode === GameMapShapeEditModeEnum.move
+            ? `${Bg.blue500} ${Bg.hoverBlue400}`
+            : `${Bg.neutral500} ${Bg.hoverNeutral400}`;
 
     return (
         <MoveIconLargeButton
-            className={`${backgroundColor} ${hoverColor} ${Stroke.neutral50}`}
+            className={`${backgroundColor} ${Stroke.neutral50}`}
             description="座標移動"
             onClick={handleClick}
         />

@@ -35,13 +35,19 @@ export class GameMap implements WithId {
         this.id = id;
     }
 
-    static create = (
-        name: string,
-        gameMapDetails: GameMapDetailList,
-        gameMapShapes: GameMapShapeList,
-        image: string,
-        id: GameMapId,
-    ): GameMap =>
+    static create = ({
+        name,
+        gameMapDetails,
+        gameMapShapes,
+        image,
+        id,
+    }: {
+        name: string;
+        gameMapDetails: GameMapDetailList;
+        gameMapShapes: GameMapShapeList;
+        image: string;
+        id: GameMapId;
+    }): GameMap =>
         new GameMap(name.trim(), gameMapDetails, gameMapShapes, image, id);
 
     copyWith = (obj?: {
@@ -76,8 +82,8 @@ export class GameMapList extends ListWithId<GameMap, GameMapId> {
     added = (item: GameMap): GameMapList =>
         new GameMapList(...this.helperAdded(item));
 
-    replaced = (targetId: GameMapId, newItem: GameMap): GameMapList =>
-        new GameMapList(...this.helperReplaced(targetId, newItem));
+    replaced = (newItem: GameMap): GameMapList =>
+        new GameMapList(...this.helperReplaced(newItem));
 
     removed = (targetId: GameMapId): GameMapList =>
         new GameMapList(...this.helperRemoved(targetId));

@@ -16,17 +16,21 @@ const TextFieldWithPlaceholder = ({
     className?: string;
 }) => {
     return (
-        <div className={`flex h-10 items-center gap-2 ${className}`}>
-            <Input
-                className={`w-33 rounded-md border-2 p-1 ${Border.neutral500}`}
-                type="text"
-                placeholder={placeholder}
-                value={value}
-                onChange={onChange}
-            />
-            {value.length > 0 && (
-                <CircleXIconButton onClick={onCloseButtonClick} />
-            )}
+        <div className={className}>
+            <div className="flex items-center gap-2">
+                <Input
+                    className={`w-full rounded-md border-2 p-1 ${Border.neutral500}`}
+                    type="text"
+                    placeholder={placeholder}
+                    value={value}
+                    onChange={onChange}
+                />
+                <div
+                    className={`grid ${value.length === 0 ? "invisible" : ""}`}
+                >
+                    <CircleXIconButton onClick={onCloseButtonClick} />
+                </div>
+            </div>
         </div>
     );
 };

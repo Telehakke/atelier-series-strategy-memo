@@ -37,7 +37,6 @@ import { WrenchIconButton } from "./commons/iconButtons";
 const ToolsButton = () => {
     const isReadonly = useAtomValue(isReadonlyAtom);
     const [isOpen, setIsOpen] = useState(false);
-
     if (isReadonly) return <></>;
 
     return (
@@ -133,6 +132,7 @@ const ExportData = () => {
 };
 
 const ImportData = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const [message, setMessage] = useState<string | null>(null);
 
@@ -157,9 +157,13 @@ const ImportData = () => {
 
             try {
                 const obj = JSON.parse(text);
+                const strategyMemoRecord =
+                    StrategyMemoRecordUtility.copied(obj);
                 const strategyMemo =
-                    StrategyMemoRecordUtility.convertToStrategyMemo(obj);
-                LocalStorage.setStrategyMemo(strategyMemo);
+                    StrategyMemoRecordUtility.convertToStrategyMemo(
+                        strategyMemoRecord,
+                    );
+                LocalStorage.setStrategyMemo(strategyMemo, isReadonly);
                 setStrategyMemo(strategyMemo);
                 resetStateAll();
             } catch (error) {
@@ -202,6 +206,7 @@ const ImportData = () => {
 /* -------------------------------------------------------------------------- */
 
 const EmptyData = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -213,7 +218,7 @@ const EmptyData = () => {
             new MemoList(),
             new StrategyMemoId(uuidv4()),
         );
-        LocalStorage.setStrategyMemo(empty);
+        LocalStorage.setStrategyMemo(empty, isReadonly);
         setStrategyMemo(empty);
         setIsOpen(false);
         resetStateAll();
@@ -241,11 +246,12 @@ const EmptyData = () => {
 };
 
 const SetSampleData = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const [isOpen, setIsOpen] = useState(false);
 
     const handleClick = () => {
-        LocalStorage.setStrategyMemo(sampleData);
+        LocalStorage.setStrategyMemo(sampleData, isReadonly);
         setStrategyMemo(sampleData);
         setIsOpen(false);
         resetStateAll();
@@ -273,6 +279,7 @@ const SetSampleData = () => {
 };
 
 const UncheckedALL = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const setPreparations = useSetAtom(preparationsAtom);
@@ -282,7 +289,7 @@ const UncheckedALL = () => {
     const handleClick = () => {
         setStrategyMemo((v) => {
             const strategyMemo = v.uncheckedAll();
-            LocalStorage.setStrategyMemo(strategyMemo);
+            LocalStorage.setStrategyMemo(strategyMemo, isReadonly);
             setGameMaps(strategyMemo.gameMaps);
             setPreparations(strategyMemo.preparations);
             setMemos(strategyMemo.memos);

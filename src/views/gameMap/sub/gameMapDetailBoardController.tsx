@@ -2,6 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
     gameMapDetailSelectionManagerAtom,
     gameMapsAtom,
+    isReadonlyAtom,
     movementStepValueAtom,
     selectedGameMapIdAtom,
     strategyMemoAtom,
@@ -39,21 +40,28 @@ const GameMapDetailBoardController = ({
     if (selectionManager.controllerType !== ControllerTypeEnum.board)
         return <></>;
 
+    const HStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex gap-4">{children}</div>
+    );
+    const VStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex flex-col items-center gap-4">{children}</div>
+    );
+
     return (
         <div className={className}>
-            <div className="flex flex-col items-center gap-4">
+            <VStack>
                 <MoveTopButton gameMapId={selectedGameMapId} />
-                <div className="flex gap-4">
+                <HStack>
                     <MoveLeftButton gameMapId={selectedGameMapId} />
                     <MoveBottomButton gameMapId={selectedGameMapId} />
                     <MoveRightButton gameMapId={selectedGameMapId} />
-                </div>
-                <div className="flex gap-4">
+                </HStack>
+                <HStack>
                     <StepSwitchButton />
                     <SelectedAllButton gameMapId={selectedGameMapId} />
                     <XButton />
-                </div>
-            </div>
+                </HStack>
+            </VStack>
         </div>
     );
 };
@@ -75,19 +83,6 @@ const MoveTopButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
     );
 };
 
-const MoveBottomButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
-    const stepValue = useAtomValue(movementStepValueAtom);
-
-    return (
-        <MoveButton
-            gameMapId={gameMapId}
-            action={(point) => point.movedBottom(stepValue)}
-        >
-            <ChevronDown className={largeIconClassName} />
-        </MoveButton>
-    );
-};
-
 const MoveLeftButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
     const stepValue = useAtomValue(movementStepValueAtom);
 
@@ -97,6 +92,19 @@ const MoveLeftButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
             action={(point) => point.movedLeft(stepValue)}
         >
             <ChevronLeft className={largeIconClassName} />
+        </MoveButton>
+    );
+};
+
+const MoveBottomButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
+    const stepValue = useAtomValue(movementStepValueAtom);
+
+    return (
+        <MoveButton
+            gameMapId={gameMapId}
+            action={(point) => point.movedBottom(stepValue)}
+        >
+            <ChevronDown className={largeIconClassName} />
         </MoveButton>
     );
 };
@@ -123,6 +131,7 @@ const MoveButton = ({
     action: (point: Point) => Point;
     children: ReactNode;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const selectionManager = useAtomValue(gameMapDetailSelectionManagerAtom);
@@ -132,26 +141,24 @@ const MoveButton = ({
             const gameMap = v.gameMaps.find(gameMapId);
             if (gameMap == null) return v;
 
-            let newGameMapDetails = gameMap.gameMapDetails;
-            selectionManager.boardItems.forEach((id) => {
-                const gameMapDetail = gameMap.gameMapDetails.find(id);
-                if (gameMapDetail == null) return;
+            const newGameMapDetails = selectionManager.boardItems.reduce(
+                (gameMapDetails, id) => {
+                    const gameMapDetail = gameMap.gameMapDetails.find(id);
+                    if (gameMapDetail == null) return gameMapDetails;
 
-                const newGameMapDetail = gameMapDetail.copyWith({
-                    point: action(gameMapDetail.point),
-                });
-                newGameMapDetails = newGameMapDetails.replaced(
-                    gameMapDetail.id,
-                    newGameMapDetail,
-                );
-            });
-
+                    const newGameMapDetail = gameMapDetail.copyWith({
+                        point: action(gameMapDetail.point),
+                    });
+                    return gameMapDetails.replaced(newGameMapDetail);
+                },
+                gameMap.gameMapDetails,
+            );
             const newStrategyMemo = v.replacedGameMapDetails(
                 gameMap,
                 newGameMapDetails,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
     };

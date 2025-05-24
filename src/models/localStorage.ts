@@ -29,7 +29,12 @@ export default class LocalStorage {
         }
     };
 
-    static setStrategyMemo = (strategyMemo: StrategyMemo): void => {
+    static setStrategyMemo = (
+        strategyMemo: StrategyMemo,
+        isReadonly: boolean,
+    ): void => {
+        if (isReadonly) return;
+
         this.delayAction.run(() => {
             const strategyMemoRecord =
                 StrategyMemoRecordUtility.convertToStrategyMemoRecord(

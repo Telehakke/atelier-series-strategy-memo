@@ -24,7 +24,7 @@ import {
     X,
 } from "lucide-react";
 import React, { ReactNode } from "react";
-import { Bg, Stroke, Text } from "./classNames";
+import { Bg, Divide, Stroke, Text } from "./classNames";
 
 export const MiddleIconButton = ({
     onClick,
@@ -45,7 +45,7 @@ export const MiddleIconButton = ({
     );
 };
 
-export const MiddleIconClassName = "m-auto size-6 stroke-inherit";
+export const middleIconClassName = "m-auto size-6 stroke-inherit";
 
 export const PencilIconButton = ({
     onClick,
@@ -56,7 +56,7 @@ export const PencilIconButton = ({
 }) => {
     return (
         <MiddleIconButton className={className} onClick={onClick}>
-            <Pencil className={`${MiddleIconClassName}`} />
+            <Pencil className={`${middleIconClassName}`} />
         </MiddleIconButton>
     );
 };
@@ -70,7 +70,7 @@ export const TrashIconButton = ({
 }) => {
     return (
         <MiddleIconButton className={className} onClick={onClick}>
-            <Trash className={`${MiddleIconClassName}`} />
+            <Trash className={`${middleIconClassName}`} />
         </MiddleIconButton>
     );
 };
@@ -84,7 +84,7 @@ export const CircleXIconButton = ({
 }) => {
     return (
         <MiddleIconButton className={className} onClick={onClick}>
-            <CircleX className={`${MiddleIconClassName}`} />
+            <CircleX className={`${middleIconClassName}`} />
         </MiddleIconButton>
     );
 };
@@ -98,7 +98,7 @@ export const ImageIconButton = ({
 }) => {
     return (
         <MiddleIconButton className={className} onClick={onClick}>
-            <Image className={`${MiddleIconClassName}`} />
+            <Image className={`${middleIconClassName}`} />
         </MiddleIconButton>
     );
 };
@@ -112,7 +112,7 @@ export const ImageOffIconButton = ({
 }) => {
     return (
         <MiddleIconButton className={className} onClick={onClick}>
-            <ImageOff className={`${MiddleIconClassName}`} />
+            <ImageOff className={`${middleIconClassName}`} />
         </MiddleIconButton>
     );
 };
@@ -126,7 +126,7 @@ export const PanelLeftOpenIconButton = ({
 }) => {
     return (
         <MiddleIconButton className={className} onClick={onClick}>
-            <PanelLeftOpen className={`${MiddleIconClassName}`} />
+            <PanelLeftOpen className={`${middleIconClassName}`} />
         </MiddleIconButton>
     );
 };
@@ -140,7 +140,7 @@ export const PanelLeftCloseIconButton = ({
 }) => {
     return (
         <MiddleIconButton className={className} onClick={onClick}>
-            <PanelLeftClose className={`${MiddleIconClassName}`} />
+            <PanelLeftClose className={`${middleIconClassName}`} />
         </MiddleIconButton>
     );
 };
@@ -154,7 +154,7 @@ export const WrenchIconButton = ({
 }) => {
     return (
         <MiddleIconButton className={className} onClick={onClick}>
-            <Wrench className={`${MiddleIconClassName}`} />
+            <Wrench className={`${middleIconClassName}`} />
         </MiddleIconButton>
     );
 };
@@ -528,6 +528,96 @@ export const FilesIconLargeButton = ({
         >
             {<Files className={largeIconClassName} />}
         </LargeIconButton>
+    );
+};
+
+/* -------------------------------------------------------------------------- */
+
+export const VerticalSegmentedIconButton = ({
+    description,
+    topIcon,
+    bottomIcon,
+    onTopButtonClick,
+    onBottomButtonClick,
+}: {
+    description: string;
+    topIcon: ReactNode;
+    bottomIcon: ReactNode;
+    onTopButtonClick: () => void;
+    onBottomButtonClick: () => void;
+}) => {
+    return (
+        <div
+            className={`relative flex flex-col divide-y-1 ${Divide.neutral50} ${Stroke.neutral50}`}
+        >
+            <Button
+                className={`h-16 w-14 rounded-t-full ${Bg.yellow500} ${Bg.hoverYellow400}`}
+                onClick={onTopButtonClick}
+            >
+                {topIcon}
+            </Button>
+            <Button
+                className={`h-16 w-14 rounded-b-full ${Bg.yellow500} ${Bg.hoverYellow400}`}
+                onClick={onBottomButtonClick}
+            >
+                {bottomIcon}
+            </Button>
+            <p
+                className={`absolute -bottom-2 left-1/2 -translate-x-1/2 bg-black/70 px-1 text-[10px] text-nowrap ${Text.neutral100}`}
+            >
+                {description}
+            </p>
+        </div>
+    );
+};
+
+export const HorizontalSegmentedIconButton = ({
+    description,
+    leftIcon,
+    middleIcon,
+    rightIcon,
+    onLeftButtonClick,
+    onMiddleButtonClick,
+    onRightButtonClick,
+}: {
+    description?: string;
+    leftIcon: ReactNode;
+    middleIcon: ReactNode;
+    rightIcon: ReactNode;
+    onLeftButtonClick: () => void;
+    onMiddleButtonClick: () => void;
+    onRightButtonClick: () => void;
+}) => {
+    return (
+        <div className="relative">
+            <div
+                className={`flex divide-x-1 ${Divide.neutral50} ${Stroke.neutral50}`}
+            >
+                <Button
+                    className={`h-14 w-16 rounded-l-full ${Bg.yellow500} ${Bg.hoverYellow400}`}
+                    onClick={onLeftButtonClick}
+                >
+                    {leftIcon}
+                </Button>
+                <Button
+                    className={`h-14 w-18 ${Bg.yellow500} ${Bg.hoverYellow400}`}
+                    onClick={onMiddleButtonClick}
+                >
+                    {middleIcon}
+                </Button>
+                <Button
+                    className={`h-14 w-16 rounded-r-full ${Bg.yellow500} ${Bg.hoverYellow400}`}
+                    onClick={onRightButtonClick}
+                >
+                    {rightIcon}
+                </Button>
+            </div>
+            <p
+                className={`absolute -bottom-2 left-1/2 -translate-x-1/2 bg-black/70 px-1 text-[10px] text-nowrap ${Text.neutral100}`}
+            >
+                {description}
+            </p>
+        </div>
     );
 };
 

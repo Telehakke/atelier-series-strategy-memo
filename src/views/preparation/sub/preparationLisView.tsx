@@ -1,5 +1,4 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-
 import { ReactNode } from "react";
 import {
     canSelectMultipleAtom,
@@ -14,7 +13,6 @@ import LocalStorage from "../../../models/localStorage";
 import { Preparation, PreparationIdList } from "../../../models/preparation";
 import PreparationFilter from "../../../models/preparationFilter";
 import Split from "../../../models/split";
-
 import CardBase from "../../commons/cardBase";
 import { Bg, Text } from "../../commons/classNames";
 
@@ -27,7 +25,7 @@ const PreparationListView = () => {
     );
 
     return (
-        <div className="space-y-2 pb-60">
+        <div className="flex flex-col items-center gap-2 pb-60">
             {filteredPreparations.map((v) => (
                 <Card key={v.id.value} preparation={v} />
             ))}
@@ -80,17 +78,14 @@ const Card = ({ preparation }: { preparation: Preparation }) => {
     ) => {
         if (isReadonly) return;
 
-        const newPreparation = preparation.copyWith({
-            checked: event.target.checked,
-        });
         setStrategyMemo((v) => {
-            const newPreparations = v.preparations.replaced(
-                preparation.id,
-                newPreparation,
-            );
+            const newPreparation = preparation.copyWith({
+                checked: event.target.checked,
+            });
+            const newPreparations = v.preparations.replaced(newPreparation);
             const newStrategyMemo = v.replacedPreparations(newPreparations);
             setPreparations(newStrategyMemo.preparations);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
     };

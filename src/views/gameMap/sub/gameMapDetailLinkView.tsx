@@ -38,7 +38,7 @@ const GameMapDetailLinkView = ({ className }: { className?: string }) => {
     };
 
     return (
-        <div className={`w-45 ${className}`}>
+        <div className={className}>
             {filteredGameMapDetails().map((v) => (
                 <a
                     className={`block truncate leading-8 ${Text.hoverBlue500}`}

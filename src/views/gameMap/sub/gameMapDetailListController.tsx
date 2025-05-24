@@ -8,6 +8,7 @@ import {
     gameMapsAtom,
     isEditGameMapDialogOpenAtom,
     isGameMapDetailEditModeAtom,
+    isReadonlyAtom,
     selectedGameMapIdAtom,
     strategyMemoAtom,
 } from "../../../atoms";
@@ -30,12 +31,12 @@ import {
     ClipboardCopyIconLargeButton,
     ClipboardPasteIconLargeButton,
     FilesIconLargeButton,
-    LargeIconButton,
     largeIconClassName,
     MoveIconLargeButton,
     PencilIconLargeButton,
     PlusIconLargeButton,
     TrashIconLargeButton,
+    VerticalSegmentedIconButton,
     XIconLargeButton,
 } from "../../commons/iconButtons";
 import TextEditor from "../../commons/textEditor";
@@ -47,50 +48,28 @@ const GameMapDetailListController = ({ className }: { className?: string }) => {
     const selectedGameMapId = useAtomValue(selectedGameMapIdAtom);
     if (selectedGameMapId == null) return <></>;
 
-    if (
-        selectionManager.controllerType === ControllerTypeEnum.list &&
-        copiedItems.isEmpty
-    )
+    if (selectionManager.controllerType === ControllerTypeEnum.list)
         return (
-            <div className={`flex gap-4 ${className}`}>
-                <div className="flex flex-col justify-end gap-4">
-                    <MoveButton />
-                    <SelectionModeToggleButton />
-                </div>
-                <div className="flex flex-col justify-end gap-4">
-                    <EditItemButton gameMapId={selectedGameMapId} />
-                    <CopyButton
+            <div className={className}>
+                {copiedItems.isEmpty ? (
+                    <ItemActionButtons
                         gameMapId={selectedGameMapId}
                         setCopiedItems={setCopiedItems}
                     />
-                    <RemoveItemButton gameMapId={selectedGameMapId} />
-                </div>
-                <div className="flex flex-col justify-end gap-4">
-                    <MoveItemUpButton gameMapId={selectedGameMapId} />
-                    <MoveItemDownButton gameMapId={selectedGameMapId} />
-                    <XButton />
-                </div>
-            </div>
-        );
-
-    if (
-        selectionManager.controllerType === ControllerTypeEnum.list &&
-        copiedItems.isNotEmpty
-    )
-        return (
-            <div className={className}>
-                <PasteAndXButtons
-                    gameMapId={selectedGameMapId}
-                    copiedItems={copiedItems}
-                    setCopiedItems={setCopiedItems}
-                />
+                ) : (
+                    <PasteAndXButtons
+                        gameMapId={selectedGameMapId}
+                        copiedItems={copiedItems}
+                        setCopiedItems={setCopiedItems}
+                    />
+                )}
             </div>
         );
 
     if (selectionManager.controllerType === ControllerTypeEnum.none)
         return (
             <div className={className}>
-                <div className="flex flex-col gap-4">
+                <div className={"flex flex-col gap-4"}>
                     <ShowGameMapShapeButton />
                     <AddItemButton gameMapId={selectedGameMapId} />
                 </div>
@@ -101,6 +80,45 @@ const GameMapDetailListController = ({ className }: { className?: string }) => {
 };
 
 export default GameMapDetailListController;
+
+/* -------------------------------------------------------------------------- */
+
+const ItemActionButtons = ({
+    gameMapId,
+    setCopiedItems,
+}: {
+    gameMapId: GameMapId;
+    setCopiedItems: React.Dispatch<React.SetStateAction<GameMapDetailList>>;
+}) => {
+    const HStack = ({ children }: { children: ReactNode }) => (
+        <div className={"flex gap-4"}>{children}</div>
+    );
+
+    const VStack = ({ children }: { children: ReactNode }) => (
+        <div className={"flex flex-col justify-end gap-4"}>{children}</div>
+    );
+
+    return (
+        <HStack>
+            <VStack>
+                <MoveButton />
+                <SelectionModeToggleButton />
+            </VStack>
+            <VStack>
+                <EditItemButton gameMapId={gameMapId} />
+                <CopyButton
+                    gameMapId={gameMapId}
+                    setCopiedItems={setCopiedItems}
+                />
+                <RemoveItemButton gameMapId={gameMapId} />
+            </VStack>
+            <VStack>
+                <MoveItemButton gameMapId={gameMapId} />
+                <XButton />
+            </VStack>
+        </HStack>
+    );
+};
 
 /* -------------------------------------------------------------------------- */
 
@@ -134,6 +152,7 @@ const AddItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const setSelectionManager = useSetAtom(gameMapDetailSelectionManagerAtom);
@@ -149,18 +168,18 @@ const AddItemDialog = ({
     const [message, setMessage] = useState("");
 
     const handleClick = () => {
-        const gameMapDetail = GameMapDetail.create(
-            name,
-            items,
-            monsters,
-            memo,
-            icon,
-            x,
-            y,
-            new GameMapId(goto),
-            false,
-            new GameMapDetailId(uuidv4()),
-        );
+        const gameMapDetail = GameMapDetail.create({
+            name: name,
+            items: items,
+            monsters: monsters,
+            memo: memo,
+            icon: icon,
+            x: x,
+            y: y,
+            goto: new GameMapId(goto),
+            checked: false,
+            id: new GameMapDetailId(uuidv4()),
+        });
 
         try {
             setStrategyMemo((v) => {
@@ -174,7 +193,7 @@ const AddItemDialog = ({
                     newGameMapDetails,
                 );
                 setGameMaps(newStrategyMemo.gameMaps);
-                LocalStorage.setStrategyMemo(newStrategyMemo);
+                LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
                 return newStrategyMemo;
             });
             // アイテムを追加したら、マップ上で連動するアイテムを選択状態にする
@@ -203,25 +222,27 @@ const AddItemDialog = ({
             secondaryButtonLabel="キャンセル"
             handlePrimaryButtonClick={handleClick}
         >
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
                 <p>{message}</p>
                 <GameMapInput
-                    name={name}
-                    setName={setName}
-                    items={items}
-                    setItems={setItems}
-                    monsters={monsters}
-                    setMonsters={setMonsters}
-                    memo={memo}
-                    setMemo={setMemo}
-                    icon={icon}
-                    setIcon={setIcon}
-                    x={x}
-                    setX={setX}
-                    y={y}
-                    setY={setY}
-                    goto={goto}
-                    setGoto={setGoto}
+                    state={{
+                        name: name,
+                        items: items,
+                        monsters: monsters,
+                        memo: memo,
+                        icon: icon,
+                        x: x,
+                        y: y,
+                        goto: goto,
+                        setName: setName,
+                        setItems: setItems,
+                        setMonsters: setMonsters,
+                        setMemo: setMemo,
+                        setIcon: setIcon,
+                        setX: setX,
+                        setY: setY,
+                        setGoto: setGoto,
+                    }}
                 />
             </div>
         </DialogView>
@@ -231,9 +252,7 @@ const AddItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const EditItemButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
-    const [isEditDialogOpen, setIsEditDialogOpen] = useAtom(
-        isEditGameMapDialogOpenAtom,
-    );
+    const [isOpen, setIsOpen] = useAtom(isEditGameMapDialogOpenAtom);
     const selectionManager = useAtomValue(gameMapDetailSelectionManagerAtom);
     if (selectionManager.listItems.length !== 1) return <></>;
 
@@ -242,9 +261,9 @@ const EditItemButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
             <PencilIconLargeButton
                 className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                 description="編集"
-                onClick={() => setIsEditDialogOpen(true)}
+                onClick={() => setIsOpen(true)}
             />
-            {isEditDialogOpen && (
+            {isOpen && (
                 <EditItemDialog
                     gameMapId={gameMapId}
                     gameMapDetailId={selectionManager.listItems.at(0)!}
@@ -261,18 +280,20 @@ const EditItemDialog = ({
     gameMapId: GameMapId;
     gameMapDetailId: GameMapDetailId;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setSelectionManager = useSetAtom(gameMapDetailSelectionManagerAtom);
-    const [isEditDialogOpen, setIsEditDialogOpen] = useAtom(
-        isEditGameMapDialogOpenAtom,
-    );
+    const [isOpen, setIsOpen] = useAtom(isEditGameMapDialogOpenAtom);
+
     const [gameMaps, setGameMaps] = useAtom(gameMapsAtom);
     const gameMap = gameMaps.find(gameMapId);
     const gameMapDetail = gameMap?.gameMapDetails.find(gameMapDetailId) ?? null;
     const [name, setName] = useState(gameMapDetail?.name ?? "");
-    const [items, setItems] = useState(gameMapDetail?.items.join("、") ?? "");
+    const [items, setItems] = useState(
+        gameMapDetail?.itemsToCommaSeparatedStr ?? "",
+    );
     const [monsters, setMonsters] = useState(
-        gameMapDetail?.monsters.join("、") ?? "",
+        gameMapDetail?.monstersToCommaSeparatedStr ?? "",
     );
     const [memo, setMemo] = useState(gameMapDetail?.memo ?? "");
     const [icon, setIcon] = useState(gameMapDetail?.icon ?? "");
@@ -285,31 +306,29 @@ const EditItemDialog = ({
     if (gameMapDetail == null) return <></>;
 
     const handleClick = () => {
-        const editedGameMapDetail = GameMapDetail.create(
-            name,
-            items,
-            monsters,
-            memo,
-            icon,
-            x,
-            y,
-            new GameMapId(goto),
-            gameMapDetail.checked,
-            gameMapDetail.id,
-        );
+        const editedGameMapDetail = GameMapDetail.create({
+            name: name,
+            items: items,
+            monsters: monsters,
+            memo: memo,
+            icon: icon,
+            x: x,
+            y: y,
+            goto: new GameMapId(goto),
+            checked: gameMapDetail.checked,
+            id: gameMapDetail.id,
+        });
 
         try {
             setStrategyMemo((v) => {
-                const newGameMapDetails = gameMap.gameMapDetails.replaced(
-                    gameMapDetail.id,
-                    editedGameMapDetail,
-                );
+                const newGameMapDetails =
+                    gameMap.gameMapDetails.replaced(editedGameMapDetail);
                 const newStrategyMemo = v.replacedGameMapDetails(
                     gameMap,
                     newGameMapDetails,
                 );
                 setGameMaps(newStrategyMemo.gameMaps);
-                LocalStorage.setStrategyMemo(newStrategyMemo);
+                LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
                 return newStrategyMemo;
             });
             setSelectionManager((v) =>
@@ -318,7 +337,7 @@ const EditItemDialog = ({
                     listItems: new GameMapDetailIdList(),
                 }),
             );
-            setIsEditDialogOpen(false);
+            setIsOpen(false);
         } catch (error) {
             if (ErrorChecker.isQuotaExceededError(error)) {
                 setMessage(ErrorChecker.quotaExceededErrorMessage);
@@ -331,8 +350,8 @@ const EditItemDialog = ({
 
     return (
         <DialogView
-            isOpen={isEditDialogOpen}
-            setIsOpen={setIsEditDialogOpen}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
             title="項目の編集"
             primaryButtonLabel="変更"
             secondaryButtonLabel="キャンセル"
@@ -341,22 +360,24 @@ const EditItemDialog = ({
             <div className="space-y-2">
                 <p>{message}</p>
                 <GameMapInput
-                    name={name}
-                    setName={setName}
-                    items={items}
-                    setItems={setItems}
-                    monsters={monsters}
-                    setMonsters={setMonsters}
-                    memo={memo}
-                    setMemo={setMemo}
-                    icon={icon}
-                    setIcon={setIcon}
-                    x={x}
-                    setX={setX}
-                    y={y}
-                    setY={setY}
-                    goto={goto}
-                    setGoto={setGoto}
+                    state={{
+                        name: name,
+                        items: items,
+                        monsters: monsters,
+                        memo: memo,
+                        icon: icon,
+                        x: x,
+                        y: y,
+                        goto: goto,
+                        setName: setName,
+                        setItems: setItems,
+                        setMonsters: setMonsters,
+                        setMemo: setMemo,
+                        setIcon: setIcon,
+                        setX: setX,
+                        setY: setY,
+                        setGoto: setGoto,
+                    }}
                 />
             </div>
         </DialogView>
@@ -395,6 +416,7 @@ const RemoveItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const [selectionManager, setSelectionManager] = useAtom(
@@ -406,16 +428,16 @@ const RemoveItemDialog = ({
             const gameMap = v.gameMaps.find(gameMapId);
             if (gameMap == null) return v;
 
-            let newGameMapDetails = gameMap.gameMapDetails;
-            selectionManager.listItems.forEach((id) => {
-                newGameMapDetails = newGameMapDetails.removed(id);
-            });
+            const newGameMapDetails = selectionManager.listItems.reduce(
+                (gameMapDetails, id) => gameMapDetails.removed(id),
+                gameMap.gameMapDetails,
+            );
             const newStrategyMemo = v.replacedGameMapDetails(
                 gameMap,
                 newGameMapDetails,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setSelectionManager((v) =>
@@ -442,82 +464,67 @@ const RemoveItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const GameMapInput = ({
-    name,
-    setName,
-    items,
-    setItems,
-    monsters,
-    setMonsters,
-    memo,
-    setMemo,
-    icon,
-    setIcon,
-    x,
-    setX,
-    y,
-    setY,
-    goto,
-    setGoto,
-}: {
+type InputState = {
     name: string;
-    setName: React.Dispatch<React.SetStateAction<string>>;
     items: string;
-    setItems: React.Dispatch<React.SetStateAction<string>>;
     monsters: string;
-    setMonsters: React.Dispatch<React.SetStateAction<string>>;
     memo: string;
-    setMemo: React.Dispatch<React.SetStateAction<string>>;
     icon: string;
-    setIcon: React.Dispatch<React.SetStateAction<string>>;
     x: string;
-    setX: React.Dispatch<React.SetStateAction<string>>;
     y: string;
-    setY: React.Dispatch<React.SetStateAction<string>>;
     goto: string;
+    setName: React.Dispatch<React.SetStateAction<string>>;
+    setItems: React.Dispatch<React.SetStateAction<string>>;
+    setMonsters: React.Dispatch<React.SetStateAction<string>>;
+    setMemo: React.Dispatch<React.SetStateAction<string>>;
+    setIcon: React.Dispatch<React.SetStateAction<string>>;
+    setX: React.Dispatch<React.SetStateAction<string>>;
+    setY: React.Dispatch<React.SetStateAction<string>>;
     setGoto: React.Dispatch<React.SetStateAction<string>>;
-}) => {
+};
+
+const GameMapInput = ({ state }: { state: InputState }) => {
     const gameMaps = useAtomValue(gameMapsAtom);
 
     return (
         <div className="flex flex-col gap-2">
             <TextField
                 label="名前"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={state.name}
+                onChange={(e) => state.setName(e.target.value)}
             />
             <TextField
                 label="アイテム"
-                value={items}
-                onChange={(e) => setItems(e.target.value)}
+                value={state.items}
+                onChange={(e) => state.setItems(e.target.value)}
             />
             <TextField
                 label="モンスター"
-                value={monsters}
-                onChange={(e) => setMonsters(e.target.value)}
+                value={state.monsters}
+                onChange={(e) => state.setMonsters(e.target.value)}
             />
             <TextEditor
                 className="h-20"
                 label="メモ"
-                value={memo}
-                onChange={(e) => setMemo(e.target.value)}
+                value={state.memo}
+                onChange={(e) => state.setMemo(e.target.value)}
             />
             <div className="flex gap-2">
                 <div className="grid w-2/3 grid-cols-3 gap-2">
                     <TextField
                         label="アイコン"
-                        value={icon}
-                        onChange={(e) => setIcon(e.target.value)}
+                        value={state.icon}
+                        onChange={(e) => state.setIcon(e.target.value)}
                     />
                     <TextField
                         label="座標x"
-                        value={x}
-                        onChange={(e) => setX(e.target.value)}
+                        value={state.x}
+                        onChange={(e) => state.setX(e.target.value)}
                     />
                     <TextField
                         label="座標y"
-                        value={y}
-                        onChange={(e) => setY(e.target.value)}
+                        value={state.y}
+                        onChange={(e) => state.setY(e.target.value)}
                     />
                 </div>
                 <Field className="w-1/3">
@@ -526,8 +533,8 @@ const GameMapInput = ({
                     </Label>
                     <Select
                         className={`h-9 w-full rounded-md border-2 ${Border.neutral500}`}
-                        value={goto}
-                        onChange={(e) => setGoto(e.target.value)}
+                        value={state.goto}
+                        onChange={(e) => state.setGoto(e.target.value)}
                     >
                         <option>-</option>
                         {gameMaps.items.map((v) => (
@@ -544,44 +551,8 @@ const GameMapInput = ({
 
 /* -------------------------------------------------------------------------- */
 
-const MoveItemUpButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
-    return (
-        <MoveItemButton
-            gameMapId={gameMapId}
-            description="下へ移動"
-            action={(gameMapDetails, id) => gameMapDetails.movedUp(id)}
-        >
-            <ChevronUp className={largeIconClassName} />
-        </MoveItemButton>
-    );
-};
-
-const MoveItemDownButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
-    return (
-        <MoveItemButton
-            gameMapId={gameMapId}
-            description="下へ移動"
-            action={(gameMapDetails, id) => gameMapDetails.movedDown(id)}
-        >
-            <ChevronDown className={largeIconClassName} />
-        </MoveItemButton>
-    );
-};
-
-const MoveItemButton = ({
-    gameMapId,
-    description,
-    action,
-    children,
-}: {
-    gameMapId: GameMapId;
-    description: string;
-    action: (
-        gameMapDetails: GameMapDetailList,
-        id: GameMapDetailId,
-    ) => GameMapDetailList;
-    children: ReactNode;
-}) => {
+const MoveItemButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const selectionManager = useAtomValue(gameMapDetailSelectionManagerAtom);
@@ -589,30 +560,37 @@ const MoveItemButton = ({
 
     const id = selectionManager.listItems.at(0)!;
 
-    const handleClick = () => {
+    const moveItem = (
+        action: (gameMapDetails: GameMapDetailList) => GameMapDetailList,
+    ) =>
         setStrategyMemo((v) => {
             const gameMap = v.gameMaps.find(gameMapId);
             if (gameMap == null) return v;
 
-            const newGameMapDetails = action(gameMap.gameMapDetails, id);
+            const newGameMapDetails = action(gameMap.gameMapDetails);
             const newStrategyMemo = v.replacedGameMapDetails(
                 gameMap,
                 newGameMapDetails,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
-    };
+
+    const handleTopButtonClick = () =>
+        moveItem((gameMapDetails) => gameMapDetails.movedUp(id));
+
+    const handleBottomButtonClick = () =>
+        moveItem((gameMapDetails) => gameMapDetails.movedDown(id));
 
     return (
-        <LargeIconButton
-            className={`${Bg.yellow500} ${Bg.hoverYellow400} ${Stroke.neutral50}`}
-            description={description}
-            onClick={handleClick}
-        >
-            {children}
-        </LargeIconButton>
+        <VerticalSegmentedIconButton
+            description="移動"
+            topIcon={<ChevronUp className={largeIconClassName} />}
+            bottomIcon={<ChevronDown className={largeIconClassName} />}
+            onTopButtonClick={handleTopButtonClick}
+            onBottomButtonClick={handleBottomButtonClick}
+        />
     );
 };
 
@@ -656,6 +634,7 @@ const PasteAndXButtons = ({
     copiedItems: GameMapDetailList;
     setCopiedItems: React.Dispatch<React.SetStateAction<GameMapDetailList>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const setSelectionManager = useSetAtom(gameMapDetailSelectionManagerAtom);
@@ -665,21 +644,25 @@ const PasteAndXButtons = ({
             const gameMap = v.gameMaps.find(gameMapId);
             if (gameMap == null) return v;
 
-            let selectedIds = new GameMapDetailIdList();
-            let newGameMapDetails = gameMap.gameMapDetails;
-            copiedItems.forEach((gameMapDetail) => {
-                const newGameMapDetail = gameMapDetail.copyWith({
-                    id: new GameMapDetailId(uuidv4()),
-                });
-                selectedIds = selectedIds.added(newGameMapDetail.id);
-                newGameMapDetails = newGameMapDetails.added(newGameMapDetail);
-            });
+            const [newGameMapDetails, selectedIds] = copiedItems.reduce(
+                ([gameMapDetails, selectedIds], gameMapDetail) => {
+                    const newGameMapDetail = gameMapDetail.copyWith({
+                        id: new GameMapDetailId(uuidv4()),
+                    });
+
+                    return [
+                        gameMapDetails.added(newGameMapDetail),
+                        selectedIds.added(newGameMapDetail.id),
+                    ];
+                },
+                [gameMap.gameMapDetails, new GameMapDetailIdList()],
+            );
             const newStrategyMemo = v.replacedGameMapDetails(
                 gameMap,
                 newGameMapDetails,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
 
             // アイテムを複製したら、マップ上で連動するアイテムを選択状態にする
             setSelectionManager((v) =>
@@ -739,12 +722,13 @@ const SelectionModeToggleButton = () => {
 
     const handleClick = () => setCanSelectMultiple((v) => !v);
 
-    const backgroundColor = canSelectMultiple ? Bg.blue500 : Bg.neutral500;
-    const hoverColor = canSelectMultiple ? Bg.hoverBlue400 : Bg.hoverNeutral400;
+    const backgroundColor = canSelectMultiple
+        ? `${Bg.blue500} ${Bg.hoverBlue400}`
+        : `${Bg.neutral500} ${Bg.hoverNeutral400}`;
 
     return (
         <FilesIconLargeButton
-            className={`${backgroundColor} ${hoverColor} ${Stroke.neutral50}`}
+            className={`${backgroundColor} ${Stroke.neutral50}`}
             description={canSelectMultiple ? "複数選択ON" : "複数選択OFF"}
             onClick={handleClick}
         />

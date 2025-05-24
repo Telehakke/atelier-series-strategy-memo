@@ -97,11 +97,11 @@ const Card = ({
 
         // マップアイテムの選択状態を切り替える
         setSelectionManager((v) =>
-            v.boardItems.hasId(gameMapDetail.id)
-                ? v.copyWith({ boardItems: new GameMapDetailIdList() })
-                : v.copyWith({
-                      boardItems: new GameMapDetailIdList(gameMapDetail.id),
-                  }),
+            v.copyWith({
+                boardItems: v.boardItems.hasId(gameMapDetail.id)
+                    ? new GameMapDetailIdList()
+                    : new GameMapDetailIdList(gameMapDetail.id),
+            }),
         );
     };
 

@@ -9,6 +9,10 @@ import {
 
 import { GameMapId } from "../../../models/gameMap";
 import { Bg, Border } from "../../commons/classNames";
+import {
+    BoardItemMovementXSlider,
+    BoardItemMovementYSlider,
+} from "./boardItemMovementSlider";
 import GameMapDetailBoard from "./gameMapDetailBoard";
 import GameMapShapeBoard from "./gameMapShapeBoard";
 
@@ -20,10 +24,11 @@ const GameMapCanvas = ({ className }: { className?: string }) => {
 
     useEffect(() => {
         // キャンバスがリサイズされたら縮小率を記録する
+        const canvasMaxWidth = 600;
         const observer = new ResizeObserver((entries) => {
             entries.forEach((e) => {
                 const width = e.target.getBoundingClientRect().width;
-                setCanvasScale(width / 600);
+                setCanvasScale(width / canvasMaxWidth);
             });
         });
         if (divElement.current != null) {
@@ -33,33 +38,37 @@ const GameMapCanvas = ({ className }: { className?: string }) => {
         return () => {
             observer.disconnect();
         };
-    }, [setCanvasScale]);
+    }, [divElement, setCanvasScale]);
 
     if (selectedGameMapId == null) return <></>;
 
     return (
-        <div
-            className={`relative mx-auto max-w-150 overflow-clip border-1 ${Bg.neutral50_950} ${Border.neutral950_300} ${className}`}
-            ref={divElement}
-        >
-            <Canvas />
-            <Image
-                className="absolute inset-0 size-full object-contain"
-                gameMapId={selectedGameMapId}
-            />
-            {/* マップの図形を編集中は、マップ詳細ラベルのレイヤーを下げる */}
-            {!isGameMapDetailEditMode && (
-                <>
-                    <div className="opacity-30">
-                        <GameMapDetailBoard gameMapId={selectedGameMapId} />
-                    </div>
-                    <div className="absolute inset-0 size-full"></div>
-                </>
-            )}
-            <GameMapShapeBoard gameMapId={selectedGameMapId} />
-            {isGameMapDetailEditMode && (
-                <GameMapDetailBoard gameMapId={selectedGameMapId} />
-            )}
+        <div>
+            <div
+                className={`relative mx-auto max-w-150 overflow-clip border-1 ${Bg.neutral50_950} ${Border.neutral950_300} ${className}`}
+                ref={divElement}
+            >
+                <Canvas />
+                <Image
+                    className="absolute inset-0 size-full object-contain"
+                    gameMapId={selectedGameMapId}
+                />
+                {/* マップの図形を編集中は、マップ詳細ラベルのレイヤーを下げる */}
+                {!isGameMapDetailEditMode && (
+                    <>
+                        <div className="opacity-30">
+                            <GameMapDetailBoard gameMapId={selectedGameMapId} />
+                        </div>
+                        <div className="absolute inset-0 size-full" />
+                    </>
+                )}
+                <GameMapShapeBoard gameMapId={selectedGameMapId} />
+                {isGameMapDetailEditMode && (
+                    <GameMapDetailBoard gameMapId={selectedGameMapId} />
+                )}
+                <BoardItemMovementYSlider className="absolute top-0 right-0 bottom-0" />
+            </div>
+            <BoardItemMovementXSlider className="mx-auto flex" />
         </div>
     );
 };
@@ -73,12 +82,12 @@ const Canvas = () => {
     const length = 200;
 
     useEffect(() => {
-        // 方眼を描く
         if (canvas.current == null) return;
 
         const ctx = canvas.current.getContext("2d");
         if (ctx == null) return;
 
+        // 方眼を描く
         ctx.strokeStyle = "#ccc";
         ctx.lineWidth = 1;
         const step = length / 10;

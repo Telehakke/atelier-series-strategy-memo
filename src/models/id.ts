@@ -45,6 +45,11 @@ export abstract class IdList<T extends Id> {
 
     protected helperRemoved = (targetId: T): readonly T[] =>
         this.items.filter((v) => v.value !== targetId.value);
+
+    reduce = <U>(
+        callbackfn: (accumulator: U, currentValue: T) => U,
+        initialValue: U,
+    ): U => this.items.reduce(callbackfn, initialValue);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -108,14 +113,19 @@ export abstract class ListWithId<T extends WithId, U extends Id> {
         predicate: (value: T, index: number, array: readonly T[]) => boolean,
     ): T[] => this.items.filter(predicate);
 
+    reduce = <V>(
+        callbackfn: (accumulator: V, currentValue: T) => V,
+        initialValue: V,
+    ): V => this.items.reduce(callbackfn, initialValue);
+
     abstract added(item: T): ListWithId<T, U>;
 
     protected helperAdded = (item: T): readonly T[] => [...this.items, item];
 
-    abstract replaced(targetId: U, newItem: T): ListWithId<T, U>;
+    abstract replaced(newItem: T): ListWithId<T, U>;
 
-    protected helperReplaced = (targetId: U, newItem: T): T[] =>
-        this.items.map((v) => (v.id.value === targetId.value ? newItem : v));
+    protected helperReplaced = (newItem: T): T[] =>
+        this.items.map((v) => (v.id.value === newItem.id.value ? newItem : v));
 
     abstract removed(targetId: U): ListWithId<T, U>;
 

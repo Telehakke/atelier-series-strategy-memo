@@ -23,7 +23,7 @@ const CardBase = ({
 }) => {
     return (
         <div
-            className={`mx-auto max-w-150 overflow-clip rounded-md border-2 hover:ring-4 ${Ring.blue500} ${Border.neutral950_300}`}
+            className={`w-full max-w-150 overflow-clip rounded-md border-2 hover:ring-4 ${Ring.blue500} ${Border.neutral950_300}`}
             onClick={onClick}
             onDoubleClick={onDoubleClick}
         >

@@ -20,7 +20,7 @@ const GameMapListView = ({ className }: { className?: string }) => {
     if (filteredGameMaps.length === 0) return <></>;
 
     return (
-        <div className={`w-45 ${className}`}>
+        <div className={className}>
             <ul
                 className={`cursor-default divide-y-1 overflow-clip rounded-md border-2 ${Border.neutral950_300} ${Divide.neutral300_800}`}
             >

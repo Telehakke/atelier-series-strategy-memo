@@ -29,7 +29,7 @@ const GameMapDetailListView = ({ gameMap }: { gameMap: GameMap }) => {
     // マップ上のアイテムが選択された場合はそのアイテムだけを表示し、
     // 未選択であればフィルタリングの結果を表示する
     const filteredGameMapDetails = selectionManager.boardItems.isNotEmpty
-        ? gameMap.gameMapDetails.items.filter((v) =>
+        ? gameMap.gameMapDetails.filter((v) =>
               selectionManager.boardItems.hasId(v.id),
           )
         : GameMapDetailFilter.filtered(
@@ -38,7 +38,7 @@ const GameMapDetailListView = ({ gameMap }: { gameMap: GameMap }) => {
           );
 
     return (
-        <div className={`space-y-2 pb-60`}>
+        <div className={`flex flex-col items-center gap-2 pb-60`}>
             {filteredGameMapDetails.map((v) => (
                 <Card key={v.id.value} gameMap={gameMap} gameMapDetail={v} />
             ))}
@@ -112,16 +112,14 @@ const Card = ({
             const newGameMapDetail = gameMapDetail.copyWith({
                 checked: event.target.checked,
             });
-            const newGameMapDetails = gameMap.gameMapDetails.replaced(
-                gameMapDetail.id,
-                newGameMapDetail,
-            );
+            const newGameMapDetails =
+                gameMap.gameMapDetails.replaced(newGameMapDetail);
             const newStrategyMemo = v.replacedGameMapDetails(
                 gameMap,
                 newGameMapDetails,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
     };
@@ -142,62 +140,88 @@ const Card = ({
 };
 
 const Contents = ({ gameMapDetail }: { gameMapDetail: GameMapDetail }) => {
-    const gameMaps = useAtomValue(gameMapsAtom);
-
-    return (
-        <>
-            {gameMapDetail.items.length > 0 && (
-                <TextWithLabel label="アイテム">
-                    {gameMapDetail.items.map((v, i) => (
-                        <span className="inline-block text-nowrap" key={i}>
-                            {`【${v}】`}
-                        </span>
-                    ))}
-                </TextWithLabel>
-            )}
-            {gameMapDetail.monsters.length > 0 && (
-                <TextWithLabel label="モンスター">
-                    {gameMapDetail.monsters.map((v, i) => (
-                        <span className="inline-block text-nowrap" key={i}>
-                            {`【${v}】`}
-                        </span>
-                    ))}
-                </TextWithLabel>
-            )}
-            {gameMapDetail.memo.length > 0 && (
-                <TextWithLabel label="メモ">{gameMapDetail.memo}</TextWithLabel>
-            )}
-            <div className="flex gap-2">
-                <TextWithLabel label="アイコン">
-                    {gameMapDetail.icon}
-                </TextWithLabel>
-                <TextWithLabel label="座標x">
-                    {gameMapDetail.point.x}
-                </TextWithLabel>
-                <TextWithLabel label="座標y">
-                    {gameMapDetail.point.y}
-                </TextWithLabel>
-                <TextWithLabel label="移動先">
-                    {gameMaps.find(gameMapDetail.goto)?.name}
-                </TextWithLabel>
-            </div>
-        </>
-    );
-};
-
-const TextWithLabel = ({
-    label,
-    children,
-}: {
-    label: string;
-    children?: ReactNode;
-}) => {
-    return (
+    const TextWithLabel = ({
+        label,
+        children,
+    }: {
+        label: string;
+        children?: ReactNode;
+    }) => (
         <div className="p-1">
             <p className={`font-bold ${Text.neutral500}`}>{label}</p>
             <p className={`whitespace-pre-wrap ${Bg.neutral100_900}`}>
                 {children}
             </p>
         </div>
+    );
+
+    const ItemView = () => {
+        if (gameMapDetail.items.length === 0) return <></>;
+
+        return (
+            <TextWithLabel label="アイテム">
+                {gameMapDetail.items.map((v, i) => (
+                    <span className="inline-block text-nowrap" key={i}>
+                        {`【${v}】`}
+                    </span>
+                ))}
+            </TextWithLabel>
+        );
+    };
+
+    const MonsterView = () => {
+        if (gameMapDetail.monsters.length === 0) return <></>;
+
+        return (
+            <TextWithLabel label="モンスター">
+                {gameMapDetail.monsters.map((v, i) => (
+                    <span className="inline-block text-nowrap" key={i}>
+                        {`【${v}】`}
+                    </span>
+                ))}
+            </TextWithLabel>
+        );
+    };
+
+    const MemoView = () => {
+        if (gameMapDetail.memo.length === 0) return <></>;
+
+        return <TextWithLabel label="メモ">{gameMapDetail.memo}</TextWithLabel>;
+    };
+
+    const IconView = () => (
+        <TextWithLabel label="アイコン">{gameMapDetail.icon}</TextWithLabel>
+    );
+
+    const XView = () => (
+        <TextWithLabel label="座標x">{gameMapDetail.point.x}</TextWithLabel>
+    );
+
+    const YView = () => (
+        <TextWithLabel label="座標y">{gameMapDetail.point.y}</TextWithLabel>
+    );
+
+    const GotoView = () => {
+        const gameMaps = useAtomValue(gameMapsAtom);
+
+        return (
+            <TextWithLabel label="移動先">
+                {gameMaps.find(gameMapDetail.goto)?.name}
+            </TextWithLabel>
+        );
+    };
+
+    return (
+        <>
+            <ItemView />
+            <MonsterView />
+            <MemoView />
+            <div className="flex gap-2">
+                <IconView />
+                <XView />
+                <YView />
+                <GotoView />
+            </div>
+        </>
     );
 };

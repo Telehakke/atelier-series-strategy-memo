@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { Angle, Point, Progress, Scale, Thickness } from "../dataClasses";
+import { Angle, DrawingRange, Point, Scale, Thickness } from "../dataClasses";
 
 import { GameMap, GameMapId, GameMapList } from "../gameMap";
 import {
@@ -65,7 +65,7 @@ describe("copied", () => {
                             scaleY: 1,
                             angle: 1,
                             flip: true,
-                            progress: 1,
+                            drawingRange: 1,
                             x: 1,
                             y: 1,
                             id: "id",
@@ -129,7 +129,7 @@ describe("convert", () => {
                         scaleY: 100,
                         angle: 1,
                         flip: true,
-                        progress: 100,
+                        drawingRange: 100,
                         x: 1,
                         y: 1,
                         id: "id",
@@ -186,7 +186,7 @@ describe("convert", () => {
                         new Scale(100, 100),
                         new Angle(1),
                         true,
-                        new Progress(100),
+                        new DrawingRange(100),
                         new Point(1, 1),
                         new GameMapShapeId("id"),
                     ),

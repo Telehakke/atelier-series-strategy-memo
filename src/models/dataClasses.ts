@@ -117,14 +117,14 @@ export class Angle {
     rotated = (): Angle => new Angle(this._value + Angle.step);
 }
 
-export class Progress {
+export class DrawingRange {
     readonly _type = "Progress";
     private readonly _value: number;
 
     constructor(value: number) {
         let validValue = value;
-        if (value < Progress.min) validValue = Progress.min;
-        if (value > Progress.max) validValue = Progress.min;
+        if (value < DrawingRange.min) validValue = DrawingRange.min;
+        if (value > DrawingRange.max) validValue = DrawingRange.max;
         this._value = validValue;
     }
 
@@ -136,5 +136,6 @@ export class Progress {
     static readonly min = this.step;
     static readonly max = 100;
 
-    increased = (): Progress => new Progress(this._value + Progress.step);
+    increased = (): DrawingRange =>
+        new DrawingRange(this._value + DrawingRange.step);
 }

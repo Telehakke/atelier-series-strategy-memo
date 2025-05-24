@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
     canSelectMultipleAtom,
     isEditMemoDialogOpenAtom,
+    isReadonlyAtom,
     memosAtom,
     selectedMemoIdsAtom,
     strategyMemoAtom,
@@ -18,11 +19,11 @@ import {
     ClipboardCopyIconLargeButton,
     ClipboardPasteIconLargeButton,
     FilesIconLargeButton,
-    LargeIconButton,
     largeIconClassName,
     PencilIconLargeButton,
     PlusIconLargeButton,
     TrashIconLargeButton,
+    VerticalSegmentedIconButton,
     XIconLargeButton,
 } from "../../commons/iconButtons";
 import TextEditor from "../../commons/textEditor";
@@ -32,45 +33,61 @@ const MemoListController = ({ className }: { className?: string }) => {
     const selectedMemoIds = useAtomValue(selectedMemoIdsAtom);
     const [copiedItems, setCopiedItems] = useState<MemoList>(new MemoList());
 
-    if (selectedMemoIds.isNotEmpty && copiedItems.isEmpty)
+    if (selectedMemoIds.isEmpty)
         return (
-            <div className={`flex gap-4 ${className}`}>
-                <div className="flex flex-col justify-end gap-4">
-                    <SelectionModeToggleButton />
-                </div>
-                <div className="flex flex-col justify-end gap-4">
-                    <EditItemButton />
-                    <CopyButton setCopiedItems={setCopiedItems} />
-                    <RemoveItemButton />
-                </div>
-                <div className="flex flex-col justify-end gap-4">
-                    <MoveItemUpButton />
-                    <MoveItemDownButton />
-                    <XButton />
-                </div>
-            </div>
-        );
-
-    if (selectedMemoIds.isNotEmpty && copiedItems.isNotEmpty)
-        return (
-            <div className={className}>
-                <PasteAndXButtons
-                    copiedItems={copiedItems}
-                    setCopiedItems={setCopiedItems}
-                />
+            <div className={`flex ${className}`}>
+                <AddItemButton />
             </div>
         );
 
     return (
         <div className={className}>
-            <div className="flex">
-                <AddItemButton />
-            </div>
+            {copiedItems.isEmpty ? (
+                <ItemActionButtons setCopiedItems={setCopiedItems} />
+            ) : (
+                <PasteAndXButtons
+                    copiedItems={copiedItems}
+                    setCopiedItems={setCopiedItems}
+                />
+            )}
         </div>
     );
 };
 
 export default MemoListController;
+
+/* -------------------------------------------------------------------------- */
+
+const ItemActionButtons = ({
+    setCopiedItems,
+}: {
+    setCopiedItems: React.Dispatch<React.SetStateAction<MemoList>>;
+}) => {
+    const HStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex gap-4">{children}</div>
+    );
+
+    const VStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex flex-col justify-end gap-4">{children}</div>
+    );
+
+    return (
+        <HStack>
+            <VStack>
+                <SelectionModeToggleButton />
+            </VStack>
+            <VStack>
+                <EditItemButton />
+                <CopyButton setCopiedItems={setCopiedItems} />
+                <RemoveItemButton />
+            </VStack>
+            <VStack>
+                <MoveItemsButton />
+                <XButton />
+            </VStack>
+        </HStack>
+    );
+};
 
 /* -------------------------------------------------------------------------- */
 
@@ -96,6 +113,7 @@ const AddItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setMemos = useSetAtom(memosAtom);
     const [title, setTitle] = useState("");
@@ -103,14 +121,19 @@ const AddItemDialog = ({
     const [message, setMessage] = useState("");
 
     const handleClick = () => {
-        const memo = Memo.create(title, text, false, new MemoId(uuidv4()));
+        const memo = Memo.create({
+            title: title,
+            text: text,
+            checked: false,
+            id: new MemoId(uuidv4()),
+        });
 
         try {
             setStrategyMemo((v) => {
                 const newMemos = v.memos.added(memo);
                 const newStrategyMemo = v.replacedMemos(newMemos);
                 setMemos(newStrategyMemo.memos);
-                LocalStorage.setStrategyMemo(newStrategyMemo);
+                LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
                 return newStrategyMemo;
             });
             setIsOpen(false);
@@ -133,13 +156,15 @@ const AddItemDialog = ({
             secondaryButtonLabel="キャンセル"
             handlePrimaryButtonClick={handleClick}
         >
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
                 <p>{message}</p>
                 <MemoInput
-                    title={title}
-                    setTitle={setTitle}
-                    text={text}
-                    setText={setText}
+                    state={{
+                        title: title,
+                        text: text,
+                        setTitle: setTitle,
+                        setText: setText,
+                    }}
                 />
             </div>
         </DialogView>
@@ -149,9 +174,7 @@ const AddItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const EditItemButton = () => {
-    const [isEditDialogOpen, setIsEditDialogOpen] = useAtom(
-        isEditMemoDialogOpenAtom,
-    );
+    const [isOpen, setIsOpen] = useAtom(isEditMemoDialogOpenAtom);
     const selectedMemoIds = useAtomValue(selectedMemoIdsAtom);
     if (selectedMemoIds.length !== 1) return <></>;
 
@@ -160,21 +183,19 @@ const EditItemButton = () => {
             <PencilIconLargeButton
                 className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                 description="編集"
-                onClick={() => setIsEditDialogOpen(true)}
+                onClick={() => setIsOpen(true)}
             />
-            {isEditDialogOpen && (
-                <EditItemDialog memoId={selectedMemoIds.at(0)!} />
-            )}
+            {isOpen && <EditItemDialog memoId={selectedMemoIds.at(0)!} />}
         </>
     );
 };
 
 const EditItemDialog = ({ memoId }: { memoId: MemoId }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setSelectedMemoIds = useSetAtom(selectedMemoIdsAtom);
-    const [isEditDialogOpen, setIsEditDialogOpen] = useAtom(
-        isEditMemoDialogOpenAtom,
-    );
+    const [isOpen, setIsOpen] = useAtom(isEditMemoDialogOpenAtom);
+
     const [memos, setMemos] = useAtom(memosAtom);
     const memo = memos.find(memoId);
     const [title, setTitle] = useState(memo?.title ?? "");
@@ -184,18 +205,21 @@ const EditItemDialog = ({ memoId }: { memoId: MemoId }) => {
     if (memo == null) return <></>;
 
     const handleClick = () => {
-        const editedMemo = Memo.create(title, text, memo.checked, memo.id);
+        const editedMemo = memo.copyWith({
+            title: title,
+            text: text,
+        });
 
         try {
             setStrategyMemo((v) => {
-                const newMemos = v.memos.replaced(memo.id, editedMemo);
+                const newMemos = v.memos.replaced(editedMemo);
                 const newStrategyMemo = v.replacedMemos(newMemos);
                 setMemos(newStrategyMemo.memos);
-                LocalStorage.setStrategyMemo(newStrategyMemo);
+                LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
                 return newStrategyMemo;
             });
             setSelectedMemoIds(new MemoIdList());
-            setIsEditDialogOpen(false);
+            setIsOpen(false);
         } catch (error) {
             if (ErrorChecker.isQuotaExceededError(error)) {
                 setMessage(ErrorChecker.quotaExceededErrorMessage);
@@ -208,8 +232,8 @@ const EditItemDialog = ({ memoId }: { memoId: MemoId }) => {
 
     return (
         <DialogView
-            isOpen={isEditDialogOpen}
-            setIsOpen={setIsEditDialogOpen}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
             title="項目の編集"
             primaryButtonLabel="変更"
             secondaryButtonLabel="キャンセル"
@@ -218,10 +242,12 @@ const EditItemDialog = ({ memoId }: { memoId: MemoId }) => {
             <div className="flex flex-col gap-2">
                 <p>{message}</p>
                 <MemoInput
-                    title={title}
-                    setTitle={setTitle}
-                    text={text}
-                    setText={setText}
+                    state={{
+                        title: title,
+                        text: text,
+                        setTitle: setTitle,
+                        setText: setText,
+                    }}
                 />
             </div>
         </DialogView>
@@ -254,19 +280,20 @@ const RemoveItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setMemos = useSetAtom(memosAtom);
     const [selectedMemoIds, setSelectedMemoIds] = useAtom(selectedMemoIdsAtom);
 
     const handleClick = () => {
         setStrategyMemo((v) => {
-            let newMemos = v.memos;
-            selectedMemoIds.forEach((id) => {
-                newMemos = newMemos.removed(id);
-            });
+            const newMemos = selectedMemoIds.reduce(
+                (memos, id) => memos.removed(id),
+                v.memos,
+            );
             const newStrategyMemo = v.replacedMemos(newMemos);
             setMemos(newStrategyMemo.memos);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setSelectedMemoIds(new MemoIdList());
@@ -288,29 +315,26 @@ const RemoveItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const MemoInput = ({
-    title,
-    setTitle,
-    text,
-    setText,
-}: {
+type InputState = {
     title: string;
-    setTitle: React.Dispatch<React.SetStateAction<string>>;
     text: string;
+    setTitle: React.Dispatch<React.SetStateAction<string>>;
     setText: React.Dispatch<React.SetStateAction<string>>;
-}) => {
+};
+
+const MemoInput = ({ state }: { state: InputState }) => {
     return (
         <div className="flex flex-col gap-2">
             <TextField
                 label="タイトル"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={state.title}
+                onChange={(e) => state.setTitle(e.target.value)}
             />
             <TextEditor
                 className="h-40"
                 label="メモ"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
+                value={state.text}
+                onChange={(e) => state.setText(e.target.value)}
             />
         </div>
     );
@@ -318,62 +342,37 @@ const MemoInput = ({
 
 /* -------------------------------------------------------------------------- */
 
-const MoveItemUpButton = () => {
-    return (
-        <MoveItemButton
-            description="上へ移動"
-            action={(memos, id) => memos.movedUp(id)}
-        >
-            <ChevronUp className={largeIconClassName} />
-        </MoveItemButton>
-    );
-};
-
-const MoveItemDownButton = () => {
-    return (
-        <MoveItemButton
-            description="下へ移動"
-            action={(memos, id) => memos.movedDown(id)}
-        >
-            <ChevronDown className={largeIconClassName} />
-        </MoveItemButton>
-    );
-};
-
-const MoveItemButton = ({
-    description,
-    action,
-    children,
-}: {
-    description: string;
-    action: (memos: MemoList, id: MemoId) => MemoList;
-    children: ReactNode;
-}) => {
+const MoveItemsButton = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setMemos = useSetAtom(memosAtom);
     const selectedMemoIds = useAtomValue(selectedMemoIdsAtom);
     if (selectedMemoIds.length !== 1) return <></>;
 
-    const handleClick = () => {
-        const id = selectedMemoIds.at(0)!;
+    const id = selectedMemoIds.at(0)!;
 
+    const moveItems = (action: (memos: MemoList) => MemoList) =>
         setStrategyMemo((v) => {
-            const newMemos = action(v.memos, id);
+            const newMemos = action(v.memos);
             const newStrategyMemo = v.replacedMemos(newMemos);
             setMemos(newStrategyMemo.memos);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
-    };
+
+    const handleTopButtonClick = () => moveItems((memos) => memos.movedUp(id));
+
+    const handleBottomButtonClick = () =>
+        moveItems((memos) => memos.movedDown(id));
 
     return (
-        <LargeIconButton
-            className={`${Bg.yellow500} ${Bg.hoverYellow400} ${Stroke.neutral50}`}
-            description={description}
-            onClick={handleClick}
-        >
-            {children}
-        </LargeIconButton>
+        <VerticalSegmentedIconButton
+            description="移動"
+            topIcon={<ChevronUp className={largeIconClassName} />}
+            bottomIcon={<ChevronDown className={largeIconClassName} />}
+            onTopButtonClick={handleTopButtonClick}
+            onBottomButtonClick={handleBottomButtonClick}
+        />
     );
 };
 
@@ -406,20 +405,20 @@ const PasteAndXButtons = ({
     copiedItems: MemoList;
     setCopiedItems: React.Dispatch<React.SetStateAction<MemoList>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setMemos = useSetAtom(memosAtom);
     const setSelectedMemoIds = useSetAtom(selectedMemoIdsAtom);
 
     const handlePasteButtonClick = () => {
         setStrategyMemo((v) => {
-            let newMemos = v.memos;
-            copiedItems.forEach((memo) => {
+            const newMemos = copiedItems.reduce((memos, memo) => {
                 const newMemo = memo.copyWith({ id: new MemoId(uuidv4()) });
-                newMemos = newMemos.added(newMemo);
-            });
+                return memos.added(newMemo);
+            }, v.memos);
             const newStrategyMemo = v.replacedMemos(newMemos);
             setMemos(newStrategyMemo.memos);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setSelectedMemoIds(new MemoIdList());
@@ -465,12 +464,13 @@ const SelectionModeToggleButton = () => {
 
     const handleClick = () => setCsnSelectMultiple((v) => !v);
 
-    const backgroundColor = canSelectMultiple ? Bg.blue500 : Bg.neutral500;
-    const hoverColor = canSelectMultiple ? Bg.hoverBlue400 : Bg.hoverNeutral400;
+    const backgroundColor = canSelectMultiple
+        ? `${Bg.blue500} ${Bg.hoverBlue400}`
+        : `${Bg.neutral500} ${Bg.hoverNeutral400}`;
 
     return (
         <FilesIconLargeButton
-            className={`${backgroundColor} ${hoverColor} ${Stroke.neutral50}`}
+            className={`${backgroundColor} ${Stroke.neutral50}`}
             description={canSelectMultiple ? "複数選択ON" : "複数選択OFF"}
             onClick={handleClick}
         />

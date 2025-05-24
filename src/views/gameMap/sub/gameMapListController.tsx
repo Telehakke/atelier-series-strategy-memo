@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
     clipModeAtom,
     gameMapsAtom,
+    isReadonlyAtom,
     jpegQualityAtom,
     selectedGameMapIdAtom,
     strategyMemoAtom,
@@ -19,7 +20,7 @@ import ImageFile, {
 } from "../../../models/imageFile";
 import LocalStorage from "../../../models/localStorage";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { GameMapDetailList } from "../../../models/gameMapDetail";
 import { GameMapShapeList } from "../../../models/gameMapShape";
 import { Bg, Border, Stroke } from "../../commons/classNames";
@@ -28,30 +29,42 @@ import {
     ImageIconButton,
     ImageOffIconButton,
     MiddleIconButton,
-    MiddleIconClassName,
+    middleIconClassName,
     PencilIconButton,
-    PlusIconLargeButton,
     TrashIconButton,
 } from "../../commons/iconButtons";
 import TextField from "../../commons/textField";
 
 const GameMapListController = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const selectedGameMapId = useAtomValue(selectedGameMapIdAtom);
+    if (isReadonly) return <></>;
     if (selectedGameMapId == null) return <></>;
 
+    const HStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex items-center gap-2">{children}</div>
+    );
+
+    const VStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex flex-col gap-2">{children}</div>
+    );
+
     return (
-        <div className="flex flex-col gap-2">
-            <div className="flex justify-end">
-                <MoveItemUpButton gameMapId={selectedGameMapId} />
+        <HStack>
+            <AddGameMapButton />
+            <VStack>
                 <EditItemButton gameMapId={selectedGameMapId} />
                 <RemoveItemButton gameMapId={selectedGameMapId} />
-            </div>
-            <div className="flex justify-end">
-                <MoveItemDownButton gameMapId={selectedGameMapId} />
+            </VStack>
+            <VStack>
                 <AddImageButton gameMapId={selectedGameMapId} />
                 <RemoveImageButton gameMapId={selectedGameMapId} />
-            </div>
-        </div>
+            </VStack>
+            <VStack>
+                <MoveItemUpButton gameMapId={selectedGameMapId} />
+                <MoveItemDownButton gameMapId={selectedGameMapId} />
+            </VStack>
+        </HStack>
     );
 };
 
@@ -59,15 +72,17 @@ export default GameMapListController;
 
 /* -------------------------------------------------------------------------- */
 
-export const AddGameMapButton = ({ className }: { className?: string }) => {
+const AddGameMapButton = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
-            <PlusIconLargeButton
-                className={`${Bg.blue500} ${Bg.hoverBlue400} ${Stroke.neutral50} ${className}`}
+            <MiddleIconButton
+                className={`${Bg.blue500} ${Bg.hoverBlue400} ${Stroke.neutral50}`}
                 onClick={() => setIsOpen(true)}
-            />
+            >
+                <Plus className={middleIconClassName} />
+            </MiddleIconButton>
             {isOpen && <AddItemDialog isOpen={isOpen} setIsOpen={setIsOpen} />}
         </>
     );
@@ -80,24 +95,25 @@ const AddItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const setSelectedGameMapId = useSetAtom(selectedGameMapIdAtom);
     const [name, setName] = useState("");
 
     const handleClick = () => {
-        const gameMap = GameMap.create(
-            name,
-            new GameMapDetailList(),
-            new GameMapShapeList(),
-            "",
-            new GameMapId(uuidv4()),
-        );
+        const gameMap = GameMap.create({
+            name: name,
+            gameMapDetails: new GameMapDetailList(),
+            gameMapShapes: new GameMapShapeList(),
+            image: "",
+            id: new GameMapId(uuidv4()),
+        });
         setStrategyMemo((v) => {
             const newGameMaps = v.gameMaps.added(gameMap);
             const newStrategyMemo = v.replacedGameMaps(newGameMaps);
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
 
@@ -152,6 +168,7 @@ const EditItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const [gameMaps, setGameMaps] = useAtom(gameMapsAtom);
     const gameMap = gameMaps.find(gameMapId);
@@ -160,14 +177,12 @@ const EditItemDialog = ({
     if (gameMap == null) return <></>;
 
     const handleClick = () => {
-        const editedGameMap = gameMap.copyWith({
-            name: name,
-        });
+        const editedGameMap = gameMap.copyWith({ name: name });
         setStrategyMemo((v) => {
-            const newGameMaps = v.gameMaps.replaced(gameMap.id, editedGameMap);
+            const newGameMaps = v.gameMaps.replaced(editedGameMap);
             const newStrategyMemo = v.replacedGameMaps(newGameMaps);
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setIsOpen(false);
@@ -219,6 +234,7 @@ const RemoveItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const setSelectedGameMapListIds = useSetAtom(selectedGameMapIdAtom);
@@ -233,7 +249,7 @@ const RemoveItemDialog = ({
             const firstGameMap = newStrategyMemo.gameMaps.at(0);
             setSelectedGameMapListIds(firstGameMap?.id ?? null);
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setIsOpen(false);
@@ -254,27 +270,23 @@ const RemoveItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const MoveItemUpButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
-    return (
-        <MoveItemButton
-            gameMapId={gameMapId}
-            action={(gameMaps) => gameMaps.movedUp(gameMapId)}
-        >
-            <ChevronUp className={MiddleIconClassName} />
-        </MoveItemButton>
-    );
-};
+const MoveItemUpButton = ({ gameMapId }: { gameMapId: GameMapId }) => (
+    <MoveItemButton
+        gameMapId={gameMapId}
+        action={(gameMaps) => gameMaps.movedUp(gameMapId)}
+    >
+        <ChevronUp className={middleIconClassName} />
+    </MoveItemButton>
+);
 
-const MoveItemDownButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
-    return (
-        <MoveItemButton
-            gameMapId={gameMapId}
-            action={(gameMaps) => gameMaps.movedDown(gameMapId)}
-        >
-            <ChevronDown className={MiddleIconClassName} />
-        </MoveItemButton>
-    );
-};
+const MoveItemDownButton = ({ gameMapId }: { gameMapId: GameMapId }) => (
+    <MoveItemButton
+        gameMapId={gameMapId}
+        action={(gameMaps) => gameMaps.movedDown(gameMapId)}
+    >
+        <ChevronDown className={middleIconClassName} />
+    </MoveItemButton>
+);
 
 const MoveItemButton = ({
     gameMapId,
@@ -285,6 +297,7 @@ const MoveItemButton = ({
     action: (gameMaps: GameMapList) => GameMapList;
     children: ReactNode;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
 
@@ -296,7 +309,7 @@ const MoveItemButton = ({
             const newGameMaps = action(v.gameMaps);
             const newStrategyMemo = v.replacedGameMaps(newGameMaps);
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
     };
@@ -361,6 +374,7 @@ const FileOpenDialog = ({
     gameMapId: GameMapId;
     setMessage: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const jpegQuality = useAtomValue(jpegQualityAtom);
@@ -386,10 +400,10 @@ const FileOpenDialog = ({
                 if (gameMap == null) return v;
 
                 const newGameMap = gameMap.copyWith({ image: base64 });
-                const newGameMaps = v.gameMaps.replaced(gameMap.id, newGameMap);
+                const newGameMaps = v.gameMaps.replaced(newGameMap);
                 const newStrategyMemo = v.replacedGameMaps(newGameMaps);
                 setGameMaps(newStrategyMemo.gameMaps);
-                LocalStorage.setStrategyMemo(newStrategyMemo);
+                LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
                 setMessage(newStrategyMemo.dataSize());
                 return newStrategyMemo;
             });
@@ -521,6 +535,7 @@ const RemoveImageDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
 
@@ -530,10 +545,10 @@ const RemoveImageDialog = ({
             if (gameMap == null) return v;
 
             const newGameMap = gameMap.copyWith({ image: "" });
-            const newGameMaps = v.gameMaps.replaced(gameMap.id, newGameMap);
+            const newGameMaps = v.gameMaps.replaced(newGameMap);
             const newStrategyMemo = v.replacedGameMaps(newGameMaps);
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setIsOpen(false);

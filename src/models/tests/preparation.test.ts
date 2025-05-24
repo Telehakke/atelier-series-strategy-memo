@@ -2,21 +2,21 @@ import { describe, expect, test } from "vitest";
 import { Preparation, PreparationId, PreparationList } from "../preparation";
 
 test("create", () => {
-    const item = Preparation.create(
-        "name",
-        "material1、material2",
-        "category1、category2",
-        false,
-        new PreparationId("id"),
-    );
-    const expected = new Preparation(
+    const item = new Preparation(
         "name",
         ["material1", "material2"],
         ["category1", "category2"],
         false,
         new PreparationId("id"),
     );
-    expect(JSON.stringify(item)).toBe(JSON.stringify(expected));
+    const newItems = Preparation.create({
+        name: item.name,
+        materials: item.materialsToCommaSeparatedStr,
+        categories: item.categoriesToCommaSeparatedStr,
+        checked: item.checked,
+        id: item.id,
+    });
+    expect(JSON.stringify(newItems)).toBe(JSON.stringify(item));
 });
 
 describe("find", () => {
@@ -58,11 +58,11 @@ test("added", () => {
 });
 
 test("replaced", () => {
-    const item1 = new Preparation("", [], [], false, new PreparationId("id1"));
-    const item2 = new Preparation("", [], [], false, new PreparationId("id2"));
-    const list = new PreparationList(item1);
-    const result = list.replaced(item1.id, item2);
-    const expected = new PreparationList(item2);
+    const item = new Preparation("", [], [], false, new PreparationId("id1"));
+    const list = new PreparationList(item);
+    const newItem = new Preparation("name", [], [], false, item.id);
+    const result = list.replaced(newItem);
+    const expected = new PreparationList(newItem);
     expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
 });
 

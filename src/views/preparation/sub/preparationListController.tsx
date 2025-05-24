@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
     canSelectMultipleAtom,
     isEditPreparationDialogOpenAtom,
+    isReadonlyAtom,
     preparationsAtom,
     selectedPreparationIdsAtom,
     strategyMemoAtom,
@@ -17,17 +18,18 @@ import {
     PreparationIdList,
     PreparationList,
 } from "../../../models/preparation";
+import Split from "../../../models/split";
 import { Bg, Stroke } from "../../commons/classNames";
 import DialogView from "../../commons/dialogView";
 import {
     ClipboardCopyIconLargeButton,
     ClipboardPasteIconLargeButton,
     FilesIconLargeButton,
-    LargeIconButton,
     largeIconClassName,
     PencilIconLargeButton,
     PlusIconLargeButton,
     TrashIconLargeButton,
+    VerticalSegmentedIconButton,
     XIconLargeButton,
 } from "../../commons/iconButtons";
 import TextField from "../../commons/textField";
@@ -36,45 +38,61 @@ const PreparationListController = ({ className }: { className?: string }) => {
     const selectedPreparationIds = useAtomValue(selectedPreparationIdsAtom);
     const [copiedItems, setCopiedItems] = useState(new PreparationList());
 
-    if (selectedPreparationIds.isNotEmpty && copiedItems.isEmpty)
+    if (selectedPreparationIds.isEmpty)
         return (
-            <div className={`flex gap-4 ${className}`}>
-                <div className="flex flex-col justify-end gap-4">
-                    <SelectionModeToggleButton />
-                </div>
-                <div className="flex flex-col justify-end gap-4">
-                    <EditItemButton />
-                    <CopyButton setCopiedItems={setCopiedItems} />
-                    <RemoveItemButton />
-                </div>
-                <div className="flex flex-col justify-end gap-4">
-                    <MoveItemUpButton />
-                    <MoveItemDownButton />
-                    <XButton />
-                </div>
-            </div>
-        );
-
-    if (selectedPreparationIds.isNotEmpty && copiedItems.isNotEmpty)
-        return (
-            <div className={className}>
-                <PasteAndXButtons
-                    copiedItems={copiedItems}
-                    setCopiedItems={setCopiedItems}
-                />
+            <div className={`flex ${className}`}>
+                <AddItemButton />
             </div>
         );
 
     return (
-        <div className={`${className}`}>
-            <div className="flex">
-                <AddItemButton />
-            </div>
+        <div className={className}>
+            {copiedItems.isEmpty ? (
+                <ItemActionButtons setCopiedItems={setCopiedItems} />
+            ) : (
+                <PasteAndXButtons
+                    copiedItems={copiedItems}
+                    setCopiedItems={setCopiedItems}
+                />
+            )}
         </div>
     );
 };
 
 export default PreparationListController;
+
+/* -------------------------------------------------------------------------- */
+
+const ItemActionButtons = ({
+    setCopiedItems,
+}: {
+    setCopiedItems: React.Dispatch<React.SetStateAction<PreparationList>>;
+}) => {
+    const HStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex gap-4">{children}</div>
+    );
+
+    const VStack = ({ children }: { children: ReactNode }) => (
+        <div className="flex flex-col justify-end gap-4">{children}</div>
+    );
+
+    return (
+        <HStack>
+            <VStack>
+                <SelectionModeToggleButton />
+            </VStack>
+            <VStack>
+                <EditItemButton />
+                <CopyButton setCopiedItems={setCopiedItems} />
+                <RemoveItemButton />
+            </VStack>
+            <VStack>
+                <MoveItemButton />
+                <XButton />
+            </VStack>
+        </HStack>
+    );
+};
 
 /* -------------------------------------------------------------------------- */
 
@@ -100,6 +118,7 @@ const AddItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setPreparations = useSetAtom(preparationsAtom);
     const [name, setName] = useState("");
@@ -108,20 +127,20 @@ const AddItemDialog = ({
     const [message, setMessage] = useState("");
 
     const handleClick = () => {
-        const preparation = Preparation.create(
-            name,
-            materials,
-            categories,
-            false,
-            new PreparationId(uuidv4()),
-        );
+        const preparation = Preparation.create({
+            name: name,
+            materials: materials,
+            categories: categories,
+            checked: false,
+            id: new PreparationId(uuidv4()),
+        });
 
         try {
             setStrategyMemo((v) => {
                 const newPreparations = v.preparations.added(preparation);
                 const newStrategyMemo = v.replacedPreparations(newPreparations);
                 setPreparations(newStrategyMemo.preparations);
-                LocalStorage.setStrategyMemo(newStrategyMemo);
+                LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
                 return newStrategyMemo;
             });
             setIsOpen(false);
@@ -144,15 +163,17 @@ const AddItemDialog = ({
             secondaryButtonLabel="キャンセル"
             handlePrimaryButtonClick={handleClick}
         >
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
                 <p>{message}</p>
                 <PreparationInput
-                    name={name}
-                    setName={setName}
-                    materials={materials}
-                    setMaterials={setMaterials}
-                    categories={categories}
-                    setCategories={setCategories}
+                    state={{
+                        name: name,
+                        materials: materials,
+                        categories: categories,
+                        setName: setName,
+                        setMaterials: setMaterials,
+                        setCategories: setCategories,
+                    }}
                 />
             </div>
         </DialogView>
@@ -162,9 +183,7 @@ const AddItemDialog = ({
 /* -------------------------------------------------------------------------- */
 
 const EditItemButton = () => {
-    const [isEditDialogOpen, setIsEditDialogOpen] = useAtom(
-        isEditPreparationDialogOpenAtom,
-    );
+    const [isOpen, setIsOpen] = useAtom(isEditPreparationDialogOpenAtom);
     const selectedPreparationIds = useAtomValue(selectedPreparationIdsAtom);
     if (selectedPreparationIds.length !== 1) return <></>;
 
@@ -173,9 +192,9 @@ const EditItemButton = () => {
             <PencilIconLargeButton
                 className={`${Bg.green500} ${Bg.hoverGreen400} ${Stroke.neutral50}`}
                 description="編集"
-                onClick={() => setIsEditDialogOpen(true)}
+                onClick={() => setIsOpen(true)}
             />
-            {isEditDialogOpen && (
+            {isOpen && (
                 <EditItemDialog preparationId={selectedPreparationIds.at(0)!} />
             )}
         </>
@@ -187,46 +206,42 @@ const EditItemDialog = ({
 }: {
     preparationId: PreparationId;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setSelectedPreparationIds = useSetAtom(selectedPreparationIdsAtom);
-    const [isEditDialogOpen, setIsEditDialogOpen] = useAtom(
-        isEditPreparationDialogOpenAtom,
-    );
+    const [isOpen, setIsOpen] = useAtom(isEditPreparationDialogOpenAtom);
+
     const [preparations, setPreparations] = useAtom(preparationsAtom);
     const preparation = preparations.find(preparationId);
     const [name, setName] = useState(preparation?.name ?? "");
     const [materials, setMaterials] = useState(
-        preparation?.materials.join("、") ?? "",
+        preparation?.materialsToCommaSeparatedStr ?? "",
     );
     const [categories, setCategories] = useState(
-        preparation?.categories.join("、") ?? "",
+        preparation?.categoriesToCommaSeparatedStr ?? "",
     );
     const [message, setMessage] = useState("");
 
     if (preparation == null) return <></>;
 
     const handleClick = () => {
-        const editedPreparations = Preparation.create(
-            name,
-            materials,
-            categories,
-            preparation.checked,
-            preparation.id,
-        );
+        const editedPreparation = preparation.copyWith({
+            name: name,
+            materials: Split.byComma(materials),
+            categories: Split.byComma(categories),
+        });
 
         try {
             setStrategyMemo((v) => {
-                const newPreparations = v.preparations.replaced(
-                    preparation.id,
-                    editedPreparations,
-                );
+                const newPreparations =
+                    v.preparations.replaced(editedPreparation);
                 const newStrategyMemo = v.replacedPreparations(newPreparations);
                 setPreparations(newStrategyMemo.preparations);
-                LocalStorage.setStrategyMemo(newStrategyMemo);
+                LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
                 return newStrategyMemo;
             });
             setSelectedPreparationIds(new PreparationIdList());
-            setIsEditDialogOpen(false);
+            setIsOpen(false);
         } catch (error) {
             if (ErrorChecker.isQuotaExceededError(error)) {
                 setMessage(ErrorChecker.quotaExceededErrorMessage);
@@ -239,8 +254,8 @@ const EditItemDialog = ({
 
     return (
         <DialogView
-            isOpen={isEditDialogOpen}
-            setIsOpen={setIsEditDialogOpen}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
             title="項目の編集"
             primaryButtonLabel="変更"
             secondaryButtonLabel="キャンセル"
@@ -249,12 +264,14 @@ const EditItemDialog = ({
             <div className="flex flex-col gap-2">
                 <p>{message}</p>
                 <PreparationInput
-                    name={name}
-                    setName={setName}
-                    materials={materials}
-                    setMaterials={setMaterials}
-                    categories={categories}
-                    setCategories={setCategories}
+                    state={{
+                        name: name,
+                        materials: materials,
+                        categories: categories,
+                        setName: setName,
+                        setMaterials: setMaterials,
+                        setCategories: setCategories,
+                    }}
                 />
             </div>
         </DialogView>
@@ -287,21 +304,22 @@ const RemoveItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setPreparations = useSetAtom(preparationsAtom);
     const [selectedPreparationIds, setSelectedPreparationIds] = useAtom(
         selectedPreparationIdsAtom,
     );
 
-    const handleButtonClick = () => {
+    const handleClick = () => {
         setStrategyMemo((v) => {
-            let newPreparations = v.preparations;
-            selectedPreparationIds.forEach((id) => {
-                newPreparations = newPreparations.removed(id);
-            });
+            const newPreparations = selectedPreparationIds.reduce(
+                (preparations, id) => preparations.removed(id),
+                v.preparations,
+            );
             const newStrategyMemo = v.replacedPreparations(newPreparations);
             setPreparations(newStrategyMemo.preparations);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setSelectedPreparationIds(new PreparationIdList());
@@ -315,7 +333,7 @@ const RemoveItemDialog = ({
             title="項目の削除"
             primaryButtonLabel="削除"
             secondaryButtonLabel="キャンセル"
-            handlePrimaryButtonClick={handleButtonClick}
+            handlePrimaryButtonClick={handleClick}
             shouldUseWarningColor={true}
         />
     );
@@ -323,37 +341,32 @@ const RemoveItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const PreparationInput = ({
-    name,
-    setName,
-    materials,
-    setMaterials,
-    categories,
-    setCategories,
-}: {
+type InputState = {
     name: string;
-    setName: React.Dispatch<React.SetStateAction<string>>;
     materials: string;
-    setMaterials: React.Dispatch<React.SetStateAction<string>>;
     categories: string;
+    setName: React.Dispatch<React.SetStateAction<string>>;
+    setMaterials: React.Dispatch<React.SetStateAction<string>>;
     setCategories: React.Dispatch<React.SetStateAction<string>>;
-}) => {
+};
+
+const PreparationInput = ({ state }: { state: InputState }) => {
     return (
         <div className="flex flex-col gap-2">
             <TextField
                 label="名前"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={state.name}
+                onChange={(e) => state.setName(e.target.value)}
             />
             <TextField
                 label="材料"
-                value={materials}
-                onChange={(e) => setMaterials(e.target.value)}
+                value={state.materials}
+                onChange={(e) => state.setMaterials(e.target.value)}
             />
             <TextField
                 label="カテゴリー"
-                value={categories}
-                onChange={(e) => setCategories(e.target.value)}
+                value={state.categories}
+                onChange={(e) => state.setCategories(e.target.value)}
             />
         </div>
     );
@@ -361,65 +374,41 @@ const PreparationInput = ({
 
 /* -------------------------------------------------------------------------- */
 
-const MoveItemUpButton = () => {
-    return (
-        <MoveItemButton
-            description="上へ移動"
-            action={(preparations, id) => preparations.movedUp(id)}
-        >
-            <ChevronUp className={largeIconClassName} />
-        </MoveItemButton>
-    );
-};
-
-const MoveItemDownButton = () => {
-    return (
-        <MoveItemButton
-            description="下へ移動"
-            action={(preparations, id) => preparations.movedDown(id)}
-        >
-            <ChevronDown className={largeIconClassName} />
-        </MoveItemButton>
-    );
-};
-
-const MoveItemButton = ({
-    description,
-    action,
-    children,
-}: {
-    description: string;
-    action: (
-        preparations: PreparationList,
-        id: PreparationId,
-    ) => PreparationList;
-    children: ReactNode;
-}) => {
+const MoveItemButton = () => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setPreparations = useSetAtom(preparationsAtom);
     const selectedPreparationIds = useAtomValue(selectedPreparationIdsAtom);
     if (selectedPreparationIds.length !== 1) return <></>;
 
-    const handleClick = () => {
-        const id = selectedPreparationIds.at(0)!;
+    const id = selectedPreparationIds.at(0)!;
 
+    const moveItem = (
+        action: (preparations: PreparationList) => PreparationList,
+    ) =>
         setStrategyMemo((v) => {
-            const newPreparations = action(v.preparations, id);
+            const newPreparations = action(v.preparations);
             const newStrategyMemo = v.replacedPreparations(newPreparations);
             setPreparations(newStrategyMemo.preparations);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
+
+    const handleTopButtonClick = () =>
+        moveItem((preparations) => preparations.movedUp(id));
+
+    const handleBottomButtonClick = () => {
+        moveItem((preparations) => preparations.movedDown(id));
     };
 
     return (
-        <LargeIconButton
-            className={`${Bg.yellow500} ${Bg.hoverYellow400} ${Stroke.neutral50}`}
-            description={description}
-            onClick={handleClick}
-        >
-            {children}
-        </LargeIconButton>
+        <VerticalSegmentedIconButton
+            description="移動"
+            topIcon={<ChevronUp className={largeIconClassName} />}
+            bottomIcon={<ChevronDown className={largeIconClassName} />}
+            onTopButtonClick={handleTopButtonClick}
+            onBottomButtonClick={handleBottomButtonClick}
+        />
     );
 };
 
@@ -454,22 +443,25 @@ const PasteAndXButtons = ({
     copiedItems: PreparationList;
     setCopiedItems: React.Dispatch<React.SetStateAction<PreparationList>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setPreparations = useSetAtom(preparationsAtom);
     const setSelectedPreparationIds = useSetAtom(selectedPreparationIdsAtom);
 
     const handlePasteButtonClick = () => {
         setStrategyMemo((v) => {
-            let newPreparations = v.preparations;
-            copiedItems.forEach((preparation) => {
-                const newPreparation = preparation.copyWith({
-                    id: new PreparationId(uuidv4()),
-                });
-                newPreparations = newPreparations.added(newPreparation);
-            });
+            const newPreparations = copiedItems.reduce(
+                (preparations, preparation) => {
+                    const newPreparation = preparation.copyWith({
+                        id: new PreparationId(uuidv4()),
+                    });
+                    return preparations.added(newPreparation);
+                },
+                v.preparations,
+            );
             const newStrategyMemo = v.replacedPreparations(newPreparations);
             setPreparations(newStrategyMemo.preparations);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setSelectedPreparationIds(new PreparationIdList());
@@ -516,12 +508,13 @@ const SelectionModeToggleButton = () => {
 
     const handleClick = () => setCanSelectMultiple((v) => !v);
 
-    const backgroundColor = canSelectMultiple ? Bg.blue500 : Bg.neutral500;
-    const hoverColor = canSelectMultiple ? Bg.hoverBlue400 : Bg.hoverNeutral400;
+    const backgroundColor = canSelectMultiple
+        ? `${Bg.blue500} ${Bg.hoverBlue400}`
+        : `${Bg.neutral500} ${Bg.hoverNeutral400}`;
 
     return (
         <FilesIconLargeButton
-            className={`${backgroundColor} ${hoverColor} ${Stroke.neutral50}`}
+            className={`${backgroundColor} ${Stroke.neutral50}`}
             description={canSelectMultiple ? "複数選択ON" : "複数選択OFF"}
             onClick={handleClick}
         />

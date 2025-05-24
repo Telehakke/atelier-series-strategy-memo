@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { Angle, Point, Progress, Scale, Thickness } from "../dataClasses";
+import { Angle, DrawingRange, Point, Scale, Thickness } from "../dataClasses";
 import {
     GameMapShape,
     GameMapShapeId,
@@ -38,7 +38,7 @@ describe("isShapeName", () => {
     });
 
     test("6", () => {
-        const result = isShapeName(ShapeNameEnum.redoDot.name);
+        const result = isShapeName(ShapeNameEnum.redo.name);
         expect(result).toBeTruthy();
     });
 
@@ -94,7 +94,7 @@ describe("copyWith", () => {
         new Scale(Scale.min, Scale.min),
         new Angle(Angle.min),
         false,
-        new Progress(Progress.min),
+        new DrawingRange(DrawingRange.min),
         new Point(Point.min, Point.min),
         new GameMapShapeId("id"),
     );
@@ -113,7 +113,7 @@ describe("copyWith", () => {
             new Scale(Scale.min + 1, Scale.min + 1),
             new Angle(Angle.min + 1),
             false,
-            new Progress(Progress.min + 1),
+            new DrawingRange(DrawingRange.min + 1),
             new Point(Point.min + 1, Point.min + 1),
             new GameMapShapeId("id"),
         );
@@ -125,7 +125,7 @@ describe("copyWith", () => {
             scale: newItem.scale,
             angle: newItem.angle,
             flip: newItem.flip,
-            progress: newItem.progress,
+            drawingRange: newItem.drawingRange,
             point: newItem.point,
             id: newItem.id,
         });
@@ -142,7 +142,7 @@ describe("find", () => {
         new Scale(0, 0),
         new Angle(0),
         false,
-        new Progress(0),
+        new DrawingRange(0),
         new Point(0, 0),
         new GameMapShapeId("id"),
     );
@@ -168,7 +168,7 @@ describe("findIndex", () => {
         new Scale(0, 0),
         new Angle(0),
         false,
-        new Progress(0),
+        new DrawingRange(0),
         new Point(0, 0),
         new GameMapShapeId("id"),
     );
@@ -194,7 +194,7 @@ test("added", () => {
         new Scale(0, 0),
         new Angle(0),
         false,
-        new Progress(0),
+        new DrawingRange(0),
         new Point(0, 0),
         new GameMapShapeId("id"),
     );
@@ -205,7 +205,7 @@ test("added", () => {
 });
 
 test("replaced", () => {
-    const item1 = new GameMapShape(
+    const item = new GameMapShape(
         ShapeNameEnum.circle.name,
         new Thickness(0),
         ShapeColorEnum.black.name,
@@ -213,25 +213,25 @@ test("replaced", () => {
         new Scale(0, 0),
         new Angle(0),
         false,
-        new Progress(0),
+        new DrawingRange(0),
         new Point(0, 0),
         new GameMapShapeId("id1"),
     );
-    const item2 = new GameMapShape(
-        ShapeNameEnum.circle.name,
+    const list = new GameMapShapeList(item);
+    const newItem = new GameMapShape(
+        ShapeNameEnum.minus.name,
         new Thickness(0),
         ShapeColorEnum.black.name,
         false,
         new Scale(0, 0),
         new Angle(0),
         false,
-        new Progress(0),
+        new DrawingRange(0),
         new Point(0, 0),
-        new GameMapShapeId("id2"),
+        item.id,
     );
-    const list = new GameMapShapeList(item1);
-    const result = list.replaced(item1.id, item2);
-    const expected = new GameMapShapeList(item2);
+    const result = list.replaced(newItem);
+    const expected = new GameMapShapeList(newItem);
     expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
 });
 
@@ -244,7 +244,7 @@ test("removed", () => {
         new Scale(0, 0),
         new Angle(0),
         false,
-        new Progress(0),
+        new DrawingRange(0),
         new Point(0, 0),
         new GameMapShapeId("id"),
     );
@@ -263,7 +263,7 @@ describe("moved", () => {
         new Scale(0, 0),
         new Angle(0),
         false,
-        new Progress(0),
+        new DrawingRange(0),
         new Point(0, 0),
         new GameMapShapeId("id1"),
     );
@@ -275,7 +275,7 @@ describe("moved", () => {
         new Scale(0, 0),
         new Angle(0),
         false,
-        new Progress(0),
+        new DrawingRange(0),
         new Point(0, 0),
         new GameMapShapeId("id2"),
     );

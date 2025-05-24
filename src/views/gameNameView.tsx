@@ -39,13 +39,14 @@ const EditGameNameDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const [gameName, setGameName] = useAtom(gameNameAtom);
 
     const handleButtonClick = () => {
         setStrategyMemo((v) => {
             const newStrategyMemo = v.replacedGameName(gameName);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setIsOpen(false);

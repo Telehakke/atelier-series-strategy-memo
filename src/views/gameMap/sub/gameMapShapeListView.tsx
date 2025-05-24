@@ -19,13 +19,13 @@ const GameMapShapeListView = ({ gameMap }: { gameMap: GameMap }) => {
 
     // マップ上のアイテムが選択された場合はそのアイテムだけを表示する
     const filteredGameMapShapes = selectionManager.boardItems.isNotEmpty
-        ? gameMap.gameMapShapes.items.filter((v) =>
+        ? gameMap.gameMapShapes.filter((v) =>
               selectionManager.boardItems.hasId(v.id),
           )
         : gameMap.gameMapShapes.items;
 
     return (
-        <div className="space-y-2 pb-60">
+        <div className="flex flex-col items-center gap-2 pb-60">
             {filteredGameMapShapes.map((v) => (
                 <Card key={v.id.value} gameMapShape={v} />
             ))}
@@ -93,61 +93,89 @@ const Card = ({ gameMapShape }: { gameMapShape: GameMapShape }) => {
 };
 
 const Contents = ({ gameMapShape }: { gameMapShape: GameMapShape }) => {
-    return (
-        <div className="flex max-sm:flex-col">
-            <div className="flex gap-2">
-                <TextWithLabel label="座標x">
-                    {gameMapShape.point.x}
-                </TextWithLabel>
-                <TextWithLabel label="座標y">
-                    {gameMapShape.point.y}
-                </TextWithLabel>
-                <TextWithLabel label="線幅">
-                    {gameMapShape.thickness.value}
-                </TextWithLabel>
-                <TextWithLabel label="色">
-                    {GameMapShapeUtility.translateShapeColor(
-                        gameMapShape.color,
-                    )}
-                </TextWithLabel>
-                <TextWithLabel label="塗り">
-                    {gameMapShape.fill ? "Yes" : "No"}
-                </TextWithLabel>
+    const TextWithLabel = ({
+        label,
+        children,
+    }: {
+        label: string;
+        children?: ReactNode;
+    }) => {
+        return (
+            <div className="p-1">
+                <p className={`font-bold ${Text.neutral500}`}>{label}</p>
+                <p className={`whitespace-pre-wrap ${Bg.neutral100_900}`}>
+                    {children}
+                </p>
             </div>
-            <div className="flex gap-2">
-                <TextWithLabel label="ズームx">
-                    {gameMapShape.scale.x}%
-                </TextWithLabel>
-                <TextWithLabel label="ズームy">
-                    {gameMapShape.scale.y}%
-                </TextWithLabel>
-                <TextWithLabel label="角度">
-                    {gameMapShape.angle.value}
-                </TextWithLabel>
-                <TextWithLabel label="反転">
-                    {gameMapShape.flip ? "Yes" : "No"}
-                </TextWithLabel>
-                <TextWithLabel label="描画範囲">
-                    {gameMapShape.progress.value}%
-                </TextWithLabel>
-            </div>
-        </div>
-    );
-};
+        );
+    };
 
-const TextWithLabel = ({
-    label,
-    children,
-}: {
-    label: string;
-    children?: ReactNode;
-}) => {
+    const X = () => (
+        <TextWithLabel label="座標x">{gameMapShape.point.x}</TextWithLabel>
+    );
+
+    const Y = () => (
+        <TextWithLabel label="座標y">{gameMapShape.point.y}</TextWithLabel>
+    );
+
+    const LineWidth = () => (
+        <TextWithLabel label="線幅">
+            {gameMapShape.thickness.value}
+        </TextWithLabel>
+    );
+
+    const Color = () => (
+        <TextWithLabel label="色">
+            {GameMapShapeUtility.translateShapeColor(gameMapShape.color)}
+        </TextWithLabel>
+    );
+
+    const IsFill = () => (
+        <TextWithLabel label="塗り">
+            {gameMapShape.fill ? "Yes" : "No"}
+        </TextWithLabel>
+    );
+
+    const ZoomX = () => (
+        <TextWithLabel label="ズームx">{gameMapShape.scale.x}%</TextWithLabel>
+    );
+
+    const ZoomY = () => (
+        <TextWithLabel label="ズームy">{gameMapShape.scale.y}%</TextWithLabel>
+    );
+
+    const Angle = () => (
+        <TextWithLabel label="角度">{gameMapShape.angle.value}</TextWithLabel>
+    );
+
+    const IsFlip = () => (
+        <TextWithLabel label="反転">
+            {gameMapShape.flip ? "Yes" : "No"}
+        </TextWithLabel>
+    );
+
+    const DrawingRange = () => (
+        <TextWithLabel label="描画範囲">
+            {gameMapShape.drawingRange.value}%
+        </TextWithLabel>
+    );
+
     return (
-        <div className="p-1">
-            <p className={`font-bold ${Text.neutral500}`}>{label}</p>
-            <p className={`whitespace-pre-wrap ${Bg.neutral100_900}`}>
-                {children}
-            </p>
+        <div className="flex gap-2 max-sm:flex-col max-sm:gap-0">
+            <div className="flex gap-2">
+                <X />
+                <Y />
+                <LineWidth />
+                <Color />
+                <IsFill />
+            </div>
+            <div className="flex gap-2">
+                <ZoomX />
+                <ZoomY />
+                <Angle />
+                <IsFlip />
+                <DrawingRange />
+            </div>
         </div>
     );
 };

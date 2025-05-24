@@ -13,7 +13,6 @@ import LocalStorage from "../../../models/localStorage";
 import { Memo, MemoIdList } from "../../../models/memo";
 import MemoFilter from "../../../models/memoFilter";
 import Split from "../../../models/split";
-
 import CardBase from "../../commons/cardBase";
 
 const MemoListView = () => {
@@ -25,7 +24,7 @@ const MemoListView = () => {
     );
 
     return (
-        <div className="space-y-2 pb-60">
+        <div className="flex flex-col items-center gap-2 pb-60">
             {filteredMemos.map((v) => (
                 <Card key={v.id.value} memo={v} />
             ))}
@@ -73,12 +72,12 @@ const Card = ({ memo }: { memo: Memo }) => {
     ) => {
         if (isReadonly) return;
 
-        const newMemo = memo.copyWith({ checked: event.target.checked });
         setStrategyMemo((v) => {
-            const newMemos = v.memos.replaced(memo.id, newMemo);
+            const newMemo = memo.copyWith({ checked: event.target.checked });
+            const newMemos = v.memos.replaced(newMemo);
             const newStrategyMemo = v.replacedMemos(newMemos);
             setMemos(newStrategyMemo.memos);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
     };

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { Angle, Point, Progress, Scale, Thickness } from "../dataClasses";
+import { Angle, DrawingRange, Point, Scale, Thickness } from "../dataClasses";
 
 describe("Point", () => {
     test("1", () => {
@@ -139,18 +139,18 @@ describe("Angle", () => {
 
 describe("Progress", () => {
     test("1", () => {
-        const result = new Progress(12.5);
+        const result = new DrawingRange(12.5);
         expect(result.value).toBe(12.5);
     });
 
     test("2", () => {
-        const min = Progress.min;
-        const result = new Progress(min - 1);
+        const min = DrawingRange.min;
+        const result = new DrawingRange(min - 1);
         expect(result.value).toBe(min);
     });
 
     test("3", () => {
-        const result = new Progress(Progress.max + 1);
-        expect(result.value).toBe(Progress.min);
+        const result = new DrawingRange(DrawingRange.max + 1);
+        expect(result.value).toBe(DrawingRange.min);
     });
 });

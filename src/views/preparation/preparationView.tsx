@@ -22,20 +22,23 @@ export default PreparationView;
 /* -------------------------------------------------------------------------- */
 
 const LeftPanel = () => {
-    const isLeftPanelOpened = useAtomValue(isLeftPanelOpenAtom);
+    const isLeftPanelOpen = useAtomValue(isLeftPanelOpenAtom);
+
+    const flex = "flex flex-col gap-2";
+    const fixedToLeft = "fixed top-13 left-0 z-5";
+    const border = `border-r-2 ${Border.neutral300_800}`;
+    const showPanel = `${isLeftPanelOpen ? "" : "hidden"}`;
 
     return (
         <div
-            className={`fixed top-0 left-0 z-5 flex h-full border-r-2 p-2 pt-14 ${Bg.neutral50_950} ${Border.neutral300_800} ${isLeftPanelOpened ? "" : "hidden"}`}
+            className={`h-full w-51 p-2 ${flex} ${fixedToLeft} ${border} ${showPanel} ${Bg.neutral50_950}`}
         >
             <div
-                className={`divide-y-2 overflow-auto ${Divide.neutral300_800}`}
+                className={`space-y-2 divide-y-2 overflow-auto overscroll-contain ${Divide.neutral300_800}`}
                 style={{ scrollbarWidth: "thin" }}
             >
-                <div>
-                    <PreparationFilteringTextField className="mb-1" />
-                </div>
-                <PreparationLinkView className="py-2" />
+                <PreparationFilteringTextField className="pb-2" />
+                <PreparationLinkView className="pb-13" />
             </div>
         </div>
     );

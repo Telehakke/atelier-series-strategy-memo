@@ -80,7 +80,7 @@ export class StrategyMemo {
         const newGameMap = gameMap.copyWith({
             gameMapDetails: newItems,
         });
-        const newGameMaps = this.gameMaps.replaced(gameMap.id, newGameMap);
+        const newGameMaps = this.gameMaps.replaced(newGameMap);
         return this.replacedGameMaps(newGameMaps);
     };
 
@@ -91,7 +91,7 @@ export class StrategyMemo {
         const newGameMap = gameMap.copyWith({
             gameMapShapes: newItems,
         });
-        const newGameMaps = this.gameMaps.replaced(gameMap.id, newGameMap);
+        const newGameMaps = this.gameMaps.replaced(newGameMap);
         return this.replacedGameMaps(newGameMaps);
     };
 

@@ -8,6 +8,7 @@ import {
     gameMapShapeEditModeAtom,
     gameMapShapeSelectionManagerAtom,
     isGameMapDetailEditModeAtom,
+    isReadonlyAtom,
     selectedGameMapIdAtom,
     strategyMemoAtom,
 } from "../../../atoms";
@@ -26,12 +27,12 @@ import {
     ClipboardCopyIconLargeButton,
     ClipboardPasteIconLargeButton,
     FilesIconLargeButton,
-    LargeIconButton,
     largeIconClassName,
     PencilIconLargeButton,
     PlusIconLargeButton,
     ShapesIconLargeButton,
     TrashIconLargeButton,
+    VerticalSegmentedIconButton,
     XIconLargeButton,
 } from "../../commons/iconButtons";
 import { GameMapShapeEditModeEnum } from "./gameMapShapeBoardControllers/gameMapShapeBoardController";
@@ -42,42 +43,21 @@ const GameMapShapeListController = ({ className }: { className?: string }) => {
     const selectedGameMapId = useAtomValue(selectedGameMapIdAtom);
     if (selectedGameMapId == null) return <></>;
 
-    if (
-        selectionManager.controllerType === ControllerTypeEnum.list &&
-        copiedItems.isEmpty
-    )
+    if (selectionManager.controllerType === ControllerTypeEnum.list)
         return (
-            <div className={`flex gap-4 ${className}`}>
-                <div className="flex flex-col justify-end gap-4">
-                    <SelectionModeToggleButton />
-                </div>
-                <div className="flex flex-col justify-end gap-4">
-                    <EditItemButton />
-                    <CopyButton
+            <div className={className}>
+                {copiedItems.isEmpty ? (
+                    <ItemActionButtons
                         gameMapId={selectedGameMapId}
                         setCopiedItems={setCopiedItems}
                     />
-                    <RemoveItemButton gameMapId={selectedGameMapId} />
-                </div>
-                <div className="flex flex-col justify-end gap-4">
-                    <MoveItemUpButton gameMapId={selectedGameMapId} />
-                    <MoveItemDownButton gameMapId={selectedGameMapId} />
-                    <XButton />
-                </div>
-            </div>
-        );
-
-    if (
-        selectionManager.controllerType === ControllerTypeEnum.list &&
-        copiedItems.isNotEmpty
-    )
-        return (
-            <div className={className}>
-                <PasteAndXButtons
-                    gameMapId={selectedGameMapId}
-                    copiedItems={copiedItems}
-                    setCopiedItems={setCopiedItems}
-                />
+                ) : (
+                    <PasteAndXButtons
+                        gameMapId={selectedGameMapId}
+                        copiedItems={copiedItems}
+                        setCopiedItems={setCopiedItems}
+                    />
+                )}
             </div>
         );
 
@@ -98,7 +78,46 @@ export default GameMapShapeListController;
 
 /* -------------------------------------------------------------------------- */
 
+const ItemActionButtons = ({
+    gameMapId,
+    setCopiedItems,
+}: {
+    gameMapId: GameMapId;
+    setCopiedItems: React.Dispatch<React.SetStateAction<GameMapShapeList>>;
+}) => {
+    const HStack = ({ children }: { children: ReactNode }) => (
+        <div className={"flex gap-4"}>{children}</div>
+    );
+
+    const VStack = ({ children }: { children: ReactNode }) => (
+        <div className={"flex flex-col justify-end gap-4"}>{children}</div>
+    );
+
+    return (
+        <HStack>
+            <VStack>
+                <SelectionModeToggleButton />
+            </VStack>
+            <VStack>
+                <EditItemButton />
+                <CopyButton
+                    gameMapId={gameMapId}
+                    setCopiedItems={setCopiedItems}
+                />
+                <RemoveItemButton gameMapId={gameMapId} />
+            </VStack>
+            <VStack>
+                <MoveItemButton gameMapId={gameMapId} />
+                <XButton />
+            </VStack>
+        </HStack>
+    );
+};
+
+/* -------------------------------------------------------------------------- */
+
 const AddItemButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const setSelectionManager = useSetAtom(gameMapShapeSelectionManagerAtom);
@@ -116,7 +135,7 @@ const AddItemButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
                 newGameMapShapes,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         // アイテムを追加したら、マップ上で連動するアイテムを選択状態にする
@@ -195,6 +214,7 @@ const RemoveItemDialog = ({
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const [selectionManager, setSelectionManager] = useAtom(
@@ -206,16 +226,16 @@ const RemoveItemDialog = ({
             const gameMap = v.gameMaps.find(gameMapId);
             if (gameMap == null) return v;
 
-            let newGameMapShapes = gameMap.gameMapShapes;
-            selectionManager.listItems.items.forEach((id) => {
-                newGameMapShapes = newGameMapShapes.removed(id);
-            });
+            const newGameMapShapes = selectionManager.listItems.reduce(
+                (gameMapShapes, id) => gameMapShapes.removed(id),
+                gameMap.gameMapShapes,
+            );
             const newStrategyMemo = v.replacedGameMapShapes(
                 gameMap,
                 newGameMapShapes,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
         setSelectionManager((v) =>
@@ -242,55 +262,18 @@ const RemoveItemDialog = ({
 
 /* -------------------------------------------------------------------------- */
 
-const MoveItemUpButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
-    const selectionManager = useAtomValue(gameMapShapeSelectionManagerAtom);
-    if (selectionManager.listItems.length !== 1) return <></>;
-
-    const id = selectionManager.listItems.at(0)!;
-
-    return (
-        <MoveItemButton
-            gameMapId={gameMapId}
-            description="上へ移動"
-            action={(gameMapShapes) => gameMapShapes.movedUp(id)}
-        >
-            <ChevronUp className={largeIconClassName} />
-        </MoveItemButton>
-    );
-};
-
-const MoveItemDownButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
-    const selectionManager = useAtomValue(gameMapShapeSelectionManagerAtom);
-    if (selectionManager.listItems.length !== 1) return <></>;
-
-    const id = selectionManager.listItems.at(0)!;
-
-    return (
-        <MoveItemButton
-            gameMapId={gameMapId}
-            description="下へ移動"
-            action={(gameMapShapes) => gameMapShapes.movedDown(id)}
-        >
-            <ChevronDown className={largeIconClassName} />
-        </MoveItemButton>
-    );
-};
-
-const MoveItemButton = ({
-    gameMapId,
-    description,
-    action,
-    children,
-}: {
-    gameMapId: GameMapId;
-    description: string;
-    action: (gameMapShapes: GameMapShapeList) => GameMapShapeList;
-    children: ReactNode;
-}) => {
+const MoveItemButton = ({ gameMapId }: { gameMapId: GameMapId }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
+    const selectionManager = useAtomValue(gameMapShapeSelectionManagerAtom);
+    if (selectionManager.listItems.length !== 1) return <></>;
 
-    const handleClick = () => {
+    const id = selectionManager.listItems.at(0)!;
+
+    const moveItem = (
+        action: (gameMapShapes: GameMapShapeList) => GameMapShapeList,
+    ) => {
         setStrategyMemo((v) => {
             const gameMap = v.gameMaps.find(gameMapId);
             if (gameMap == null) return v;
@@ -301,19 +284,25 @@ const MoveItemButton = ({
                 newGameMapShapes,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
             return newStrategyMemo;
         });
     };
 
+    const handleTopButtonClick = () =>
+        moveItem((gameMapShapes) => gameMapShapes.movedUp(id));
+
+    const handleBottomButtonClick = () =>
+        moveItem((gameMapShapes) => gameMapShapes.movedDown(id));
+
     return (
-        <LargeIconButton
-            className={`${Bg.yellow500} ${Bg.hoverYellow400} ${Stroke.neutral50}`}
-            description={description}
-            onClick={handleClick}
-        >
-            {children}
-        </LargeIconButton>
+        <VerticalSegmentedIconButton
+            description="移動"
+            topIcon={<ChevronUp className={largeIconClassName} />}
+            bottomIcon={<ChevronDown className={largeIconClassName} />}
+            onTopButtonClick={handleTopButtonClick}
+            onBottomButtonClick={handleBottomButtonClick}
+        />
     );
 };
 
@@ -357,6 +346,7 @@ const PasteAndXButtons = ({
     copiedItems: GameMapShapeList;
     setCopiedItems: React.Dispatch<React.SetStateAction<GameMapShapeList>>;
 }) => {
+    const isReadonly = useAtomValue(isReadonlyAtom);
     const setStrategyMemo = useSetAtom(strategyMemoAtom);
     const setGameMaps = useSetAtom(gameMapsAtom);
     const setSelectionManager = useSetAtom(gameMapShapeSelectionManagerAtom);
@@ -366,21 +356,25 @@ const PasteAndXButtons = ({
             const gameMap = v.gameMaps.find(gameMapId);
             if (gameMap == null) return v;
 
-            let selectedIds = new GameMapShapeIdList();
-            let newGameMapShapes = gameMap.gameMapShapes;
-            copiedItems.forEach((gameMapShape) => {
-                const newGameMapShape = gameMapShape.copyWith({
-                    id: new GameMapShapeId(uuidv4()),
-                });
-                selectedIds = selectedIds.added(newGameMapShape.id);
-                newGameMapShapes = newGameMapShapes.added(newGameMapShape);
-            });
+            const [newGameMapShapes, selectedIds] = copiedItems.reduce(
+                ([gameMapShapes, selectedIds], gameMapShape) => {
+                    const newGameMapShape = gameMapShape.copyWith({
+                        id: new GameMapShapeId(uuidv4()),
+                    });
+
+                    return [
+                        gameMapShapes.added(newGameMapShape),
+                        selectedIds.added(newGameMapShape.id),
+                    ];
+                },
+                [gameMap.gameMapShapes, new GameMapShapeIdList()],
+            );
             const newStrategyMemo = v.replacedGameMapShapes(
                 gameMap,
                 newGameMapShapes,
             );
             setGameMaps(newStrategyMemo.gameMaps);
-            LocalStorage.setStrategyMemo(newStrategyMemo);
+            LocalStorage.setStrategyMemo(newStrategyMemo, isReadonly);
 
             // アイテムを複製したら、マップ上で連動するアイテムを選択状態にする
             setSelectionManager((v) =>
@@ -440,12 +434,13 @@ const SelectionModeToggleButton = () => {
 
     const handleClick = () => setCanSelectMultiple((v) => !v);
 
-    const backgroundColor = canSelectMultiple ? Bg.blue500 : Bg.neutral500;
-    const hoverColor = canSelectMultiple ? Bg.hoverBlue400 : Bg.hoverNeutral400;
+    const backgroundColor = canSelectMultiple
+        ? `${Bg.blue500} ${Bg.hoverBlue400}`
+        : `${Bg.neutral500} ${Bg.hoverNeutral400}`;
 
     return (
         <FilesIconLargeButton
-            className={`${backgroundColor} ${hoverColor} ${Stroke.neutral50}`}
+            className={`${backgroundColor} ${Stroke.neutral50}`}
             description={canSelectMultiple ? "複数選択ON" : "複数選択OFF"}
             onClick={handleClick}
         />

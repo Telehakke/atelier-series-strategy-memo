@@ -40,11 +40,11 @@ test("added", () => {
 });
 
 test("replaced", () => {
-    const item1 = new Memo("", "", false, new MemoId("id1"));
-    const item2 = new Memo("", "", false, new MemoId("id2"));
-    const list = new MemoList(item1);
-    const result = list.replaced(item1.id, item2);
-    const expected = new MemoList(item2);
+    const item = new Memo("", "", false, new MemoId("id1"));
+    const list = new MemoList(item);
+    const newItem = new Memo("", "", false, item.id);
+    const result = list.replaced(newItem);
+    const expected = new MemoList(newItem);
     expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
 });
 

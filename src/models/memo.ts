@@ -34,12 +34,17 @@ export class Memo implements WithId {
         this.id = id;
     }
 
-    static create = (
-        title: string,
-        text: string,
-        checked: boolean,
-        id: MemoId,
-    ): Memo => new Memo(title.trim(), text.trim(), checked, id);
+    static create = ({
+        title,
+        text,
+        checked,
+        id,
+    }: {
+        title: string;
+        text: string;
+        checked: boolean;
+        id: MemoId;
+    }): Memo => new Memo(title.trim(), text.trim(), checked, id);
 
     copyWith = (obj?: {
         title?: string;
@@ -74,8 +79,8 @@ export class MemoList extends ListWithId<Memo, MemoId> {
 
     added = (item: Memo): MemoList => new MemoList(...this.helperAdded(item));
 
-    replaced = (targetId: MemoId, newItem: Memo): MemoList =>
-        new MemoList(...this.helperReplaced(targetId, newItem));
+    replaced = (newItem: Memo): MemoList =>
+        new MemoList(...this.helperReplaced(newItem));
 
     removed = (targetId: MemoId): MemoList =>
         new MemoList(...this.helperRemoved(targetId));

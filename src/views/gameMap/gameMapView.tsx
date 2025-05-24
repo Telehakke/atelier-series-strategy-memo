@@ -14,9 +14,7 @@ import GameMapDetailLinkView from "./sub/gameMapDetailLinkView";
 import GameMapDetailListController from "./sub/gameMapDetailListController";
 import GameMapDetailListView from "./sub/gameMapDetailListView";
 import GameMapFilteringTextField from "./sub/gameMapFilteringTextField";
-import GameMapListController, {
-    AddGameMapButton,
-} from "./sub/gameMapListController";
+import GameMapListController from "./sub/gameMapListController";
 import GameMapListView from "./sub/gameMapListView";
 import GameMapShapeBoardController from "./sub/gameMapShapeBoardControllers/gameMapShapeBoardController";
 import GameMapShapeListController from "./sub/gameMapShapeListController";
@@ -40,30 +38,25 @@ export default GameMapView;
 /* -------------------------------------------------------------------------- */
 
 const LeftPanel = () => {
-    const isLeftPanelOpened = useAtomValue(isLeftPanelOpenAtom);
-    const isReadonly = useAtomValue(isReadonlyAtom);
+    const isLeftPanelOpen = useAtomValue(isLeftPanelOpenAtom);
+
+    const flex = "flex flex-col gap-2";
+    const fixedToLeft = "fixed top-13 left-0 z-5";
+    const border = `border-r-2 ${Border.neutral300_800}`;
+    const showPanel = `${isLeftPanelOpen ? "" : "hidden"}`;
 
     return (
         <div
-            className={`fixed top-0 left-0 z-5 flex h-full flex-col gap-2 border-r-2 p-2 pt-14 ${Bg.neutral50_950} ${Border.neutral300_800} ${isLeftPanelOpened ? "" : "hidden"}`}
+            className={`h-full w-51 p-2 ${flex} ${fixedToLeft} ${border} ${showPanel} ${Bg.neutral50_950}`}
         >
-            {!isReadonly && <GameMapListController />}
+            <GameMapListController />
             <div
-                className={`divide-y-2 overflow-auto ${Divide.neutral300_800}`}
-                style={{
-                    scrollbarWidth: "thin",
-                }}
+                className={`space-y-2 divide-y-2 overflow-auto overscroll-contain ${Divide.neutral300_800}`}
+                style={{ scrollbarWidth: "thin" }}
             >
-                <div className="flex flex-col gap-2 pb-2">
-                    <GameMapListView />
-                    {!isReadonly && (
-                        <AddGameMapButton className="self-center" />
-                    )}
-                </div>
-                <div>
-                    <GameMapFilteringTextField className="my-1" />
-                </div>
-                <GameMapDetailLinkView className="py-2" />
+                <GameMapListView className="pb-2" />
+                <GameMapFilteringTextField className="pb-2" />
+                <GameMapDetailLinkView className="pb-13" />
             </div>
         </div>
     );

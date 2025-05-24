@@ -48,6 +48,7 @@ export const Ring = {
 } as const;
 
 export const Divide = {
+    neutral50: "divide-neutral-50",
     neutral300_800: "divide-neutral-300 dark:divide-neutral-800",
     neutral950_300: "divide-neutral-950 dark:divide-neutral-300",
 } as const;

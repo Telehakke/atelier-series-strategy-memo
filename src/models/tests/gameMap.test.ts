@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { Angle, Point, Progress, Scale, Thickness } from "../dataClasses";
+import { Angle, DrawingRange, Point, Scale, Thickness } from "../dataClasses";
 import { GameMap, GameMapId, GameMapList } from "../gameMap";
 import {
     GameMapDetail,
@@ -53,7 +53,7 @@ describe("copyWith", () => {
                     new Scale(0, 0),
                     new Angle(0),
                     false,
-                    new Progress(0),
+                    new DrawingRange(0),
                     new Point(0, 0),
                     new GameMapShapeId(""),
                 ),
@@ -149,24 +149,24 @@ test("added", () => {
     expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
 });
 
-test("changed", () => {
-    const item1 = new GameMap(
+test("replaced", () => {
+    const item = new GameMap(
         "",
         new GameMapDetailList(),
         new GameMapShapeList(),
         "",
         new GameMapId("id1"),
     );
-    const item2 = new GameMap(
-        "",
+    const list = new GameMapList(item);
+    const newItem = new GameMap(
+        "name",
         new GameMapDetailList(),
         new GameMapShapeList(),
         "",
-        new GameMapId("id2"),
+        item.id,
     );
-    const list = new GameMapList(item1);
-    const result = list.replaced(item1.id, item2);
-    const expected = new GameMapList(item2);
+    const result = list.replaced(newItem);
+    const expected = new GameMapList(newItem);
     expect(JSON.stringify(result)).toBe(JSON.stringify(expected));
 });
 

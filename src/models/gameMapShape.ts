@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Angle, Point, Progress, Scale, Thickness } from "./dataClasses";
+import { Angle, DrawingRange, Point, Scale, Thickness } from "./dataClasses";
 import { Id, IdList, ListWithId, WithId } from "./id";
 import { isString } from "./typeGuards";
 
@@ -35,14 +35,14 @@ export const ShapeNameEnum: {
     readonly minus: ShapeNameDetail;
     readonly moveRight: ShapeNameDetail;
     readonly moveHorizontal: ShapeNameDetail;
-    readonly redoDot: ShapeNameDetail;
+    readonly redo: ShapeNameDetail;
 } = {
     square: { name: "square", label: "四角" },
     circle: { name: "circle", label: "円" },
     minus: { name: "minus", label: "直線" },
     moveRight: { name: "moveRight", label: "矢印" },
     moveHorizontal: { name: "moveHorizontal", label: "両矢印" },
-    redoDot: { name: "redoDot", label: "カーブ" },
+    redo: { name: "redo", label: "カーブ" },
 } as const;
 
 export type ShapeName = keyof typeof ShapeNameEnum;
@@ -120,7 +120,7 @@ export class GameMapShape implements WithId {
     readonly scale: Scale;
     readonly angle: Angle;
     readonly flip: boolean;
-    readonly progress: Progress;
+    readonly drawingRange: DrawingRange;
     readonly point: Point;
     readonly id: GameMapShapeId;
 
@@ -132,7 +132,7 @@ export class GameMapShape implements WithId {
         scale: Scale,
         angle: Angle,
         flip: boolean,
-        progress: Progress,
+        drawingRange: DrawingRange,
         point: Point,
         id: GameMapShapeId,
     ) {
@@ -143,7 +143,7 @@ export class GameMapShape implements WithId {
         this.scale = scale;
         this.angle = angle;
         this.flip = flip;
-        this.progress = progress;
+        this.drawingRange = drawingRange;
         this.point = point;
         this.id = id;
     }
@@ -157,7 +157,7 @@ export class GameMapShape implements WithId {
             new Scale(100, 100),
             new Angle(0),
             false,
-            new Progress(100),
+            new DrawingRange(100),
             new Point(50, 50),
             new GameMapShapeId(uuidv4()),
         );
@@ -170,7 +170,7 @@ export class GameMapShape implements WithId {
         scale?: Scale;
         angle?: Angle;
         flip?: boolean;
-        progress?: Progress;
+        drawingRange?: DrawingRange;
         point?: Point;
         id?: GameMapShapeId;
     }): GameMapShape =>
@@ -184,7 +184,7 @@ export class GameMapShape implements WithId {
                   obj.scale ?? this.scale,
                   obj.angle ?? this.angle,
                   obj.flip ?? this.flip,
-                  obj.progress ?? this.progress,
+                  obj.drawingRange ?? this.drawingRange,
                   obj.point ?? this.point,
                   obj.id ?? this.id,
               );
@@ -205,11 +205,8 @@ export class GameMapShapeList extends ListWithId<GameMapShape, GameMapShapeId> {
     added = (item: GameMapShape): GameMapShapeList =>
         new GameMapShapeList(...this.helperAdded(item));
 
-    replaced = (
-        targetId: GameMapShapeId,
-        newItem: GameMapShape,
-    ): GameMapShapeList =>
-        new GameMapShapeList(...this.helperReplaced(targetId, newItem));
+    replaced = (newItem: GameMapShape): GameMapShapeList =>
+        new GameMapShapeList(...this.helperReplaced(newItem));
 
     removed = (targetId: GameMapShapeId): GameMapShapeList =>
         new GameMapShapeList(...this.helperRemoved(targetId));

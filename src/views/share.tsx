@@ -165,7 +165,7 @@ const ImportShareDialog = ({
 
     const handleClick = () => {
         setIsReadonly(false);
-        LocalStorage.setStrategyMemo(strategyMemo);
+        LocalStorage.setStrategyMemo(strategyMemo, false);
 
         const url = new URL(location.href);
         url.search = "";

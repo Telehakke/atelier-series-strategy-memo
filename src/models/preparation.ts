@@ -44,13 +44,19 @@ export class Preparation implements WithId {
         this.id = id;
     }
 
-    static create = (
-        name: string,
-        materials: string,
-        categories: string,
-        checked: boolean,
-        id: PreparationId,
-    ): Preparation =>
+    static create = ({
+        name,
+        materials,
+        categories,
+        checked,
+        id,
+    }: {
+        name: string;
+        materials: string;
+        categories: string;
+        checked: boolean;
+        id: PreparationId;
+    }): Preparation =>
         new Preparation(
             name.trim(),
             Split.byComma(materials),
@@ -75,6 +81,14 @@ export class Preparation implements WithId {
                   obj.checked ?? this.checked,
                   obj.id ?? this.id,
               );
+
+    get materialsToCommaSeparatedStr(): string {
+        return this.materials.join("、");
+    }
+
+    get categoriesToCommaSeparatedStr(): string {
+        return this.categories.join("、");
+    }
 }
 
 export class PreparationList extends ListWithId<Preparation, PreparationId> {
@@ -91,11 +105,8 @@ export class PreparationList extends ListWithId<Preparation, PreparationId> {
     added = (item: Preparation): PreparationList =>
         new PreparationList(...this.helperAdded(item));
 
-    replaced = (
-        targetId: PreparationId,
-        newItem: Preparation,
-    ): PreparationList =>
-        new PreparationList(...this.helperReplaced(targetId, newItem));
+    replaced = (newItem: Preparation): PreparationList =>
+        new PreparationList(...this.helperReplaced(newItem));
 
     removed = (targetId: PreparationId): PreparationList =>
         new PreparationList(...this.helperRemoved(targetId));

@@ -58,18 +58,29 @@ export class GameMapDetail implements WithId {
         this.id = id;
     }
 
-    static create = (
-        name: string,
-        items: string,
-        monsters: string,
-        memo: string,
-        icon: string,
-        x: string,
-        y: string,
-        goto: GameMapId,
-        checked: boolean,
-        id: GameMapDetailId,
-    ): GameMapDetail => {
+    static create = ({
+        name,
+        items,
+        monsters,
+        memo,
+        icon,
+        x,
+        y,
+        goto,
+        checked,
+        id,
+    }: {
+        name: string;
+        items: string;
+        monsters: string;
+        memo: string;
+        icon: string;
+        x: string;
+        y: string;
+        goto: GameMapId;
+        checked: boolean;
+        id: GameMapDetailId;
+    }): GameMapDetail => {
         let validX = parseInt(x);
         if (isNaN(validX)) validX = 0;
 
@@ -113,6 +124,14 @@ export class GameMapDetail implements WithId {
                   obj.checked ?? this.checked,
                   obj.id ?? this.id,
               );
+
+    get itemsToCommaSeparatedStr(): string {
+        return this.items.join("、");
+    }
+
+    get monstersToCommaSeparatedStr(): string {
+        return this.monsters.join("、");
+    }
 }
 
 export class GameMapDetailList extends ListWithId<
@@ -133,11 +152,8 @@ export class GameMapDetailList extends ListWithId<
     added = (item: GameMapDetail): GameMapDetailList =>
         new GameMapDetailList(...this.helperAdded(item));
 
-    replaced = (
-        targetId: GameMapDetailId,
-        newItem: GameMapDetail,
-    ): GameMapDetailList =>
-        new GameMapDetailList(...this.helperReplaced(targetId, newItem));
+    replaced = (newItem: GameMapDetail): GameMapDetailList =>
+        new GameMapDetailList(...this.helperReplaced(newItem));
 
     removed = (targetId: GameMapDetailId): GameMapDetailList =>
         new GameMapDetailList(...this.helperRemoved(targetId));
